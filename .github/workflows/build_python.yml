@@ -19,6 +19,7 @@ env:
 jobs:
   build_linux:
     name: Linux ${{ inputs.python_version }} ${{ matrix.arch }}
+    if: false
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -80,6 +81,7 @@ jobs:
 
   build_windows:
     name: Windows x86_64 ${{ inputs.python_version }} (build)
+    if: false
     runs-on: windows-latest
 
     steps:
@@ -108,6 +110,7 @@ jobs:
 
   test_windows:
     name: Windows x86_64 ${{ inputs.python_version }} (test)
+    if: false
     needs: build_windows
     runs-on: windows-latest
 
@@ -128,3 +131,48 @@ jobs:
 
           # make tests nonfatal for now
           ./bin/python -m test || true
+
+  build_macos:
+    name: MacOS universal2 ${{ inputs.python_version }}
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build
+        run: |
+          set -ex
+
+          PYTHON_FULL_VER=${{ inputs.python_version }}
+          WORKDIR=$(pwd)
+          ARCH=universal2
+
+          git clone https://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
+
+          mkdir python-build
+          mkdir python-install
+          cd python-build
+
+          cmake \
+            -DPYTHON_VERSION=${PYTHON_FULL_VER} \
+            -DCMAKE_BUILD_TYPE:STRING=Release \
+            -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/python-install \
+            -DBUILD_EXTENSIONS_AS_BUILTIN=ON \
+            -DBUILD_LIBPYTHON_SHARED=ON \
+            -DBUILD_TESTING=ON \
+            ../python-cmake-buildsystem
+          make -j8
+          make install
+
+          cd ${WORKDIR}/python-build
+          tar -czf ${WORKDIR}/build-python-${PYTHON_FULL_VER}-darwin-${ARCH}.tar.gz .
+          cd ${WORKDIR}
+          mv python-install python-${PYTHON_FULL_VER}-darwin-${ARCH}
+          tar -czf python-${PYTHON_FULL_VER}-darwin-${ARCH}.tar.gz python-${PYTHON_FULL_VER}-darwin-${ARCH}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: python
+          path: ./*python*.tar.gz
