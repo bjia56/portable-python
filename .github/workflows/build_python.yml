@@ -148,6 +148,8 @@ jobs:
           WORKDIR=$(pwd)
           ARCH=universal2
 
+          export MACOSX_DEPLOYMENT_TARGET=11
+
           git clone https://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
 
           mkdir python-build
