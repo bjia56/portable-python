@@ -1,0 +1,18 @@
+name: Build Python on branch
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ${{ matrix.python_version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python_version: [ 3.8.17, 3.9.17 ]
+    uses: ./.github/workflows/build_python.yml
+    with:
+      python_version: ${{ matrix.python_version }}

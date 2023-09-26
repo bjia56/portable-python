@@ -1,0 +1,106 @@
+name: Build Python
+
+on:
+  workflow_dispatch:
+    inputs:
+      python_version:
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      python_version:
+        required: true
+        type: string
+
+env:
+  image_map: '{"x86_64": "debian:buster", "aarch64": "debian:buster", "armv7l": "debian:buster"}'
+  platform_map: '{"x86_64": "linux/amd64", "aarch64": "linux/arm64/v8", "armv7l": "linux/arm/v7"}'
+
+jobs:
+  build_linux:
+    name: Linux ${{ inputs.python_version }} ${{ matrix.arch }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [ x86_64, aarch64, armv7l ]
+
+    steps:
+      - name: Parse image
+        id: parse_image
+        run: |
+          IMAGE=$(echo ${{ toJSON(env.image_map) }} | jq -r '.["${{ matrix.arch }}"]')
+          echo "::set-output name=image::$IMAGE"
+
+      - name: Parse platform
+        id: parse_platform
+        run: |
+          PLATFORM=$(echo ${{ toJSON(env.platform_map) }} | jq -r '.["${{ matrix.arch }}"]')
+          echo "::set-output name=platform::$PLATFORM"
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        if: ${{ matrix.arch != 'x86_64' }}
+
+      - name: Build
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ${{ steps.parse_image.outputs.image }}
+          options: -v ${{ github.workspace }}:/work --workdir /tmp --platform ${{ steps.parse_platform.outputs.platform }}
+          run: |
+            set -e
+            /work/scripts/build_linux.sh ${{ matrix.arch }} ${{ inputs.python_version }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        if: ${{ always() }}
+        with:
+          name: python
+          path: ./*python*.tar.gz
+
+      - name: Test python in clean environment
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ${{ steps.parse_image.outputs.image }}
+          options: -v ${{ github.workspace }}:/work --workdir /tmp --platform ${{ steps.parse_platform.outputs.platform }}
+          run: |
+            set -e
+
+            cp /work/python*.tar.gz .
+            tar -xzf ./python*.tar.gz
+            ldd -v -r ./bin/python || true
+            ./bin/python --version
+
+            # make tests nonfatal for now
+            ./bin/python -m test || true
+
+  build_windows:
+    name: Windows x86_64 ${{ inputs.python_version }}
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure build for x86_64
+        uses: ilammy/msvc-dev-cmd@v1.12.1
+
+      - name: Remove Strawberry
+        shell: pwsh
+        run: |
+          Rename-Item c:\strawberry strawberry2
+
+      - name: Build
+        shell: bash
+        run: |
+          set -ex
+          ./scripts/build_windows.sh x86_64 ${{ inputs.python_version }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: python
+          path: ./*python*.tar.gz
