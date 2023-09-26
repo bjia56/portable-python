@@ -4,6 +4,7 @@ ARCH=$1
 PYTHON_FULL_VER=$2
 
 WORKDIR=$(pwd)
+NPROC=$(sysctl -n hw.logicalcpu)
 
 set -ex
 
@@ -34,7 +35,7 @@ tar -xf openssl-1.1.1w.tar.gz
 mkdir deps/openssl
 cd openssl-1.1.1w
 ./Configure enable-rc5 zlib no-asm darwin64-x86_64-cc --prefix=${WORKDIR}/deps/openssl
-make
+make -j${NPROC}
 make install
 
 unset CC
@@ -55,7 +56,7 @@ cmake \
   -G "Unix Makefiles" \
   -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/deps/bzip2 \
   ..
-make
+make -j${NPROC}
 make install
 
 echo "::endgroup::"
@@ -74,7 +75,7 @@ cmake \
   -G "Unix Makefiles" \
   -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/deps/xz \
   ..
-make
+make -j${NPROC}
 make install
 
 echo "::endgroup::"
@@ -89,7 +90,7 @@ tar -xf sqlite-autoconf-3430100.tar.gz
 mkdir deps/sqlite3
 cd sqlite-autoconf-3430100
 ./configure --prefix ${WORKDIR}/deps/sqlite3
-make
+make -j${NPROC}
 make install
 
 echo "::endgroup::"
@@ -109,7 +110,7 @@ cmake \
   -G "Unix Makefiles" \
   -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/deps/zlib \
   ..
-make
+make -j${NPROC}
 make install
 
 echo "::endgroup::"
@@ -128,7 +129,7 @@ cmake \
   -G "Unix Makefiles" \
   -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/deps/libffi \
   ..
-make
+make -j${NPROC}
 make install
 
 echo "::endgroup::"
@@ -160,7 +161,7 @@ cmake \
   -DLibFFI_INCLUDE_DIR:PATH=${WORKDIR}/deps/libffi/include \
   -DLibFFI_LIBRARY:FILEPATH=${WORKDIR}/deps/libffi/lib/ffi_static.lib \
   ../python-cmake-buildsystem
-make
+make -j${NPROC}
 make install
 cd ${WORKDIR}
 
