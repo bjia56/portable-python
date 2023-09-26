@@ -142,7 +142,7 @@ make install
 cd ${WORKDIR}
 mkdir libffi-arm64-out
 cd libffi-3.4.2-arm64
-./configure --prefix ${WORKDIR}/libffi-arm64-out --build=aarch64-apple-darwin 
+./configure --prefix ${WORKDIR}/libffi-arm64-out --build=aarch64-apple-darwin20.0.0 
 make -j${NPROC}
 make install
 
