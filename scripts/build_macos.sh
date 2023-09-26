@@ -38,8 +38,6 @@ cd openssl-1.1.1w
 make -j${NPROC}
 make install
 
-unset CC
-
 echo "::endgroup::"
 #########
 # bzip2 #
