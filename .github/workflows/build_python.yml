@@ -143,36 +143,7 @@ jobs:
       - name: Build
         run: |
           set -ex
-
-          PYTHON_FULL_VER=${{ inputs.python_version }}
-          WORKDIR=$(pwd)
-          ARCH=universal2
-
-          export MACOSX_DEPLOYMENT_TARGET=11
-
-          git clone https://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
-
-          mkdir python-build
-          mkdir python-install
-          cd python-build
-
-          cmake \
-            -DPYTHON_VERSION=${PYTHON_FULL_VER} \
-            "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
-            -DCMAKE_BUILD_TYPE:STRING=Release \
-            -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/python-install \
-            -DBUILD_EXTENSIONS_AS_BUILTIN=ON \
-            -DBUILD_LIBPYTHON_SHARED=ON \
-            -DBUILD_TESTING=ON \
-            ../python-cmake-buildsystem
-          make -j8
-          make install
-
-          cd ${WORKDIR}/python-build
-          tar -czf ${WORKDIR}/build-python-${PYTHON_FULL_VER}-darwin-${ARCH}.tar.gz .
-          cd ${WORKDIR}
-          mv python-install python-${PYTHON_FULL_VER}-darwin-${ARCH}
-          tar -czf python-${PYTHON_FULL_VER}-darwin-${ARCH}.tar.gz python-${PYTHON_FULL_VER}-darwin-${ARCH}
+          ./scripts/build_macos.sh universal2 ${{ inputs.python_version }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
