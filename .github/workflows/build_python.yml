@@ -158,6 +158,7 @@ jobs:
 
           cmake \
             -DPYTHON_VERSION=${PYTHON_FULL_VER} \
+            "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
             -DCMAKE_BUILD_TYPE:STRING=Release \
             -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/python-install \
             -DBUILD_EXTENSIONS_AS_BUILTIN=ON \
