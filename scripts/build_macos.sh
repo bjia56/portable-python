@@ -65,16 +65,10 @@ echo "::endgroup::"
 echo "::group::lzma"
 cd ${WORKDIR}
 
-git clone https://github.com/tukaani-project/xz.git --branch v5.4.4 --single-branch --depth 1
+wget -q https://github.com/tukaani-project/xz/releases/download/v5.4.4/xz-5.4.4.tar.gz
 mkdir deps/xz
-cd xz
-mkdir build
-cd build
-cmake \
-  -G "Unix Makefiles" \
-  -DCMAKE_C_COMPILER=${CC} \
-  -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/deps/xz \
-  ..
+cd xz-5.4.4
+./configure --prefix ${WORKDIR}/deps/xz
 make -j${NPROC}
 make install
 
