@@ -54,6 +54,7 @@ mkdir build
 cd build
 cmake \
   -G "Unix Makefiles" \
+  -DCMAKE_C_COMPILER=${CC} \
   -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/deps/bzip2 \
   ..
 make -j${NPROC}
@@ -73,6 +74,7 @@ mkdir build
 cd build
 cmake \
   -G "Unix Makefiles" \
+  -DCMAKE_C_COMPILER=${CC} \
   -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/deps/xz \
   ..
 make -j${NPROC}
@@ -108,6 +110,7 @@ mkdir build
 cd build
 cmake \
   -G "Unix Makefiles" \
+  -DCMAKE_C_COMPILER=${CC} \
   -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/deps/zlib \
   ..
 make -j${NPROC}
@@ -127,6 +130,7 @@ mkdir build
 cd build
 cmake \
   -G "Unix Makefiles" \
+  -DCMAKE_C_COMPILER=${CC} \
   -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/deps/libffi \
   ..
 make -j${NPROC}
@@ -142,6 +146,7 @@ cd ${WORKDIR}
 cd python-build
 cmake \
   -G "Unix Makefiles" \
+  -DCMAKE_C_COMPILER=${CC} \
   -DCMAKE_C_STANDARD=99 \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
   -DCMAKE_BUILD_TYPE:STRING=Release \
@@ -150,16 +155,16 @@ cmake \
   -DBUILD_LIBPYTHON_SHARED=ON \
   -DBUILD_TESTING=ON \
   -DOPENSSL_ROOT_DIR:PATH=${WORKDIR}/deps/openssl \
-  -DSQLite3_INCLUDE_DIR:PATH=${WORKDIR}/deps/sqlite3 \
-  -DSQLite3_LIBRARY:FILEPATH=${WORKDIR}/deps/sqlite3/sqlite3.lib \
+  -DSQLite3_INCLUDE_DIR:PATH=${WORKDIR}/deps/sqlite3/include \
+  -DSQLite3_LIBRARY:FILEPATH=${WORKDIR}/deps/sqlite3/lib/libsqlite3.a \
   -DZLIB_INCLUDE_DIR:PATH=${WORKDIR}/deps/zlib/include \
-  -DZLIB_LIBRARY:FILEPATH=${WORKDIR}/deps/zlib/lib/zlibstatic.lib \
+  -DZLIB_LIBRARY:FILEPATH=${WORKDIR}/deps/zlib/lib/libz.a \
   -DLZMA_INCLUDE_PATH:PATH=${WORKDIR}/deps/xz/include \
-  -DLZMA_LIBRARY:FILEPATH=${WORKDIR}/deps/xz/lib/liblzma.lib \
+  -DLZMA_LIBRARY:FILEPATH=${WORKDIR}/deps/xz/lib/liblzma.a \
   -DBZIP2_INCLUDE_DIR:PATH=${WORKDIR}/deps/bzip2/include \
-  -DBZIP2_LIBRARIES:FILEPATH=${WORKDIR}/deps/bzip2/lib/libbz2.lib \
+  -DBZIP2_LIBRARIES:FILEPATH=${WORKDIR}/deps/bzip2/lib/libbz2.a \
   -DLibFFI_INCLUDE_DIR:PATH=${WORKDIR}/deps/libffi/include \
-  -DLibFFI_LIBRARY:FILEPATH=${WORKDIR}/deps/libffi/lib/ffi_static.lib \
+  -DLibFFI_LIBRARY:FILEPATH=${WORKDIR}/deps/libffi/lib/libffi.a \
   ../python-cmake-buildsystem
 make -j${NPROC}
 make install
