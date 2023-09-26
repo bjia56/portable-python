@@ -1,2 +1,2 @@
-# portable-snakes
+# portable-python
 Portable Python binaries
