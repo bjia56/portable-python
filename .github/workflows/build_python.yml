@@ -79,7 +79,7 @@ jobs:
             ./bin/python -m test || true
 
   build_windows:
-    name: Windows x86_64 ${{ inputs.python_version }} (build)
+    name: Windows ${{ inputs.python_version }} x86_64 (build)
     runs-on: windows-latest
 
     steps:
@@ -107,7 +107,7 @@ jobs:
           path: ./*python*.tar.gz
 
   test_windows:
-    name: Windows x86_64 ${{ inputs.python_version }} (test)
+    name: Windows ${{ inputs.python_version }} x86_64 (test)
     needs: build_windows
     runs-on: windows-latest
 
