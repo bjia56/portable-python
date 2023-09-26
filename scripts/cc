@@ -1,10 +1,4 @@
 #!/bin/bash
-# https://stackoverflow.com/a/75250222
+# Based on https://stackoverflow.com/a/75250222
 
-if [[ $* == *-arch\ x86_64* ]] && ! [[ $* == *-arch\ arm64* ]]; then
-    echo Forcing compilation with arm64
-    cc -arch arm64 $@
-else
-    echo Not forcing compilation with arm64 
-    cc $@
-fi
+cc -arch arm64 "$@"
