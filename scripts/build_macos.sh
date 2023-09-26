@@ -131,16 +131,11 @@ echo "::endgroup::"
 echo "::group::libffi"
 cd ${WORKDIR}
 
-git clone https://github.com/python-cmake-buildsystem/libffi.git --branch libffi-cmake-buildsystem-v3.4.2-2021-06-28-f9ea416 --single-branch --depth 1
+wget -q https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.tar.gz
+tar -xf libffi-3.4.2.tar.gz
 mkdir deps/libffi
-cd libffi
-mkdir build
-cd build
-cmake \
-  -G "Unix Makefiles" \
-  "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
-  -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/deps/libffi \
-  ..
+cd libffi-3.4.2
+CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --prefix ${WORKDIR}/deps/libffi
 make -j${NPROC}
 make install
 
