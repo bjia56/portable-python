@@ -4,7 +4,7 @@ ARCH=$1
 PYTHON_FULL_VER=$2
 
 WORKDIR=$(pwd)
-NPROC=$(sysctl -n hw.logicalcpu)
+NPROC=$(sysctl -n hw.ncpu)
 
 set -ex
 
@@ -31,15 +31,11 @@ cd ${WORKDIR}
 wget -q https://www.openssl.org/source/openssl-1.1.1w.tar.gz
 tar -xf openssl-1.1.1w.tar.gz
 
-export CC=${WORKDIR}/scripts/cc
-
 mkdir deps/openssl
 cd openssl-1.1.1w
-./Configure enable-rc5 zlib no-asm darwin64-x86_64-cc --prefix=${WORKDIR}/deps/openssl
+CC=${WORKDIR}/scripts/cc ./Configure enable-rc5 zlib no-asm darwin64-x86_64-cc --prefix=${WORKDIR}/deps/openssl
 make -j${NPROC}
 make install_sw
-
-unset CC
 
 file ${WORKDIR}/deps/openssl/lib/libcrypto.a
 file ${WORKDIR}/deps/openssl/lib/libssl.a
@@ -95,17 +91,13 @@ echo "::endgroup::"
 echo "::group::sqlite3"
 cd ${WORKDIR}
 
-export CC=${WORKDIR}/scripts/cc
-
 wget -q https://www.sqlite.org/2023/sqlite-autoconf-3430100.tar.gz
 tar -xf sqlite-autoconf-3430100.tar.gz
 mkdir deps/sqlite3
 cd sqlite-autoconf-3430100
-./configure --prefix ${WORKDIR}/deps/sqlite3
+CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --prefix ${WORKDIR}/deps/sqlite3
 make -j${NPROC}
 make install
-
-unset CC
 
 file ${WORKDIR}/deps/sqlite3/lib/libsqlite3.a
 
