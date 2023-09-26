@@ -80,7 +80,7 @@ jobs:
             ./bin/python -m test || true
 
   build_windows:
-    name: Windows x86_64 ${{ inputs.python_version }} (build)
+    name: Windows ${{ inputs.python_version }} x86_64 (build)
     if: false
     runs-on: windows-latest
 
@@ -109,7 +109,7 @@ jobs:
           path: ./*python*.tar.gz
 
   test_windows:
-    name: Windows x86_64 ${{ inputs.python_version }} (test)
+    name: Windows ${{ inputs.python_version }} x86_64 (test)
     if: false
     needs: build_windows
     runs-on: windows-latest
@@ -133,7 +133,7 @@ jobs:
           ./bin/python -m test || true
 
   build_macos:
-    name: MacOS universal2 ${{ inputs.python_version }}
+    name: MacOS ${{ inputs.python_version }} universal2
     runs-on: macos-latest
 
     steps:
