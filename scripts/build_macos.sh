@@ -18,7 +18,6 @@ mkdir python-install
 mkdir deps
 
 export MACOSX_DEPLOYMENT_TARGET=11
-export CC=${WORKDIR}/scripts/cc
 
 git clone https://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
 
@@ -32,11 +31,15 @@ cd ${WORKDIR}
 wget -q https://www.openssl.org/source/openssl-1.1.1w.tar.gz
 tar -xf openssl-1.1.1w.tar.gz
 
+export CC=${WORKDIR}/scripts/cc
+
 mkdir deps/openssl
 cd openssl-1.1.1w
 ./Configure enable-rc5 zlib no-asm darwin64-x86_64-cc --prefix=${WORKDIR}/deps/openssl
 make -j${NPROC}
 make install_sw
+
+unset CC
 
 echo "::endgroup::"
 #########
@@ -52,7 +55,7 @@ mkdir build
 cd build
 cmake \
   -G "Unix Makefiles" \
-  -DCMAKE_C_COMPILER=${CC} \
+  "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
   -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/deps/bzip2 \
   ..
 make -j${NPROC}
@@ -65,11 +68,16 @@ echo "::endgroup::"
 echo "::group::lzma"
 cd ${WORKDIR}
 
-wget -q https://github.com/tukaani-project/xz/releases/download/v5.4.4/xz-5.4.4.tar.gz
-tar -xf xz-5.4.4.tar.gz
+git clone https://github.com/tukaani-project/xz.git --branch v5.4.4 --single-branch --depth 1
 mkdir deps/xz
-cd xz-5.4.4
-./configure --prefix ${WORKDIR}/deps/xz
+cd xz
+mkdir build
+cd build
+cmake \
+  -G "Unix Makefiles" \
+  "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
+  -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/deps/xz \
+  ..
 make -j${NPROC}
 make install
 
@@ -80,6 +88,8 @@ echo "::endgroup::"
 echo "::group::sqlite3"
 cd ${WORKDIR}
 
+export CC=${WORKDIR}/scripts/cc
+
 wget -q https://www.sqlite.org/2023/sqlite-autoconf-3430100.tar.gz
 tar -xf sqlite-autoconf-3430100.tar.gz
 mkdir deps/sqlite3
@@ -87,6 +97,8 @@ cd sqlite-autoconf-3430100
 ./configure --prefix ${WORKDIR}/deps/sqlite3
 make -j${NPROC}
 make install
+
+unset CC
 
 echo "::endgroup::"
 ########
@@ -103,7 +115,7 @@ mkdir build
 cd build
 cmake \
   -G "Unix Makefiles" \
-  -DCMAKE_C_COMPILER=${CC} \
+  "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
   -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/deps/zlib \
   ..
 make -j${NPROC}
@@ -123,7 +135,7 @@ mkdir build
 cd build
 cmake \
   -G "Unix Makefiles" \
-  -DCMAKE_C_COMPILER=${CC} \
+  "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
   -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/deps/libffi \
   ..
 make -j${NPROC}
@@ -139,7 +151,7 @@ cd ${WORKDIR}
 cd python-build
 cmake \
   -G "Unix Makefiles" \
-  -DCMAKE_C_COMPILER=${CC} \
+   "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
   -DCMAKE_C_STANDARD=99 \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
   -DCMAKE_BUILD_TYPE:STRING=Release \
