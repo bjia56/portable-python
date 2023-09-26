@@ -41,6 +41,9 @@ make install_sw
 
 unset CC
 
+file ${WORKDIR}/deps/openssl/lib/libcrypto.a
+file ${WORKDIR}/deps/openssl/lib/libssl.a
+
 echo "::endgroup::"
 #########
 # bzip2 #
@@ -60,6 +63,8 @@ cmake \
   ..
 make -j${NPROC}
 make install
+
+file ${WORKDIR}/deps/bzip2/lib/libbz2.a
 
 echo "::endgroup::"
 ########
@@ -81,6 +86,8 @@ cmake \
 make -j${NPROC}
 make install
 
+file ${WORKDIR}/deps/xz/lib/liblzma.a
+
 echo "::endgroup::"
 ###########
 # sqlite3 #
@@ -99,6 +106,8 @@ make -j${NPROC}
 make install
 
 unset CC
+
+file ${WORKDIR}/deps/sqlite3/lib/libsqlite3.a
 
 echo "::endgroup::"
 ########
@@ -121,6 +130,8 @@ cmake \
 make -j${NPROC}
 make install
 
+file ${WORKDIR}/deps/zlib/lib/libz.a
+
 echo "::endgroup::"
 ##########
 # libffi #
@@ -140,6 +151,8 @@ cmake \
   ..
 make -j${NPROC}
 make install
+
+file ${WORKDIR}/deps/libffi/lib/libffi.a
 
 echo "::endgroup::"
 #########

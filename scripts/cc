@@ -3,7 +3,7 @@
 
 if [[ $* == *-arch\ x86_64* ]] && ! [[ $* == *-arch\ arm64* ]]; then
     echo Forcing compilation with arm64
-    cc -arch arm64 $@
+    cc -arch arm64 "$@"
 else
-    cc $@
+    cc "$@"
 fi
