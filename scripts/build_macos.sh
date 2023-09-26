@@ -66,6 +66,7 @@ echo "::group::lzma"
 cd ${WORKDIR}
 
 wget -q https://github.com/tukaani-project/xz/releases/download/v5.4.4/xz-5.4.4.tar.gz
+tar -xf xz-5.4.4.tar.gz
 mkdir deps/xz
 cd xz-5.4.4
 ./configure --prefix ${WORKDIR}/deps/xz
