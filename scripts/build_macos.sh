@@ -17,6 +17,7 @@ mkdir python-install
 mkdir deps
 
 export MACOSX_DEPLOYMENT_TARGET=11
+export CC=${WORKDIR}/scripts/cc
 
 git clone https://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
 
@@ -26,10 +27,6 @@ echo "::endgroup::"
 ###########
 echo "::group::OpenSSL"
 cd ${WORKDIR}
-
-# https://stackoverflow.com/a/75250222
-
-export CC=${WORKDIR}/scripts/cc
 
 wget -q https://www.openssl.org/source/openssl-1.1.1w.tar.gz
 tar -xf openssl-1.1.1w.tar.gz
@@ -55,7 +52,6 @@ cd bzip2
 mkdir build
 cd build
 cmake \
-  -G "Visual Studio 17 2022" -A x64 \
   -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/deps/bzip2 \
   ..
 cmake --build . --config Release -- /property:Configuration=Release
@@ -74,7 +70,6 @@ cd xz
 mkdir build
 cd build
 cmake \
-  -G "Visual Studio 17 2022" -A x64 \
   -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/deps/xz \
   ..
 cmake --build . --config Release -- /property:Configuration=Release
@@ -87,12 +82,13 @@ echo "::endgroup::"
 echo "::group::sqlite3"
 cd ${WORKDIR}
 
-curl -L https://www.sqlite.org/2023/sqlite-amalgamation-3430100.zip --output sqlite3-src.zip
-unzip sqlite3-src.zip
-mv sqlite-amalgamation-3430100 deps/sqlite3
-cd deps/sqlite3
-cl //c sqlite3.c
-lib sqlite3.obj
+wget -q https://www.sqlite.org/2023/sqlite-autoconf-3430100.tar.gz
+tar -xf sqlite-autoconf-3430100.tar.gz
+mkdir deps/sqlite3
+cd sqlite-autoconf-3430100
+CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --prefix ${WORKDIR}/deps/sqlite3
+make
+make install
 
 echo "::endgroup::"
 ########
