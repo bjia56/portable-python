@@ -71,6 +71,7 @@ jobs:
 
             cp /work/python*.tar.gz .
             tar -xzf ./python*.tar.gz
+            cd python*
             ldd -v -r ./bin/python || true
             ./bin/python --version
 
