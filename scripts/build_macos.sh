@@ -52,10 +52,11 @@ cd bzip2
 mkdir build
 cd build
 cmake \
+  -G "Unix Makefiles" \
   -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/deps/bzip2 \
   ..
-cmake --build . --config Release -- /property:Configuration=Release
-cmake --build . --target INSTALL -- /property:Configuration=Release
+make
+make install
 
 echo "::endgroup::"
 ########
@@ -70,10 +71,11 @@ cd xz
 mkdir build
 cd build
 cmake \
+  -G "Unix Makefiles" \
   -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/deps/xz \
   ..
-cmake --build . --config Release -- /property:Configuration=Release
-cmake --build . --target INSTALL -- /property:Configuration=Release
+make
+make install
 
 echo "::endgroup::"
 ###########
@@ -86,7 +88,7 @@ wget -q https://www.sqlite.org/2023/sqlite-autoconf-3430100.tar.gz
 tar -xf sqlite-autoconf-3430100.tar.gz
 mkdir deps/sqlite3
 cd sqlite-autoconf-3430100
-CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --prefix ${WORKDIR}/deps/sqlite3
+./configure --prefix ${WORKDIR}/deps/sqlite3
 make
 make install
 
@@ -104,11 +106,11 @@ cd zlib-1.3
 mkdir build
 cd build
 cmake \
-  -G "Visual Studio 17 2022" -A x64 \
+  -G "Unix Makefiles" \
   -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/deps/zlib \
   ..
-cmake --build . --config Release -- /property:Configuration=Release
-cmake --build . --target INSTALL -- /property:Configuration=Release
+make
+make install
 
 echo "::endgroup::"
 ##########
@@ -123,11 +125,11 @@ cd libffi
 mkdir build
 cd build
 cmake \
-  -G "Visual Studio 17 2022" -A x64 \
+  -G "Unix Makefiles" \
   -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/deps/libffi \
   ..
-cmake --build . --config Release -- /property:Configuration=Release
-cmake --build . --target INSTALL -- /property:Configuration=Release
+make
+make install
 
 echo "::endgroup::"
 #########
@@ -138,7 +140,7 @@ cd ${WORKDIR}
 
 cd python-build
 cmake \
-  -G "Visual Studio 17 2022" -A x64 \
+  -G "Unix Makefiles" \
   -DCMAKE_C_STANDARD=99 \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
   -DCMAKE_BUILD_TYPE:STRING=Release \
@@ -146,8 +148,6 @@ cmake \
   -DBUILD_EXTENSIONS_AS_BUILTIN=OFF \
   -DBUILD_LIBPYTHON_SHARED=ON \
   -DBUILD_TESTING=ON \
-  -DBUILD_WININST=OFF \
-  -DINSTALL_WINDOWS_TRADITIONAL:BOOL=OFF \
   -DOPENSSL_ROOT_DIR:PATH=${WORKDIR}/deps/openssl \
   -DSQLite3_INCLUDE_DIR:PATH=${WORKDIR}/deps/sqlite3 \
   -DSQLite3_LIBRARY:FILEPATH=${WORKDIR}/deps/sqlite3/sqlite3.lib \
@@ -160,12 +160,9 @@ cmake \
   -DLibFFI_INCLUDE_DIR:PATH=${WORKDIR}/deps/libffi/include \
   -DLibFFI_LIBRARY:FILEPATH=${WORKDIR}/deps/libffi/lib/ffi_static.lib \
   ../python-cmake-buildsystem
-cmake --build . --config Release -- /verbosity:detailed /property:Configuration=Release
-cmake --build . --target INSTALL -- /verbosity:detailed /property:Configuration=Release
+make
+make install
 cd ${WORKDIR}
-
-# Need to bundle openssl with the executable
-cp deps/openssl/bin/*.dll python-install/bin
 
 echo "::endgroup::"
 ###############
@@ -192,9 +189,9 @@ echo "::group::Compress output"
 cd ${WORKDIR}
 
 cd python-build
-tar -czf ../build-python-${PYTHON_FULL_VER}-windows-${ARCH}.tar.gz .
+tar -czf ../build-python-${PYTHON_FULL_VER}-darwin-${ARCH}.tar.gz .
 cd ${WORKDIR}
-mv python-install python-${PYTHON_FULL_VER}-windows-${ARCH}
-tar -czf python-${PYTHON_FULL_VER}-windows-${ARCH}.tar.gz python-${PYTHON_FULL_VER}-windows-${ARCH}
+mv python-install python-${PYTHON_FULL_VER}-darwin-${ARCH}
+tar -czf python-${PYTHON_FULL_VER}-darwin-${ARCH}.tar.gz python-${PYTHON_FULL_VER}-darwin-${ARCH}
 
 echo "::endgroup::"
