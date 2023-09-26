@@ -79,7 +79,7 @@ jobs:
             ./bin/python -m test || true
 
   build_windows:
-    name: Windows x86_64 ${{ inputs.python_version }}
+    name: Windows x86_64 ${{ inputs.python_version }} (build)
     runs-on: windows-latest
 
     steps:
@@ -105,3 +105,26 @@ jobs:
         with:
           name: python
           path: ./*python*.tar.gz
+
+  test_windows:
+    name: Windows x86_64 ${{ inputs.python_version }} (test)
+    needs: build_windows
+    runs-on: windows-latest
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: python
+          path: ./python/
+
+      - name: Test python in clean environment
+        shell: bash
+        run: |
+          tar -xvf python/python-${{ inputs.python_version }}-windows-x86_64.tar.gz
+
+          cd python-${{ inputs.python_version }}-windows-x86_64
+          bin/python --version
+
+          # make tests nonfatal for now
+          ./bin/python -m test || true
