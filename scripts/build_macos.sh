@@ -2,6 +2,7 @@
 
 ARCH=$1
 PYTHON_FULL_VER=$2
+PYTHON_VER=$(echo ${PYTHON_FULL_VER} | cut -d "." -f 1-2)
 
 WORKDIR=$(pwd)
 NPROC=$(sysctl -n hw.ncpu)
@@ -187,13 +188,19 @@ make install
 cd ${WORKDIR}
 
 echo "::endgroup::"
-###############
-# Test python #
-###############
-echo "::group::Test python"
+#########################
+# Test and patch python #
+#########################
+echo "::group::Test and patch python"
 cd ${WORKDIR}
 
-otool -L ./python-install/bin/python
+./python-install/bin/python --version
+
+otool -L ./python-install/bin/python 
+install_name_tool -add_rpath @executable_path/../lib ./python-install/bin/python
+install_name_tool -change ${WORKDIR}/python-install/lib/libpython${PYTHON_VER} @rpath/libpython${PYTHON_VER} ./python-install/bin/python
+otool -L ./python-install/bin/python 
+
 ./python-install/bin/python --version
 
 echo "::endgroup::"
