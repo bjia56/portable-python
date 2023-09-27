@@ -19,7 +19,7 @@ mkdir deps
 
 export MACOSX_DEPLOYMENT_TARGET=11
 
-git clone https://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
+git clone https://github.com/bjia56/python-cmake-buildsystem.git --branch macos-arm64 --single-branch --depth 1
 
 echo "::endgroup::"
 ###########
