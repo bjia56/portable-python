@@ -146,8 +146,11 @@ CC="/usr/bin/cc" CFLAGS="-target arm64-apple-macos11" ./configure --prefix ${WOR
 make -j${NPROC}
 make install
 
+cd ${WORKDIR}
+lipo --create --output libffi.a ${WORKDIR}/deps/libffi/lib/libffi.a ${WORKDIR}/libffi-arm64-out/lib/libffi.a
+mv libffi.a ${WORKDIR}/deps/libffi/lib/libffi.a
+
 file ${WORKDIR}/deps/libffi/lib/libffi.a
-file ${WORKDIR}/libffi-arm64-out/lib/libffi.a
 
 echo "::endgroup::"
 #########
