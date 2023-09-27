@@ -196,10 +196,10 @@ cd ${WORKDIR}
 
 ./python-install/bin/python --version
 
-otool -l ./python-install/bin/python 
+otool -l ./python-install/bin/python
 install_name_tool -add_rpath @executable_path/../lib ./python-install/bin/python
-install_name_tool -id @rpath/libpython${PYTHON_VER} ./python-install/bin/python
-otool -l ./python-install/bin/python 
+install_name_tool -change ${WORKDIR}/python-install/lib/libpython${PYTHON_VER}.dylib @rpath/libpython${PYTHON_VER}.dylib ./python-install/bin/python
+otool -l ./python-install/bin/python
 
 ./python-install/bin/python --version
 
