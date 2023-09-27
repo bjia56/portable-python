@@ -193,6 +193,7 @@ echo "::endgroup::"
 echo "::group::Test python"
 cd ${WORKDIR}
 
+otool -L ./python-install/bin/python
 ./python-install/bin/python --version
 
 echo "::endgroup::"
