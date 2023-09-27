@@ -133,7 +133,7 @@ jobs:
           ./bin/python -m test || true
 
   build_macos:
-    name: MacOS ${{ inputs.python_version }} universal2
+    name: MacOS ${{ inputs.python_version }} universal2 (build)
     runs-on: macos-latest
 
     steps:
@@ -150,3 +150,26 @@ jobs:
         with:
           name: python
           path: ./*python*.tar.gz
+
+  test_macos:
+    name: MacOS ${{ inputs.python_version }} universal2 (test)
+    needs: build_macos
+    runs-on: macos-latest
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: python
+          path: ./python/
+
+      - name: Test python in clean environment
+        shell: bash
+        run: |
+          tar -xvf python/python-${{ inputs.python_version }}-darwin-universal2.tar.gz
+
+          cd python-${{ inputs.python_version }}-darwin-universal2
+          ./bin/python --version
+
+          # make tests nonfatal for now
+          ./bin/python -m test || true
