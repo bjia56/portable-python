@@ -131,18 +131,18 @@ echo "::endgroup::"
 echo "::group::libffi"
 cd ${WORKDIR}
 
-wget -q https://patch-diff.githubusercontent.com/raw/libffi/libffi/pull/535.patch
-git clone https://github.com/libffi/libffi.git --branch v3.4.2 --single-branch --depth 1
+wget -q https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.tar.gz
+tar -xf libffi-3.4.2.tar.gz
 mkdir deps/libffi
-cd libffi
-git apply ../535.patch
-mkdir build
-cd build
-cmake \
-  -G "Unix Makefiles" \
-  "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
-  -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/deps/libffi \
-  ..
+cp -r libffi-3.4.2 libffi-3.4.2-arm64
+cd libffi-3.4.2
+./configure --prefix ${WORKDIR}/deps/libffi
+make -j${NPROC}
+make install
+cd ${WORKDIR}
+mkdir libffi-arm64-out
+cd libffi-3.4.2-arm64
+./configure --prefix ${WORKDIR}/libffi-arm64-out --build=aarch64-apple-darwin20.0.0 
 make -j${NPROC}
 make install
 
