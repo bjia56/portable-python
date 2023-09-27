@@ -136,13 +136,13 @@ tar -xf libffi-3.4.2.tar.gz
 mkdir deps/libffi
 cp -r libffi-3.4.2 libffi-3.4.2-arm64
 cd libffi-3.4.2
-./configure --prefix ${WORKDIR}/deps/libffi
+CC="/usr/bin/cc" ./configure --prefix ${WORKDIR}/deps/libffi
 make -j${NPROC}
 make install
 cd ${WORKDIR}
 mkdir libffi-arm64-out
 cd libffi-3.4.2-arm64
-./configure --prefix ${WORKDIR}/libffi-arm64-out --build=aarch64-apple-darwin --host=aarch64-apple-darwin
+CC="/usr/bin/cc" CFLAGS="-target arm64-apple-macos11" ./configure --prefix ${WORKDIR}/libffi-arm64-out --build=aarch64-apple-darwin --host=aarch64-apple-darwin --target=aarch64-apple-darwin
 make -j${NPROC}
 make install
 
