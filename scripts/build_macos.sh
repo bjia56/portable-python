@@ -142,7 +142,7 @@ make install
 cd ${WORKDIR}
 mkdir libffi-arm64-out
 cd libffi-3.4.2-arm64
-CC="/usr/bin/cc" CFLAGS="-target arm64-apple-macos11" ./configure --prefix ${WORKDIR}/libffi-arm64-out --build=aarch64-apple-darwin --host=aarch64-apple-darwin --target=aarch64-apple-darwin
+CC="/usr/bin/cc" CFLAGS="-target arm64-apple-macos11" ./configure --prefix ${WORKDIR}/libffi-arm64-out --build=aarch64-apple-darwin --host=aarch64
 make -j${NPROC}
 make install
 
