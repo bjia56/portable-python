@@ -1,11 +1,6 @@
 #!/bin/bash
 
-python_tarball=$(basename $1)
-
-build_tuple=$(echo $python_tarball | sed "s/\.tar\.gz//")
-python_version=$(echo $build_tuple | cut -d '-' -f 2)
-platform=$(echo $build_tuple | cut -d '-' -f 3)
-arch=$(echo $build_tuple | cut -d '-' -f 4)
+python_version=$1
 
 tags=$(git tag | grep $python_version)
 

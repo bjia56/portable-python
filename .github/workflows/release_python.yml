@@ -37,14 +37,11 @@ jobs:
 
       - name: Pick tag
         run: |
-          pattern="/tmp/python/*.tar.gz"
-          files=( $pattern )
-          file="${files[0]}"
-          echo "SELECTED_TAG=$(./scripts/pick_semver.sh $file)" >> $GITHUB_ENV
+          echo "SELECTED_TAG=$(./scripts/pick_semver.sh ${{ inputs.python_version }})" >> $GITHUB_ENV
 
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: /tmp/python/*.tar.gz
+          files: /tmp/python/python*.tar.gz
           tag_name: ${{ env.SELECTED_TAG }}
           body: "Python ${{ inputs.python_version }}"
