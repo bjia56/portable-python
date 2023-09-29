@@ -4,7 +4,7 @@
   "description": "Portable Python 3.9",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "postinstall": "node install-python.js"
   },
   "repository": {
     "type": "git",
@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/bjia56/portable-python#readme",
   "dependencies": {
+    "follow-redirects": "^1.15.3",
     "tar": "^6.2.0"
   }
 }

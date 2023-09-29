@@ -1,12 +1,12 @@
-import { platform as _platform, arch as _arch } from "os";
+var os = require("os");
 
 const pythonVersion = "3.9.17";
 
 var platform = (() => {
-    if (_platform() == "win32") {
+    if (os.platform() == "win32") {
         return "windows";
     }
-    return _platform();
+    return os.platform();
 })();
 
 var arch = (() => {
@@ -14,7 +14,7 @@ var arch = (() => {
         return "universal2";
     }
 
-    switch (_arch()) {
+    switch (os.arch()) {
     case "x64":
         return "x86_64";
     case "arm":
@@ -24,4 +24,4 @@ var arch = (() => {
     }
 })();
 
-export default `python-${pythonVersion}-${platform}-${arch}`
+module.exports = `python-${pythonVersion}-${platform}-${arch}`;

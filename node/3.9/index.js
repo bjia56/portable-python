@@ -1,5 +1,5 @@
-import { platform } from "os";
-import { join } from "path";
-import pythonVersion from "./pythonVersion";
+var os = require("os");
+var path = require("path");
+var pythonVersion = require("./pythonVersion");
 
-export default join(__dirname, pythonVersion, "bin", "python" + (platform() === "win32" ? ".exe" : ""));
+module.exports = path.join(__dirname, pythonVersion, "bin", "python" + (os.platform() === "win32" ? ".exe" : ""));
