@@ -85,9 +85,10 @@ if [[ "${ARCH}" == "armv7l" ]]; then
   additionalparams+=(-DUSE_SYSTEM_LIBMPDEC=ON)
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 fi
-CFLAGS="-lm -lc -lgcc -lc -lz -lssl -lffi -lsqlite3 -lreadline -lncurses -lbz2 -llzma -luuid -lgdbm -ltk" cmake \
+CFLAGS="-lm -lc -lgcc -lc" cmake \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
   -DCMAKE_BUILD_TYPE:STRING=Release \
+  -DWITH_STATIC_DEPENDENCIES=ON \
   -DCMAKE_INSTALL_PREFIX:PATH=${PWD}/../python-install \
   -DBUILD_EXTENSIONS_AS_BUILTIN=ON \
   -DBUILD_LIBPYTHON_SHARED=ON \
