@@ -73,7 +73,7 @@ if [[ "${ARCH}" == "armv7l" ]]; then
   wget -q https://www.bytereef.org/software/mpdecimal/releases/mpdecimal-2.5.0.tar.gz
   tar -xzf mpdecimal*.tar.gz
   cd mpdecimal-2.5.0
-  ./configure
+  CFLAGS="-lm -lc -lgcc -lc" ./configure
   make
   make install
   cd /build
@@ -85,7 +85,7 @@ if [[ "${ARCH}" == "armv7l" ]]; then
   additionalparams+=(-DUSE_SYSTEM_LIBMPDEC=ON)
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 fi
-cmake \
+CFLAGS="-lm -lc -lgcc -lc -lz -lssl -lffi -lsqlite3 -lreadline -lncurses -lbz2 -llzma -luuid -lgdbm -ltk" cmake \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
   -DCMAKE_BUILD_TYPE:STRING=Release \
   -DCMAKE_INSTALL_PREFIX:PATH=${PWD}/../python-install \
