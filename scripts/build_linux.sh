@@ -86,7 +86,7 @@ if [[ "${ARCH}" == "armv7l" ]]; then
   additionalparams+=(-DUSE_SYSTEM_LIBMPDEC=ON)
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 fi
-cmake --trace-expand \
+cmake \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
   -DCMAKE_BUILD_TYPE:STRING=Release \
   -DWITH_STATIC_DEPENDENCIES=ON \
