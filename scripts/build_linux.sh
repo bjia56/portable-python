@@ -95,7 +95,7 @@ LDFLAGS="-lxcb -ltinfo" cmake \
   "${additionalparams[@]}" \
   -DBUILD_TESTING=ON \
   ../python-cmake-buildsystem
-make -j8
+make VERBOSE=1 -j8
 make install
 
 tar -czf /work/build-python-${PYTHON_FULL_VER}-linux-${ARCH}.tar.gz .
