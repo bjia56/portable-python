@@ -19,7 +19,7 @@ apt -y install build-essential python3 python3-pip git wget
 # dependencies for enabled python extensions
 apt -y install zlib1g-dev libssl-dev libffi-dev libsqlite3-dev
 apt -y install libreadline-dev libncurses-dev libbz2-dev liblzma-dev
-apt -y install uuid-dev libgdbm-dev tk-dev
+apt -y install uuid-dev libgdbm-dev tk-dev libxcb1-dev
 
 # cmake
 # we are pulling the precompiled cmake available as a python package
@@ -85,7 +85,7 @@ if [[ "${ARCH}" == "armv7l" ]]; then
   additionalparams+=(-DUSE_SYSTEM_LIBMPDEC=ON)
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 fi
-CFLAGS="-lxcb" cmake \
+cmake \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
   -DCMAKE_BUILD_TYPE:STRING=Release \
   -DWITH_STATIC_DEPENDENCIES=ON \
