@@ -29,6 +29,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Get tags
+        run: git fetch --tags origin
+
       - name: Download artifact
         uses: actions/download-artifact@v3
         with:
