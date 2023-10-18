@@ -96,8 +96,8 @@ patch_object () {
         replace_needed+=(--replace-needed $libname $rpath_prefix/$libname)
     done <<< "$deps"
 
-    patchelf "${add_needed[@]}" $python
-    patchelf "${replace_needed[@]}" $python
+    #patchelf "${add_needed[@]}" $python
+    #patchelf "${replace_needed[@]}" $python
 }
 
 patch_object
