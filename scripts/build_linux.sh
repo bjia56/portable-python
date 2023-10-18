@@ -118,8 +118,8 @@ echo "::endgroup::"
 ################
 echo "::group::Patch python"
 
-/build/scripts/patch_libpython.sh ./lib/libpython${PYTHON_VER}.so ./bin/python
-patchelf --replace-needed libpython${PYTHON_VER}.so "\$ORIGIN/../lib/libpython${PYTHON_VER}.so" ./bin/python
+#/build/scripts/patch_libpython.sh ./lib/libpython${PYTHON_VER}.so ./bin/python
+patchelf --set-rpath "\$ORIGIN/../lib/" ./bin/python
 
 echo "::endgroup::"
 ##############################################
