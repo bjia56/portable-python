@@ -1,0 +1,41 @@
+{
+  "name": "@bjia56/portable-python",
+  "version": "0.0.1",
+  "description": "Portable Python",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+      "dist"
+  ],
+   "scripts": {
+    "build": "tsup",
+    "prepublishOnly": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bjia56/portable-python.git"
+  },
+  "keywords": [
+    "python"
+  ],
+  "author": "Brett Jia",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/bjia56/portable-python/issues"
+  },
+  "homepage": "https://github.com/bjia56/portable-python",
+  "dependencies": {
+    "follow-redirects": "^1.15.3",
+    "tar": "^6.2.0"
+  },
+  "devDependencies": {
+    "@types/follow-redirects": "^1.14.4",
+    "@types/tar": "^6.1.10",
+    "ts-node": "^10.9.1",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.2"
+  }
+}
