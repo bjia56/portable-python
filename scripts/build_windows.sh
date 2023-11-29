@@ -154,8 +154,8 @@ cmake \
   -DLibFFI_INCLUDE_DIR:PATH=${WORKDIR}/deps/libffi/include \
   -DLibFFI_LIBRARY:FILEPATH=${WORKDIR}/deps/libffi/lib/ffi_static.lib \
   ../python-cmake-buildsystem
-cmake --build . --config Release -- /verbosity:detailed /property:Configuration=Release
-cmake --build . --target INSTALL -- /verbosity:detailed /property:Configuration=Release
+cmake --build . --config Release -- /property:Configuration=Release
+cmake --build . --target INSTALL -- /property:Configuration=Release
 cd ${WORKDIR}
 
 # Need to bundle openssl with the executable
