@@ -68,7 +68,6 @@ jobs:
           path: ./build-python*.tar.gz
 
       - name: Test python in clean environment
-        if: false
         uses: addnab/docker-run-action@v3
         with:
           image: ${{ steps.parse_image.outputs.image }}
@@ -83,7 +82,7 @@ jobs:
             ./bin/python --version
 
             # make tests nonfatal for now
-            ./bin/python -m test || true
+            # ./bin/python -m test || true
 
   build_windows:
     name: Windows ${{ inputs.python_version }} x86_64 (build)
@@ -123,7 +122,6 @@ jobs:
   test_windows:
     name: Windows ${{ inputs.python_version }} x86_64 (test)
     needs: build_windows
-    if: false
     runs-on: windows-latest
 
     steps:
@@ -142,7 +140,7 @@ jobs:
           bin/python --version
 
           # make tests nonfatal for now
-          ./bin/python -m test || true
+          # ./bin/python -m test || true
 
   build_macos:
     name: MacOS ${{ inputs.python_version }} universal2 (build)
@@ -173,7 +171,6 @@ jobs:
   test_macos:
     name: MacOS ${{ inputs.python_version }} universal2 (test)
     needs: build_macos
-    if: false
     runs-on: macos-latest
 
     steps:
@@ -192,4 +189,4 @@ jobs:
           ./bin/python --version
 
           # make tests nonfatal for now
-          ./bin/python -m test || true
+          # ./bin/python -m test || true
