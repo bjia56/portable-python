@@ -171,6 +171,8 @@ cmake \
   -DBUILD_EXTENSIONS_AS_BUILTIN=OFF \
   -DBUILD_LIBPYTHON_SHARED=ON \
   -DBUILD_TESTING=ON \
+  -DINSTALL_TEST=OFF \
+  -DINSTALL_MANUAL=OFF \
   -DOPENSSL_ROOT_DIR:PATH=${WORKDIR}/deps/openssl \
   -DSQLite3_INCLUDE_DIR:PATH=${WORKDIR}/deps/sqlite3/include \
   -DSQLite3_LIBRARY:FILEPATH=${WORKDIR}/deps/sqlite3/lib/libsqlite3.a \
@@ -221,6 +223,8 @@ cd ${WORKDIR}
 cd python-build
 tar -czf ../build-python-${PYTHON_FULL_VER}-darwin-${ARCH}.tar.gz .
 cd ${WORKDIR}
+python3 -m pip install pyclean
+python3 -m pyclean -v python-install
 mv python-install python-${PYTHON_FULL_VER}-darwin-${ARCH}
 tar -czf python-${PYTHON_FULL_VER}-darwin-${ARCH}.tar.gz python-${PYTHON_FULL_VER}-darwin-${ARCH}
 

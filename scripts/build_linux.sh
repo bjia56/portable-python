@@ -93,6 +93,8 @@ cmake \
   -DBUILD_LIBPYTHON_SHARED=ON \
   "${additionalparams[@]}" \
   -DBUILD_TESTING=ON \
+  -DINSTALL_TEST=OFF \
+  -DINSTALL_MANUAL=OFF \
   ../python-cmake-buildsystem
 make -j8
 make install
@@ -158,6 +160,8 @@ echo "::endgroup::"
 echo "::group::Compress output"
 
 cd ..
+python3 -m pip install pyclean
+python3 -m pyclean -v python-install
 mv python-install python-${PYTHON_FULL_VER}-linux-${ARCH}
 tar -czf /work/python-${PYTHON_FULL_VER}-linux-${ARCH}.tar.gz python-${PYTHON_FULL_VER}-linux-${ARCH}
 

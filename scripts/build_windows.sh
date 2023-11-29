@@ -138,6 +138,8 @@ cmake \
   -DBUILD_EXTENSIONS_AS_BUILTIN=OFF \
   -DBUILD_LIBPYTHON_SHARED=ON \
   -DBUILD_TESTING=ON \
+  -DINSTALL_TEST=OFF \
+  -DINSTALL_MANUAL=OFF \
   -DBUILD_WININST=OFF \
   -DINSTALL_WINDOWS_TRADITIONAL:BOOL=OFF \
   -DOPENSSL_ROOT_DIR:PATH=${WORKDIR}/deps/openssl \
@@ -152,8 +154,8 @@ cmake \
   -DLibFFI_INCLUDE_DIR:PATH=${WORKDIR}/deps/libffi/include \
   -DLibFFI_LIBRARY:FILEPATH=${WORKDIR}/deps/libffi/lib/ffi_static.lib \
   ../python-cmake-buildsystem
-cmake --build . --config Release -- /verbosity:detailed /property:Configuration=Release
-cmake --build . --target INSTALL -- /verbosity:detailed /property:Configuration=Release
+cmake --build . --config Release -- /property:Configuration=Release
+cmake --build . --target INSTALL -- /property:Configuration=Release
 cd ${WORKDIR}
 
 # Need to bundle openssl with the executable
@@ -186,6 +188,8 @@ cd ${WORKDIR}
 cd python-build
 tar -czf ../build-python-${PYTHON_FULL_VER}-windows-${ARCH}.tar.gz .
 cd ${WORKDIR}
+python3 -m pip install pyclean
+python3 -m pyclean -v python-install
 mv python-install python-${PYTHON_FULL_VER}-windows-${ARCH}
 tar -czf python-${PYTHON_FULL_VER}-windows-${ARCH}.tar.gz python-${PYTHON_FULL_VER}-windows-${ARCH}
 

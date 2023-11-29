@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ex
+set -e
 
 libpython=$1
 python=$2

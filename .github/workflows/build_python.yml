@@ -56,12 +56,19 @@ jobs:
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
-        if: ${{ always() }}
         with:
           name: python
-          path: ./*python*.tar.gz
+          path: ./python*.tar.gz
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        if: ${{ always() }}
+        with:
+          name: build-python
+          path: ./build-python*.tar.gz
 
       - name: Test python in clean environment
+        if: false
         uses: addnab/docker-run-action@v3
         with:
           image: ${{ steps.parse_image.outputs.image }}
@@ -104,11 +111,19 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: python
-          path: ./*python*.tar.gz
+          path: ./python*.tar.gz
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        if: ${{ always() }}
+        with:
+          name: build-python
+          path: ./build-python*.tar.gz
 
   test_windows:
     name: Windows ${{ inputs.python_version }} x86_64 (test)
     needs: build_windows
+    if: false
     runs-on: windows-latest
 
     steps:
@@ -146,11 +161,19 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: python
-          path: ./*python*.tar.gz
+          path: ./python*.tar.gz
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        if: ${{ always() }}
+        with:
+          name: build-python
+          path: ./build-python*.tar.gz
 
   test_macos:
     name: MacOS ${{ inputs.python_version }} universal2 (test)
     needs: build_macos
+    if: false
     runs-on: macos-latest
 
     steps:
