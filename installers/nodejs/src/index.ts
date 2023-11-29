@@ -1,8 +1,7 @@
-import { createWriteStream, unlink, existsSync, rm } from "fs";
+import { createWriteStream, unlink, existsSync, rm, promises as fsPromises } from "fs";
 import redirects from "follow-redirects";
-import { dirname, join } from "path";
+import { join } from "path";
 import { platform, arch } from "os";
-import { fileURLToPath } from 'url';
 import { x } from "tar";
 
 const DL_PLATFORM = (() => {
@@ -144,6 +143,9 @@ export class PortablePython {
         const url = `https://github.com/bjia56/portable-python/releases/download/${this.releaseTag}/${this.pythonDistributionName}.tar.gz`
         const downloadPath = join(this.installDir, `${this.pythonDistributionName}.tar.gz`);
 
+        await fsPromises.mkdir(this.installDir, { recursive: true });
+
+        const installDir = this.installDir;
         await new Promise<void>((resolve, reject) =>
             download(url, downloadPath, function(err) {
                 if (err) {
@@ -151,7 +153,7 @@ export class PortablePython {
                     return;
                 }
 
-                x({ file: downloadPath, cwd: __dirname, sync: true });
+                x({ file: downloadPath, cwd: installDir, sync: true });
                 unlink(downloadPath, () => resolve());
             })
         );
