@@ -188,6 +188,8 @@ cd ${WORKDIR}
 cd python-build
 tar -czf ../build-python-${PYTHON_FULL_VER}-windows-${ARCH}.tar.gz .
 cd ${WORKDIR}
+python3 -m pip install pyclean
+python3 -m pyclean -v python-install
 mv python-install python-${PYTHON_FULL_VER}-windows-${ARCH}
 tar -czf python-${PYTHON_FULL_VER}-windows-${ARCH}.tar.gz python-${PYTHON_FULL_VER}-windows-${ARCH}
 

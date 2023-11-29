@@ -52,15 +52,20 @@ jobs:
           options: -v ${{ github.workspace }}:/work --workdir /tmp --platform ${{ steps.parse_platform.outputs.platform }}
           run: |
             set -e
-            export PYTHONDONTWRITEBYTECODE=1
             /work/scripts/build_linux.sh ${{ matrix.arch }} ${{ inputs.python_version }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: python
+          path: ./python*.tar.gz
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         if: ${{ always() }}
         with:
-          name: python
-          path: ./*python*.tar.gz
+          name: build-python
+          path: ./build-python*.tar.gz
 
       - name: Test python in clean environment
         if: false
@@ -100,14 +105,20 @@ jobs:
         shell: bash
         run: |
           set -ex
-          export PYTHONDONTWRITEBYTECODE=1
           ./scripts/build_windows.sh x86_64 ${{ inputs.python_version }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: python
-          path: ./*python*.tar.gz
+          path: ./python*.tar.gz
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        if: ${{ always() }}
+        with:
+          name: build-python
+          path: ./build-python*.tar.gz
 
   test_windows:
     name: Windows ${{ inputs.python_version }} x86_64 (test)
@@ -144,14 +155,20 @@ jobs:
       - name: Build
         run: |
           set -ex
-          export PYTHONDONTWRITEBYTECODE=1
           ./scripts/build_macos.sh universal2 ${{ inputs.python_version }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: python
-          path: ./*python*.tar.gz
+          path: ./python*.tar.gz
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        if: ${{ always() }}
+        with:
+          name: build-python
+          path: ./build-python*.tar.gz
 
   test_macos:
     name: MacOS ${{ inputs.python_version }} universal2 (test)
