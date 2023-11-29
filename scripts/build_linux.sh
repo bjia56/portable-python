@@ -93,6 +93,8 @@ cmake \
   -DBUILD_LIBPYTHON_SHARED=ON \
   "${additionalparams[@]}" \
   -DBUILD_TESTING=ON \
+  -DINSTALL_TEST=OFF \
+  -DINSTALL_MANUAL=OFF \
   ../python-cmake-buildsystem
 make -j8
 make install
