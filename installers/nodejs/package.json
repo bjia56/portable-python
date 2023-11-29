@@ -1,8 +1,7 @@
 {
   "name": "@bjia56/portable-python",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Portable Python",
-  "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
