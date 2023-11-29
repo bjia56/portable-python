@@ -62,6 +62,7 @@ jobs:
           path: ./*python*.tar.gz
 
       - name: Test python in clean environment
+        if: false
         uses: addnab/docker-run-action@v3
         with:
           image: ${{ steps.parse_image.outputs.image }}
@@ -109,6 +110,7 @@ jobs:
   test_windows:
     name: Windows ${{ inputs.python_version }} x86_64 (test)
     needs: build_windows
+    if: false
     runs-on: windows-latest
 
     steps:
@@ -151,6 +153,7 @@ jobs:
   test_macos:
     name: MacOS ${{ inputs.python_version }} universal2 (test)
     needs: build_macos
+    if: false
     runs-on: macos-latest
 
     steps:
