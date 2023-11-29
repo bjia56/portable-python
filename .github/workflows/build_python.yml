@@ -52,6 +52,7 @@ jobs:
           options: -v ${{ github.workspace }}:/work --workdir /tmp --platform ${{ steps.parse_platform.outputs.platform }}
           run: |
             set -e
+            export PYTHONDONTWRITEBYTECODE=1
             /work/scripts/build_linux.sh ${{ matrix.arch }} ${{ inputs.python_version }}
 
       - name: Upload artifacts
@@ -99,6 +100,7 @@ jobs:
         shell: bash
         run: |
           set -ex
+          export PYTHONDONTWRITEBYTECODE=1
           ./scripts/build_windows.sh x86_64 ${{ inputs.python_version }}
 
       - name: Upload artifacts
@@ -142,6 +144,7 @@ jobs:
       - name: Build
         run: |
           set -ex
+          export PYTHONDONTWRITEBYTECODE=1
           ./scripts/build_macos.sh universal2 ${{ inputs.python_version }}
 
       - name: Upload artifacts
