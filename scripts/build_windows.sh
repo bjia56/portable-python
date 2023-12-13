@@ -16,7 +16,7 @@ mkdir python-build
 mkdir python-install
 mkdir deps
 
-git clone https://github.com/fbordignon/python-cmake-buildsystem.git --branch upgrade3.10.0 --single-branch --depth 1
+git clone https://github.com/bjia56/python-cmake-buildsystem.git --branch python3.10 --single-branch --depth 1
 #git clone https://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
 
 echo "::endgroup::"
