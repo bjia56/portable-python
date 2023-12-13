@@ -60,7 +60,8 @@ cd /build
 mkdir python-build
 mkdir python-install
 
-git clone https://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
+git clone https://github.com/fbordignon/python-cmake-buildsystem.git --branch upgrade3.10.0 --single-branch --depth 1
+#git clone https://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
 
 echo "::endgroup::"
 #############
