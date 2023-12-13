@@ -87,7 +87,6 @@ jobs:
   build_windows:
     name: Windows ${{ inputs.python_version }} x86_64 (build)
     runs-on: windows-latest
-    if: false
 
     steps:
       - name: Checkout
@@ -146,7 +145,6 @@ jobs:
   build_macos:
     name: MacOS ${{ inputs.python_version }} universal2 (build)
     runs-on: macos-latest
-    if: false
 
     steps:
       - name: Checkout
