@@ -22,6 +22,7 @@ libpanel.so
 libmenu.so
 libform.so
 libncurses.so
+libncursesw.so
 libcurses.so
 libtinfo.so
 libuuid.so
