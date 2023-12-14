@@ -111,7 +111,7 @@ echo "::group::zlib"
 cd ${WORKDIR}
 
 curl -L https://zlib.net/zlib13.zip --output zlib.zip
-unzip zlib.zip
+unzip -qq zlib.zip
 mkdir deps/zlib
 cd zlib-1.3
 mkdir build
