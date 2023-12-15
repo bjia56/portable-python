@@ -29,12 +29,14 @@ const DL_ARCH = (() => {
 })();
 
 const VERSIONS = [
+    "3.10.13",
     "3.9.17",
     "3.8.17",
 ];
 
 const VERSION_BUILDS = new Map<string, string>([
-   [ "3.9.17", "v3.9.17-build.1"],
+    ["3.10.13", "v3.10.13-build.0"],
+    ["3.9.17", "v3.9.17-build.1"],
     ["3.8.17", "v3.8.17-build.1"],
 ]);
 
