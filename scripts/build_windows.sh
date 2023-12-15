@@ -16,8 +16,8 @@ mkdir python-build
 mkdir python-install
 mkdir deps
 
-#git clone https://github.com/bjia56/python-cmake-buildsystem.git --branch win-patches --single-branch --depth 1
-git clone https://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
+git clone https://github.com/bjia56/python-cmake-buildsystem.git --branch python3.10 --single-branch --depth 1
+#git clone https://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
 
 echo "::endgroup::"
 ###########
@@ -76,7 +76,7 @@ echo "::group::sqlite3"
 cd ${WORKDIR}
 
 curl -L https://www.sqlite.org/2023/sqlite-amalgamation-3430100.zip --output sqlite3-src.zip
-unzip sqlite3-src.zip
+unzip -qq sqlite3-src.zip
 mv sqlite-amalgamation-3430100 deps/sqlite3
 cd deps/sqlite3
 cl //c sqlite3.c
@@ -90,7 +90,7 @@ echo "::group::zlib"
 cd ${WORKDIR}
 
 curl -L https://zlib.net/zlib13.zip --output zlib.zip
-unzip zlib.zip
+unzip -qq zlib.zip
 mkdir deps/zlib
 cd zlib-1.3
 mkdir build

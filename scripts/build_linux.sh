@@ -60,7 +60,8 @@ cd /build
 mkdir python-build
 mkdir python-install
 
-git clone https://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
+git clone https://github.com/bjia56/python-cmake-buildsystem.git --branch python3.10 --single-branch --depth 1
+#git clone https://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
 
 echo "::endgroup::"
 #############
@@ -85,6 +86,7 @@ if [[ "${ARCH}" == "armv7l" ]]; then
   additionalparams+=(-DUSE_SYSTEM_LIBMPDEC=ON)
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 fi
+#cmake --trace-expand \
 cmake \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
   -DCMAKE_BUILD_TYPE:STRING=Release \

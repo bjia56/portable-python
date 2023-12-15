@@ -20,7 +20,8 @@ mkdir deps
 
 export MACOSX_DEPLOYMENT_TARGET=10.15
 
-git clone https://github.com/bjia56/python-cmake-buildsystem.git --branch macos-arm64 --single-branch --depth 1
+git clone https://github.com/bjia56/python-cmake-buildsystem.git --branch python3.10 --single-branch --depth 1
+#git clone https://github.com/bjia56/python-cmake-buildsystem.git --branch macos-arm64 --single-branch --depth 1
 
 echo "::endgroup::"
 ###########
@@ -110,7 +111,7 @@ echo "::group::zlib"
 cd ${WORKDIR}
 
 curl -L https://zlib.net/zlib13.zip --output zlib.zip
-unzip zlib.zip
+unzip -qq zlib.zip
 mkdir deps/zlib
 cd zlib-1.3
 mkdir build
