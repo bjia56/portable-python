@@ -199,11 +199,13 @@ cd ${WORKDIR}
 
 ./python-install/bin/python --version
 cp ${WORKDIR}/deps/openssl/lib/libssl.1.1.dylib ${WORKDIR}/python-install/lib/python${PYTHON_VER}/lib-dynload/
+cp ${WORKDIR}/deps/openssl/lib/libcrypto.1.1.dylib ${WORKDIR}/python-install/lib/python${PYTHON_VER}/lib-dynload/
 
 otool -l ./python-install/bin/python
 install_name_tool -add_rpath @executable_path/../lib ./python-install/bin/python
 install_name_tool -change ${WORKDIR}/python-install/lib/libpython${PYTHON_VER}.dylib @rpath/libpython${PYTHON_VER}.dylib ./python-install/bin/python
-install_name_tool -change ${WORKDIR}/deps/openssl/lib/libssl.1.1.dylib @loader_path/libssl.1.1.dylib ${WORKDIR}/python-install/lib/python${PYTHON_VER}/lib-dynload/_ssl.so 
+install_name_tool -change ${WORKDIR}/deps/openssl/lib/libssl.1.1.dylib @loader_path/libssl.1.1.dylib ${WORKDIR}/python-install/lib/python${PYTHON_VER}/lib-dynload/_ssl.so
+install_name_tool -change ${WORKDIR}/deps/openssl/lib/libcrypto.1.1.dylib @loader_path/libcrypto.1.1.dylib ${WORKDIR}/python-install/lib/python${PYTHON_VER}/lib-dynload/_ssl.so
 otool -l ./python-install/bin/python
 otool -l ./python-install/lib/python${PYTHON_VER}/lib-dynload/_ssl.so
 
