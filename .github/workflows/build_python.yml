@@ -116,11 +116,6 @@ jobs:
           name: python
           path: ./python*.zip
 
-      - uses: vimtor/action-zip@v1.1
-        with:
-          files: python-${{ inputs.python_version }}-windows-x86_64
-          dest: python-${{ inputs.python_version }}-windows-x86_64.zip
-
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         if: ${{ always() }}
@@ -143,7 +138,7 @@ jobs:
       - name: Test python in clean environment
         shell: bash
         run: |
-          unzip python/python-${{ inputs.python_version }}-windows-x86_64.zip
+          7z.exe e python/python-${{ inputs.python_version }}-windows-x86_64.zip
 
           cd python-${{ inputs.python_version }}-windows-x86_64
           bin/python --version
