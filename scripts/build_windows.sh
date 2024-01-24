@@ -89,7 +89,7 @@ echo "::endgroup::"
 echo "::group::zlib"
 cd ${WORKDIR}
 
-curl -L https://zlib.net/zlib13.zip --output zlib.zip
+curl -L https://zlib.net/fossils/zlib-1.3.tar.gz --output zlib.zip
 unzip -qq zlib.zip
 mkdir deps/zlib
 cd zlib-1.3
