@@ -1,8 +1,10 @@
-import { createWriteStream, unlink, existsSync, rm, mkdirSync } from "fs";
-import redirects from "follow-redirects";
+import { createWriteStream, existsSync, rm, mkdirSync, chmodSync } from "fs";
 import { join } from "path";
 import { platform, arch } from "os";
-import { x } from "tar";
+import { Readable } from 'stream';
+import { finished } from 'stream/promises';
+import { ReadableStream } from 'stream/web';
+import AdmZip from "adm-zip";
 
 const DL_PLATFORM = (() => {
     if (platform() == "win32") {
@@ -51,29 +53,10 @@ function pickVersion(version: string) {
 }
 
 // https://stackoverflow.com/a/32134846
-function download(url: string, dest: string, cb: (s: any) => void) {
+async function download(url: string, dest: string) {
+    const res = await fetch(url);
     const file = createWriteStream(dest);
-
-    const request = redirects.https.get(url, (response) => {
-        // check if response is success
-        if (response.statusCode !== 200) {
-            return cb('Response status was ' + response.statusCode);
-        }
-
-        response.pipe(file);
-    });
-
-    // close() is async, call cb after close completes
-    file.on('finish', () => file.close(cb));
-
-    // check for request error too
-    request.on('error', (err) => {
-        unlink(dest, () => cb(err.message)); // delete the (partial) file and then return the error
-    });
-
-    file.on('error', (err) => {
-        unlink(dest, () => cb(err.message)); // delete the (partial) file and then return the error
-    });
+    await finished(Readable.fromWeb(res.body as ReadableStream).pipe(file));
 }
 
 export class PortablePython {
@@ -142,27 +125,22 @@ export class PortablePython {
             return;
         }
 
-        const url = `https://github.com/bjia56/portable-python/releases/download/${this.releaseTag}/${this.pythonDistributionName}.tar.gz`
-        const downloadPath = join(this.installDir, `${this.pythonDistributionName}.tar.gz`);
+        const url = `https://github.com/bjia56/portable-python/releases/download/${this.releaseTag}/${this.pythonDistributionName}.zip`
+        const downloadPath = join(this.installDir, `${this.pythonDistributionName}.zip`);
 
         mkdirSync(this.installDir, { recursive: true });
 
         const installDir = this.installDir;
-        await new Promise<void>((resolve, reject) =>
-            download(url, downloadPath, function(err) {
-                if (err) {
-                    reject(err);
-                    return;
-                }
+        await download(url, downloadPath);
 
-                x({ file: downloadPath, cwd: installDir, sync: true });
-                unlink(downloadPath, () => resolve());
-            })
-        );
+        const zip = new AdmZip(downloadPath);
+        zip.extractAllTo(installDir, true)
 
         if (!this.isInstalled()) {
             throw Error("something went wrong and the installation failed");
         }
+
+        chmodSync(this.executablePath, 0o777);
     }
 
     /**

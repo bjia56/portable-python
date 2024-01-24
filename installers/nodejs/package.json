@@ -1,14 +1,14 @@
 {
   "name": "@bjia56/portable-python",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Portable Python",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "files": [
-      "dist"
+    "dist"
   ],
-   "scripts": {
+  "scripts": {
     "build": "tsup",
     "prepublishOnly": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -27,12 +27,10 @@
   },
   "homepage": "https://github.com/bjia56/portable-python",
   "dependencies": {
-    "follow-redirects": "^1.15.3",
-    "tar": "^6.2.0"
+    "adm-zip": "^0.5.10"
   },
   "devDependencies": {
-    "@types/follow-redirects": "^1.14.4",
-    "@types/tar": "^6.1.10",
+    "@types/adm-zip": "^0.5.5",
     "ts-node": "^10.9.1",
     "tsup": "^8.0.1",
     "typescript": "^5.3.2"
