@@ -138,7 +138,7 @@ jobs:
       - name: Test python in clean environment
         shell: bash
         run: |
-          7z.exe e python/python-${{ inputs.python_version }}-windows-x86_64.zip
+          7z.exe x python/python-${{ inputs.python_version }}-windows-x86_64.zip
 
           cd python-${{ inputs.python_version }}-windows-x86_64
           bin/python --version
