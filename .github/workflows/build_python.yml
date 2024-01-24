@@ -138,6 +138,7 @@ jobs:
 
           cd python-${{ inputs.python_version }}-windows-x86_64
           bin/python --version
+          ./bin/python -c "import ssl"
 
           # make tests nonfatal for now
           # ./bin/python -m test || true
@@ -187,6 +188,7 @@ jobs:
 
           cd python-${{ inputs.python_version }}-darwin-universal2
           ./bin/python --version
+          ./bin/python -c "import ssl"
 
           # make tests nonfatal for now
           # ./bin/python -m test || true
