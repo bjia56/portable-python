@@ -114,6 +114,11 @@ jobs:
           name: python
           path: ./python*.zip
 
+      - uses: vimtor/action-zip@v1.1
+        with:
+          files: python-${{ inputs.python_version }}-windows-x86_64
+          dest: python-${{ inputs.python_version }}-windows-x86_64.zip
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         if: ${{ always() }}
