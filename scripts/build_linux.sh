@@ -14,7 +14,7 @@ echo "::group::Install dependencies"
 export DEBIAN_FRONTEND=noninteractive
 apt update
 apt -y upgrade
-apt -y install build-essential python3 python3-pip git wget
+apt -y install build-essential python3 python3-pip git wget zip
 
 # dependencies for enabled python extensions
 apt -y install zlib1g-dev libssl-dev libffi-dev libsqlite3-dev
@@ -166,5 +166,6 @@ python3 -m pip install pyclean
 python3 -m pyclean -v python-install
 mv python-install python-${PYTHON_FULL_VER}-linux-${ARCH}
 tar -czf /work/python-${PYTHON_FULL_VER}-linux-${ARCH}.tar.gz python-${PYTHON_FULL_VER}-linux-${ARCH}
+zip /work/python-${PYTHON_FULL_VER}-linux-${ARCH}.zip $(tar tf /work/python-${PYTHON_FULL_VER}-linux-${ARCH}.tar.gz)
 
 echo "::endgroup::"

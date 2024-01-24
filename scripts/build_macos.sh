@@ -110,8 +110,8 @@ echo "::endgroup::"
 echo "::group::zlib"
 cd ${WORKDIR}
 
-curl -L https://zlib.net/zlib13.zip --output zlib.zip
-unzip -qq zlib.zip
+curl -L https://zlib.net/fossils/zlib-1.3.tar.gz --output zlib.tar.gz
+tar -xf zlib.tar.gz
 mkdir deps/zlib
 cd zlib-1.3
 mkdir build
@@ -164,7 +164,8 @@ cd ${WORKDIR}
 cd python-build
 cmake \
   -G "Unix Makefiles" \
-   "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
+  "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
+  -DCMAKE_OSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET} \
   -DCMAKE_C_STANDARD=99 \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
   -DCMAKE_BUILD_TYPE:STRING=Release \
@@ -198,11 +199,16 @@ echo "::group::Test and patch python"
 cd ${WORKDIR}
 
 ./python-install/bin/python --version
+cp ${WORKDIR}/deps/openssl/lib/libssl.1.1.dylib ${WORKDIR}/python-install/lib/python${PYTHON_VER}/lib-dynload/
+cp ${WORKDIR}/deps/openssl/lib/libcrypto.1.1.dylib ${WORKDIR}/python-install/lib/python${PYTHON_VER}/lib-dynload/
 
 otool -l ./python-install/bin/python
 install_name_tool -add_rpath @executable_path/../lib ./python-install/bin/python
 install_name_tool -change ${WORKDIR}/python-install/lib/libpython${PYTHON_VER}.dylib @rpath/libpython${PYTHON_VER}.dylib ./python-install/bin/python
+install_name_tool -change ${WORKDIR}/deps/openssl/lib/libssl.1.1.dylib @loader_path/libssl.1.1.dylib ${WORKDIR}/python-install/lib/python${PYTHON_VER}/lib-dynload/_ssl.so
+install_name_tool -change ${WORKDIR}/deps/openssl/lib/libcrypto.1.1.dylib @loader_path/libcrypto.1.1.dylib ${WORKDIR}/python-install/lib/python${PYTHON_VER}/lib-dynload/_ssl.so
 otool -l ./python-install/bin/python
+otool -l ./python-install/lib/python${PYTHON_VER}/lib-dynload/_ssl.so
 
 ./python-install/bin/python --version
 
@@ -228,5 +234,6 @@ python3 -m pip install pyclean
 python3 -m pyclean -v python-install
 mv python-install python-${PYTHON_FULL_VER}-darwin-${ARCH}
 tar -czf python-${PYTHON_FULL_VER}-darwin-${ARCH}.tar.gz python-${PYTHON_FULL_VER}-darwin-${ARCH}
+zip python-${PYTHON_FULL_VER}-darwin-${ARCH}.zip $(tar tf python-${PYTHON_FULL_VER}-darwin-${ARCH}.tar.gz)
 
 echo "::endgroup::"

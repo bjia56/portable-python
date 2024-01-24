@@ -89,8 +89,8 @@ echo "::endgroup::"
 echo "::group::zlib"
 cd ${WORKDIR}
 
-curl -L https://zlib.net/zlib13.zip --output zlib.zip
-unzip -qq zlib.zip
+curl -L https://zlib.net/fossils/zlib-1.3.tar.gz --output zlib.tar.gz
+tar -xf zlib.tar.gz
 mkdir deps/zlib
 cd zlib-1.3
 mkdir build
@@ -192,5 +192,6 @@ python3 -m pip install pyclean
 python3 -m pyclean -v python-install
 mv python-install python-${PYTHON_FULL_VER}-windows-${ARCH}
 tar -czf python-${PYTHON_FULL_VER}-windows-${ARCH}.tar.gz python-${PYTHON_FULL_VER}-windows-${ARCH}
+7z.exe a python-${PYTHON_FULL_VER}-windows-${ARCH}.zip python-${PYTHON_FULL_VER}-windows-${ARCH}
 
 echo "::endgroup::"
