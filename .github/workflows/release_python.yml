@@ -45,6 +45,6 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: /tmp/python/python*.tar.gz
+          files: /tmp/python/python*.zip
           tag_name: ${{ env.SELECTED_TAG }}
           body: "Python ${{ inputs.python_version }}"

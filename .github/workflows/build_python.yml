@@ -58,14 +58,14 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: python
-          path: ./python*.tar.gz
+          path: ./python*.zip
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         if: ${{ always() }}
         with:
           name: build-python
-          path: ./build-python*.tar.gz
+          path: ./*python*.tar.gz
 
       - name: Test python in clean environment
         uses: addnab/docker-run-action@v3
@@ -75,9 +75,11 @@ jobs:
           run: |
             set -e
 
-            cp /work/python*.tar.gz .
-            tar -xzf ./python*.tar.gz
-            cd python*
+            cp /work/python*.zip .
+            unzip ./python*.zip
+
+            cd python-${{ inputs.python_version }}-linux-${{ matrix.arch }}
+            chmod +x ./bin/python
             ldd -v -r ./bin/python || true
             ./bin/python --version
 
@@ -110,14 +112,14 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: python
-          path: ./python*.tar.gz
+          path: ./python*.zip
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         if: ${{ always() }}
         with:
           name: build-python
-          path: ./build-python*.tar.gz
+          path: ./*python*.tar.gz
 
   test_windows:
     name: Windows ${{ inputs.python_version }} x86_64 (test)
@@ -134,7 +136,7 @@ jobs:
       - name: Test python in clean environment
         shell: bash
         run: |
-          tar -xvf python/python-${{ inputs.python_version }}-windows-x86_64.tar.gz
+          unzip python/python-${{ inputs.python_version }}-windows-x86_64.zip
 
           cd python-${{ inputs.python_version }}-windows-x86_64
           bin/python --version
@@ -160,14 +162,14 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: python
-          path: ./python*.tar.gz
+          path: ./python*.zip
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         if: ${{ always() }}
         with:
           name: build-python
-          path: ./build-python*.tar.gz
+          path: ./*python*.tar.gz
 
   test_macos:
     name: MacOS ${{ inputs.python_version }} universal2 (test)
@@ -184,9 +186,10 @@ jobs:
       - name: Test python in clean environment
         shell: bash
         run: |
-          tar -xvf python/python-${{ inputs.python_version }}-darwin-universal2.tar.gz
+          unzip python/python-${{ inputs.python_version }}-darwin-universal2.zip
 
           cd python-${{ inputs.python_version }}-darwin-universal2
+          chmod +x ./bin/python
           ./bin/python --version
           ./bin/python -c "import ssl"
 
