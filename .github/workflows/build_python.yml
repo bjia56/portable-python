@@ -54,6 +54,11 @@ jobs:
             set -e
             /work/scripts/build_linux.sh ${{ matrix.arch }} ${{ inputs.python_version }}
 
+      - uses: vimtor/action-zip@v1.1
+        with:
+          files: python-${{ inputs.python_version }}-linux-${{ matrix.arch }}
+          dest: python-${{ inputs.python_version }}-linux-${{ matrix.arch }}.zip
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -108,6 +113,11 @@ jobs:
           set -ex
           ./scripts/build_windows.sh x86_64 ${{ inputs.python_version }}
 
+      - uses: vimtor/action-zip@v1.1
+        with:
+          files: python-${{ inputs.python_version }}-windows-x86_64
+          dest: python-${{ inputs.python_version }}-windows-x86_64.zip
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -157,6 +167,11 @@ jobs:
         run: |
           set -ex
           ./scripts/build_macos.sh universal2 ${{ inputs.python_version }}
+
+      - uses: vimtor/action-zip@v1.1
+        with:
+          files: python-${{ inputs.python_version }}-darwin-universal2
+          dest: python-${{ inputs.python_version }}-darwin-universal2.zip
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
