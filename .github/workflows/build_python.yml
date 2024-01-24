@@ -74,6 +74,8 @@ jobs:
           options: -v ${{ github.workspace }}:/work --workdir /tmp --platform ${{ steps.parse_platform.outputs.platform }}
           run: |
             set -e
+            apt update
+            apt install -y unzip
 
             cp /work/python*.zip .
             unzip ./python*.zip
