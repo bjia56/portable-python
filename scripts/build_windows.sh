@@ -161,6 +161,9 @@ cd ${WORKDIR}
 # Need to bundle openssl with the executable
 cp deps/openssl/bin/*.dll python-install/bin
 
+# Need to bundle vcredist
+cp /c/WINDOWS/SYSTEM32/VCRUNTIME140.dll python-install/bin
+
 echo "::endgroup::"
 ###############
 # Test python #
