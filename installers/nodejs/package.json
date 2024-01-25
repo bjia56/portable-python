@@ -1,6 +1,7 @@
 {
   "name": "@bjia56/portable-python",
-  "version": "0.0.6",
+  "private": true,
+  "version": "0.1.0",
   "description": "Portable Python",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
