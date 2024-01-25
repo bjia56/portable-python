@@ -18,7 +18,6 @@ env:
 
 jobs:
   build_linux:
-    if: false
     name: Linux ${{ inputs.python_version }} ${{ matrix.arch }}
     runs-on: ubuntu-latest
     strategy:
