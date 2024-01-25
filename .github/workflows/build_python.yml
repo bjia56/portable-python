@@ -176,7 +176,7 @@ jobs:
   test_macos:
     name: MacOS ${{ inputs.python_version }} universal2 (test)
     needs: build_macos
-    runs-on: macos-latest
+    runs-on: macos-11
 
     steps:
       - name: Download artifact
