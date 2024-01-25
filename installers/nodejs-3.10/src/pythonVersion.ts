@@ -1,0 +1,1 @@
+export const pythonVersion = "3.10";
