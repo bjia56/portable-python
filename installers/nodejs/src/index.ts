@@ -136,12 +136,12 @@ export class PortablePython {
         const zip = new AdmZip(downloadPath);
         zip.extractAllTo(installDir, true)
 
+        rmSync(downloadPath);
         if (!this.isInstalled()) {
             throw Error("something went wrong and the installation failed");
         }
 
         chmodSync(this.executablePath, 0o777);
-        rmSync(downloadPath);
     }
 
     /**
