@@ -18,7 +18,7 @@ mkdir python-build
 mkdir python-install
 mkdir deps
 
-export MACOSX_DEPLOYMENT_TARGET=10.5
+export MACOSX_DEPLOYMENT_TARGET=10.0
 
 git clone https://github.com/bjia56/python-cmake-buildsystem.git --branch python3.10 --single-branch --depth 1
 #git clone https://github.com/bjia56/python-cmake-buildsystem.git --branch macos-arm64 --single-branch --depth 1
