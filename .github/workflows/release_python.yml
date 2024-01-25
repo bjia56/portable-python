@@ -6,11 +6,19 @@ on:
       python_version:
         required: true
         type: string
+      beta:
+        required: false
+        type: boolean
+        default: false
   workflow_call:
     inputs:
       python_version:
         required: true
         type: string
+      beta:
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   build:
@@ -40,7 +48,7 @@ jobs:
 
       - name: Pick tag
         run: |
-          echo "SELECTED_TAG=$(./scripts/pick_semver.sh ${{ inputs.python_version }})" >> $GITHUB_ENV
+          echo "SELECTED_TAG=$(./scripts/pick_semver.sh ${{ inputs.python_version }} ${{ inputs.beta }})" >> $GITHUB_ENV
 
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -48,3 +56,4 @@ jobs:
           files: /tmp/python/python*.zip
           tag_name: ${{ env.SELECTED_TAG }}
           body: "Python ${{ inputs.python_version }}"
+          prerelease: ${{ inputs.beta }}
