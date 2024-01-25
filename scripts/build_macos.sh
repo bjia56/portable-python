@@ -42,6 +42,8 @@ make install_sw
 file ${WORKDIR}/deps/openssl/lib/libcrypto.a
 file ${WORKDIR}/deps/openssl/lib/libssl.a
 
+install_name_tool -change ${WORKDIR}/deps/openssl/lib/libcrypto.1.1.dylib @loader_path/libcrypto.1.1.dylib ${WORKDIR}/deps/openssl/lib/libssl.1.1.dylib
+
 otool -l ${WORKDIR}/deps/openssl/lib/libssl.1.1.dylib
 otool -l ${WORKDIR}/deps/openssl/lib/libcrypto.1.1.dylib
 
