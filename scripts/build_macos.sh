@@ -42,6 +42,9 @@ make install_sw
 file ${WORKDIR}/deps/openssl/lib/libcrypto.a
 file ${WORKDIR}/deps/openssl/lib/libssl.a
 
+otool -l ${WORKDIR}/deps/openssl/lib/libssl.1.1.dylib
+otool -l ${WORKDIR}/deps/openssl/lib/libcrypto.1.1.dylib
+
 echo "::endgroup::"
 #########
 # bzip2 #
