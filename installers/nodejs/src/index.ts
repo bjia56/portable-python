@@ -1,4 +1,4 @@
-import { createWriteStream, existsSync, rm, mkdirSync, chmodSync } from "fs";
+import { createWriteStream, existsSync, rm, rmSync, mkdirSync, chmodSync } from "fs";
 import { join } from "path";
 import { platform, arch } from "os";
 import { Readable } from 'stream';
@@ -141,6 +141,7 @@ export class PortablePython {
         }
 
         chmodSync(this.executablePath, 0o777);
+        rmSync(downloadPath);
     }
 
     /**
