@@ -18,7 +18,7 @@ mkdir python-build
 mkdir python-install
 mkdir deps
 
-export MACOSX_DEPLOYMENT_TARGET=10.15
+export MACOSX_DEPLOYMENT_TARGET=10.5
 
 git clone https://github.com/bjia56/python-cmake-buildsystem.git --branch python3.10 --single-branch --depth 1
 #git clone https://github.com/bjia56/python-cmake-buildsystem.git --branch macos-arm64 --single-branch --depth 1
@@ -57,6 +57,7 @@ cd build
 cmake \
   -G "Unix Makefiles" \
   "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
+  -DCMAKE_OSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET} \
   -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/deps/bzip2 \
   ..
 make -j${NPROC}
@@ -79,6 +80,7 @@ cd build
 cmake \
   -G "Unix Makefiles" \
   "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
+  -DCMAKE_OSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET} \
   -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/deps/xz \
   ..
 make -j${NPROC}
@@ -119,6 +121,7 @@ cd build
 cmake \
   -G "Unix Makefiles" \
   "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
+  -DCMAKE_OSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET} \
   -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/deps/zlib \
   ..
 make -j${NPROC}
