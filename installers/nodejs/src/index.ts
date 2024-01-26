@@ -37,9 +37,9 @@ const VERSIONS = [
 ];
 
 const VERSION_BUILDS = new Map<string, string>([
-    ["3.10.13", "v3.10.13-build.1"],
-    ["3.9.17", "v3.9.17-build.2"],
-    ["3.8.17", "v3.8.17-build.2"],
+    ["3.10.13", "v3.10.13-build.2"],
+    ["3.9.17", "v3.9.17-build.3"],
+    ["3.8.17", "v3.8.17-build.3"],
 ]);
 
 function pickVersion(version: string) {
