@@ -30,10 +30,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-        if: ${{ matrix.arch != 'x86_64' }}
-
       - name: Build
         run: |
           sudo ./scripts/build_linux_zig.sh ${{ matrix.arch }} ${{ inputs.python_version }}

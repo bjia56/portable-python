@@ -141,7 +141,7 @@ rm *.tar.gz
 cd commontk-bzip2*
 mkdir build
 cd build
-cmake -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
+cmake -DCMAKE_SYSTEM_PROCESSOR=${ARCH} -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
 make -j4
 make install
 
@@ -158,7 +158,7 @@ rm *.tar.gz
 cd xz*
 mkdir build
 cd build
-cmake -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
+cmake -DCMAKE_SYSTEM_PROCESSOR=${ARCH} -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
 make -j4
 make install
 
@@ -175,7 +175,7 @@ rm *.tar.gz
 cd libuuid*
 mkdir build
 cd build
-cmake -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DLIBUUID_SHARED=OFF -DLIBUUID_STATIC=ON ..
+cmake -DCMAKE_SYSTEM_PROCESSOR=${ARCH} -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DLIBUUID_SHARED=OFF -DLIBUUID_STATIC=ON ..
 make -j4
 make install
 
@@ -239,6 +239,7 @@ mkdir python-build
 mkdir python-install
 cd python-build
 CFLAGS="-I${DEPSDIR}/include" cmake \
+    -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
     -DCMAKE_C_STANDARD=99 \
     -DPYTHON_VERSION=${PYTHON_FULL_VER} \
     -DCMAKE_BUILD_TYPE:STRING=Release \
