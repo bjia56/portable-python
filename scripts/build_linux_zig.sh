@@ -81,7 +81,7 @@ wget -q https://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.4.tar.gz
 tar -xf ncurses*.tar.gz
 rm *.tar.gz
 cd ncurses*
-./configure --prefix=${DEPSDIR}
+./configure --with-normal --enable-overwrite --prefix=${DEPSDIR}
 make -j4
 make install
 cd ${BUILDDIR}
