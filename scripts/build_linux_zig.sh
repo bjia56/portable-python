@@ -10,6 +10,8 @@ WORKDIR=$(pwd)
 BUILDDIR=${WORKDIR}/build
 DEPSDIR=${WORKDIR}/deps
 
+trap "cd ${BUILDDIR}/python-build && tar -czf ${WORKDIR}/build-python-${PYTHON_FULL_VER}-linux-${ARCH}.tar.gz ." EXIT
+
 ########################
 # Install dependencies #
 ########################
@@ -274,8 +276,6 @@ CFLAGS="-I${DEPSDIR}/include" cmake \
     ../python-cmake-buildsystem
 make -j4
 make install
-
-tar -czf ${WORKDIR}/build-python-${PYTHON_FULL_VER}-linux-${ARCH}.tar.gz .
 
 echo "::endgroup::"
 #############################################
