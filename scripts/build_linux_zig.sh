@@ -94,7 +94,7 @@ wget -q https://www.sqlite.org/2024/sqlite-autoconf-3450000.tar.gz
 tar -xf sqlite*.tar.gz
 rm *.tar.gz
 cd sqlite*
-./configure --prefix=${DEPSDIR}
+./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
 make install
 
