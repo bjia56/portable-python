@@ -11,7 +11,6 @@ BUILDDIR=${WORKDIR}/build
 DEPSDIR=${WORKDIR}/deps
 
 apt update
-apt -y upgrade
 apt -y install wget build-essential cmake lld
 
 cd /
