@@ -33,6 +33,7 @@ mkdir ${DEPSDIR}
 export AR=zig_ar
 export CC=zig_cc
 export CXX=zig_cxx
+export CHOST=${ARCH}
 
 export TARGET=${ARCH}-linux-gnu.2.17
 export ZIG_TARGET=${TARGET}
