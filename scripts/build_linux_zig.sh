@@ -10,8 +10,14 @@ WORKDIR=$(pwd)
 BUILDDIR=${WORKDIR}/build
 DEPSDIR=${WORKDIR}/deps
 
+########################
+# Install dependencies #
+########################
+echo "::group::Install dependencies"
+
+export DEBIAN_FRONTEND=noninteractive
 apt update
-apt -y install wget build-essential pkg-config cmake autoconf git python3 meson clang
+apt -y install wget build-essential pkg-config cmake autoconf git python3 meson clang patchelf
 
 cd /
 wget -q https://ziglang.org/download/0.11.0/zig-linux-x86_64-0.11.0.tar.xz
@@ -23,7 +29,6 @@ export PATH=${PATH}:/zig-linux-x86_64-0.11.0
 
 mkdir ${BUILDDIR}
 mkdir ${DEPSDIR}
-cd ${BUILDDIR}
 
 export AR=zig_ar
 export CC=zig_cc
@@ -32,6 +37,13 @@ export CXX=zig_cxx
 export TARGET=${ARCH}-linux-gnu.2.17
 export ZIG_TARGET=${TARGET}
 
+echo "::endgroup::"
+########
+# zlib #
+########
+echo "::group::zlib"
+cd ${BUILDDIR}
+
 wget -q https://zlib.net/fossils/zlib-1.3.tar.gz
 tar -xf zlib*.tar.gz
 rm *.tar.gz
@@ -39,6 +51,12 @@ cd zlib*
 ./configure --prefix=${DEPSDIR}
 make -j4
 make install
+
+echo "::endgroup::"
+###########
+# OpenSSL #
+###########
+echo "::group::OpenSSL"
 cd ${BUILDDIR}
 
 wget -q https://github.com/openssl/openssl/archive/refs/tags/OpenSSL_1_1_1w.tar.gz
@@ -48,6 +66,12 @@ cd openssl-OpenSSL*
 ./config no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 make -j4
 make install_sw
+
+echo "::endgroup::"
+##########
+# libffi #
+##########
+echo "::group::libffi"
 cd ${BUILDDIR}
 
 wget -q https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.tar.gz
@@ -57,6 +81,12 @@ cd libffi*
 ./configure --prefix=${DEPSDIR}
 make -j4
 make install
+
+echo "::endgroup::"
+###########
+# sqlite3 #
+###########
+echo "::group::sqlite3"
 cd ${BUILDDIR}
 
 wget -q https://www.sqlite.org/2024/sqlite-autoconf-3450000.tar.gz
@@ -66,6 +96,12 @@ cd sqlite*
 ./configure --prefix=${DEPSDIR}
 make -j4
 make install
+
+echo "::endgroup::"
+############
+# readline #
+############
+echo "::group::readline"
 cd ${BUILDDIR}
 
 wget -q https://ftp.gnu.org/gnu/readline/readline-8.2.tar.gz
@@ -75,6 +111,12 @@ cd readline*
 ./configure --prefix=${DEPSDIR}
 make -j4
 make install
+
+echo "::endgroup::"
+###########
+# ncurses #
+###########
+echo "::group::ncurses"
 cd ${BUILDDIR}
 
 wget -q https://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.4.tar.gz
@@ -84,6 +126,12 @@ cd ncurses*
 ./configure --with-normal --enable-overwrite --prefix=${DEPSDIR}
 make -j4
 make install
+
+echo "::endgroup::"
+#########
+# bzip2 #
+#########
+echo "::group::bzip2"
 cd ${BUILDDIR}
 
 wget -q -O bzip2.tar.gz https://github.com/commontk/bzip2/tarball/master
@@ -95,6 +143,12 @@ cd build
 cmake -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
 make -j4
 make install
+
+echo "::endgroup::"
+######
+# xz #
+######
+echo "::group::xz"
 cd ${BUILDDIR}
 
 wget -q https://github.com/tukaani-project/xz/releases/download/v5.4.5/xz-5.4.5.tar.gz
@@ -106,6 +160,12 @@ cd build
 cmake -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
 make -j4
 make install
+
+echo "::endgroup::"
+########
+# uuid #
+########
+echo "::group::uuid"
 cd ${BUILDDIR}
 
 wget -q -O libuuid-cmake.tar.gz https://github.com/gershnik/libuuid-cmake/archive/refs/tags/v2.39.3.tar.gz
@@ -117,6 +177,12 @@ cd build
 cmake -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DLIBUUID_SHARED=OFF -DLIBUUID_STATIC=ON ..
 make -j4
 make install
+
+echo "::endgroup::"
+########
+# gdbm #
+########
+echo "::group::gdbm"
 cd ${BUILDDIR}
 
 wget -q https://ftp.gnu.org/gnu/gdbm/gdbm-1.23.tar.gz
@@ -126,15 +192,27 @@ cd gdbm*
 ./configure --enable-libgdbm-compat --prefix=${DEPSDIR}
 make -j4
 make install
+
+echo "::endgroup::"
+#######
+# tcl #
+#######
+echo "::group::tcl"
 cd ${BUILDDIR}
 
-wget -q https://prdownloads.sourceforge.net/tcl/tcl8.6.13-src.tar.gz
-tar -xf tcl*.tar.gz
-rm *.tar.gz
-cd tcl*/unix
-./configure --prefix=${DEPSDIR}
-make -j4
-make install
+#wget -q https://prdownloads.sourceforge.net/tcl/tcl8.6.13-src.tar.gz
+#tar -xf tcl*.tar.gz
+#rm *.tar.gz
+#cd tcl*/unix
+#./configure --prefix=${DEPSDIR}
+#make -j4
+#make install
+
+echo "::endgroup::"
+######
+# tk #
+######
+echo "::group::tk"
 cd ${BUILDDIR}
 
 #wget -q https://prdownloads.sourceforge.net/tcl/tk8.6.13-src.tar.gz
@@ -144,7 +222,13 @@ cd ${BUILDDIR}
 #CFLAGS="-I${DEPSDIR}/include" ./configure --prefix=${DEPSDIR}
 #make -j4
 #make install
-#cd ${BUILDDIR}
+
+echo "::endgroup::"
+##########
+# Python #
+##########
+echo "::group::Python"
+cd ${BUILDDIR}
 
 wget -q -O python-cmake-buildsystem.tar.gz https://github.com/bjia56/python-cmake-buildsystem/tarball/portable-python
 tar -xf python-cmake-buildsystem.tar.gz
