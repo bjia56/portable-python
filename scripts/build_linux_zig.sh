@@ -11,7 +11,7 @@ BUILDDIR=${WORKDIR}/build
 DEPSDIR=${WORKDIR}/deps
 
 apt update
-apt -y install wget build-essential cmake lld
+apt -y install wget build-essential pkg-config cmake autoconf git python3 meson clang
 
 cd /
 wget -q https://ziglang.org/download/0.11.0/zig-linux-x86_64-0.11.0.tar.xz
@@ -28,7 +28,6 @@ cd ${BUILDDIR}
 export AR=zig_ar
 export CC=zig_cc
 export CXX=zig_cxx
-#export LD=lld
 
 export TARGET=${ARCH}-linux-gnu.2.17
 export ZIG_TARGET=${TARGET}
@@ -124,7 +123,7 @@ wget -q https://ftp.gnu.org/gnu/gdbm/gdbm-1.23.tar.gz
 tar -xf gdbm*.tar.gz
 rm *.tar.gz
 cd gdbm*
-./configure --prefix=${DEPSDIR}
+./configure --enable-libgdbm-compat --prefix=${DEPSDIR}
 make -j4
 make install
 cd ${BUILDDIR}
@@ -138,7 +137,15 @@ make -j4
 make install
 cd ${BUILDDIR}
 
-export CFLAGS="-I${DEPSDIR}/include"
+wget -q https://prdownloads.sourceforge.net/tcl/tk8.6.13-src.tar.gz
+tar -xf tk*.tar.gz
+rm *.tar.gz
+cd tk*/unix
+CFLAGS="-I${DEPSDIR}/include" ./configure --prefix=${DEPSDIR}
+make -j4
+make install
+cd ${BUILDDIR}
+
 wget -q -O python-cmake-buildsystem.tar.gz https://github.com/bjia56/python-cmake-buildsystem/tarball/portable-python
 tar -xf python-cmake-buildsystem.tar.gz
 rm *.tar.gz
@@ -146,17 +153,19 @@ mv *python-cmake-buildsystem* python-cmake-buildsystem
 mkdir python-build
 mkdir python-install
 cd python-build
-cmake \
+CFLAGS="-I${DEPSDIR}/include" cmake \
     -DCMAKE_C_STANDARD=99 \
     -DPYTHON_VERSION=${PYTHON_FULL_VER} \
     -DCMAKE_BUILD_TYPE:STRING=Release \
     -DCMAKE_INSTALL_PREFIX:PATH=/build/python-install \
     -DBUILD_EXTENSIONS_AS_BUILTIN=OFF \
     -DBUILD_LIBPYTHON_SHARED=ON \
+    -DUSE_SYSTEM_LIBRARIES=OFF \
     -DBUILD_TESTING=ON \
     -DINSTALL_TEST=OFF \
     -DINSTALL_MANUAL=OFF \
-    -DOPENSSL_ROOT_DIR:PATH=${DEPSDIR} \
+    -DOPENSSL_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+    -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/libssl.a;${DEPSDIR}/lib/libcrypto.a" \
     -DSQLite3_INCLUDE_DIR:PATH=${DEPSDIR}/include \
     -DSQLite3_LIBRARY:FILEPATH=${DEPSDIR}/lib/libsqlite3.a \
     -DZLIB_INCLUDE_DIR:PATH=${DEPSDIR}/include \
@@ -172,7 +181,10 @@ cmake \
     -DUUID_LIBRARY:FILEPATH=${DEPSDIR}/lib/libuuid_static.a \
     -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.a \
     -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.a \
+    -DGDBM_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/gdbm.h \
     -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.a \
+    -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.a \
+    -DNDBM_TAG=NDBM \
     ../python-cmake-buildsystem
 make -j4
 make install
