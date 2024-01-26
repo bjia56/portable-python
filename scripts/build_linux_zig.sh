@@ -109,7 +109,7 @@ wget -q https://ftp.gnu.org/gnu/readline/readline-8.2.tar.gz
 tar -xf readline*.tar.gz
 rm *.tar.gz
 cd readline*
-./configure --prefix=${DEPSDIR}
+./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
 make install
 
@@ -124,7 +124,7 @@ wget -q https://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.4.tar.gz
 tar -xf ncurses*.tar.gz
 rm *.tar.gz
 cd ncurses*
-./configure --with-normal --enable-overwrite --prefix=${DEPSDIR}
+./configure --host=${ARCH}-linux --with-normal --enable-overwrite --prefix=${DEPSDIR}
 make -j4
 make install
 
@@ -190,7 +190,7 @@ wget -q https://ftp.gnu.org/gnu/gdbm/gdbm-1.23.tar.gz
 tar -xf gdbm*.tar.gz
 rm *.tar.gz
 cd gdbm*
-./configure --enable-libgdbm-compat --prefix=${DEPSDIR}
+./configure --host=${ARCH}-linux --enable-libgdbm-compat --prefix=${DEPSDIR}
 make -j4
 make install
 
@@ -205,7 +205,7 @@ cd ${BUILDDIR}
 #tar -xf tcl*.tar.gz
 #rm *.tar.gz
 #cd tcl*/unix
-#./configure --prefix=${DEPSDIR}
+#./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
 #make -j4
 #make install
 
@@ -220,7 +220,7 @@ cd ${BUILDDIR}
 #tar -xf tk*.tar.gz
 #rm *.tar.gz
 #cd tk*/unix
-#CFLAGS="-I${DEPSDIR}/include" ./configure --prefix=${DEPSDIR}
+#CFLAGS="-I${DEPSDIR}/include" ./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
 #make -j4
 #make install
 
