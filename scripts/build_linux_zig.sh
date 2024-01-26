@@ -79,7 +79,7 @@ wget -q https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.t
 tar -xf libffi*.tar.gz
 rm *.tar.gz
 cd libffi*
-./configure --prefix=${DEPSDIR}
+./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
 make install
 
