@@ -139,7 +139,7 @@ make install
 cd ${BUILDDIR}
 
 export CFLAGS="-I${DEPSDIR}/include"
-wget -q -O python-cmake-buildsystem.tar.gz https://github.com/bjia56/python-cmake-buildsystem/tarball/python3.10
+wget -q -O python-cmake-buildsystem.tar.gz https://github.com/bjia56/python-cmake-buildsystem/tarball/portable-python
 tar -xf python-cmake-buildsystem.tar.gz
 rm *.tar.gz
 mv *python-cmake-buildsystem* python-cmake-buildsystem
