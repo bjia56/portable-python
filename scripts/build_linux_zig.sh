@@ -137,14 +137,14 @@ make -j4
 make install
 cd ${BUILDDIR}
 
-wget -q https://prdownloads.sourceforge.net/tcl/tk8.6.13-src.tar.gz
-tar -xf tk*.tar.gz
-rm *.tar.gz
-cd tk*/unix
-CFLAGS="-I${DEPSDIR}/include" ./configure --prefix=${DEPSDIR}
-make -j4
-make install
-cd ${BUILDDIR}
+#wget -q https://prdownloads.sourceforge.net/tcl/tk8.6.13-src.tar.gz
+#tar -xf tk*.tar.gz
+#rm *.tar.gz
+#cd tk*/unix
+#CFLAGS="-I${DEPSDIR}/include" ./configure --prefix=${DEPSDIR}
+#make -j4
+#make install
+#cd ${BUILDDIR}
 
 wget -q -O python-cmake-buildsystem.tar.gz https://github.com/bjia56/python-cmake-buildsystem/tarball/portable-python
 tar -xf python-cmake-buildsystem.tar.gz
