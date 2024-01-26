@@ -14,7 +14,7 @@ apt update
 apt -y install wget build-essential cmake lld
 
 cd /
-wget https://ziglang.org/download/0.11.0/zig-linux-x86_64-0.11.0.tar.xz
+wget -q https://ziglang.org/download/0.11.0/zig-linux-x86_64-0.11.0.tar.xz
 tar -xf zig*.tar.xz
 cd ${WORKDIR}
 
@@ -33,7 +33,7 @@ export CXX=zig_cxx
 export TARGET=${ARCH}-linux-gnu.2.17
 export ZIG_TARGET=${TARGET}
 
-wget https://zlib.net/fossils/zlib-1.3.tar.gz
+wget -q https://zlib.net/fossils/zlib-1.3.tar.gz
 tar -xf zlib*.tar.gz
 rm *.tar.gz
 cd zlib*
@@ -42,7 +42,7 @@ make -j4
 make install
 cd ${BUILDDIR}
 
-wget https://github.com/openssl/openssl/archive/refs/tags/OpenSSL_1_1_1w.tar.gz
+wget -q https://github.com/openssl/openssl/archive/refs/tags/OpenSSL_1_1_1w.tar.gz
 tar -xf OpenSSL*.tar.gz
 rm *.tar.gz
 cd openssl-OpenSSL*
@@ -51,7 +51,7 @@ make -j4
 make install_sw
 cd ${BUILDDIR}
 
-wget https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.tar.gz
+wget -q https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.tar.gz
 tar -xf libffi*.tar.gz
 rm *.tar.gz
 cd libffi*
@@ -60,7 +60,7 @@ make -j4
 make install
 cd ${BUILDDIR}
 
-wget https://www.sqlite.org/2024/sqlite-autoconf-3450000.tar.gz
+wget -q https://www.sqlite.org/2024/sqlite-autoconf-3450000.tar.gz
 tar -xf sqlite*.tar.gz
 rm *.tar.gz
 cd sqlite*
@@ -69,7 +69,7 @@ make -j4
 make install
 cd ${BUILDDIR}
 
-wget https://ftp.gnu.org/gnu/readline/readline-8.2.tar.gz
+wget -q https://ftp.gnu.org/gnu/readline/readline-8.2.tar.gz
 tar -xf readline*.tar.gz
 rm *.tar.gz
 cd readline*
@@ -78,7 +78,7 @@ make -j4
 make install
 cd ${BUILDDIR}
 
-wget https://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.4.tar.gz
+wget -q https://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.4.tar.gz
 tar -xf ncurses*.tar.gz
 rm *.tar.gz
 cd ncurses*
@@ -87,7 +87,7 @@ make -j4
 make install
 cd ${BUILDDIR}
 
-wget -O bzip2.tar.gz https://github.com/commontk/bzip2/tarball/master
+wget -q -O bzip2.tar.gz https://github.com/commontk/bzip2/tarball/master
 tar -xf bzip2*.tar.gz
 rm *.tar.gz
 cd commontk-bzip2*
@@ -98,7 +98,7 @@ make -j4
 make install
 cd ${BUILDDIR}
 
-wget https://github.com/tukaani-project/xz/releases/download/v5.4.5/xz-5.4.5.tar.gz
+wget -q https://github.com/tukaani-project/xz/releases/download/v5.4.5/xz-5.4.5.tar.gz
 tar -xf xz*.tar.gz
 rm *.tar.gz
 cd xz*
@@ -109,7 +109,7 @@ make -j4
 make install
 cd ${BUILDDIR}
 
-wget -O libuuid-cmake.tar.gz https://github.com/gershnik/libuuid-cmake/archive/refs/tags/v2.39.3.tar.gz
+wget -q -O libuuid-cmake.tar.gz https://github.com/gershnik/libuuid-cmake/archive/refs/tags/v2.39.3.tar.gz
 tar -xf libuuid*tar.gz
 rm *.tar.gz
 cd libuuid*
@@ -120,7 +120,7 @@ make -j4
 make install
 cd ${BUILDDIR}
 
-wget https://ftp.gnu.org/gnu/gdbm/gdbm-1.23.tar.gz
+wget -q https://ftp.gnu.org/gnu/gdbm/gdbm-1.23.tar.gz
 tar -xf gdbm*.tar.gz
 rm *.tar.gz
 cd gdbm*
@@ -129,7 +129,7 @@ make -j4
 make install
 cd ${BUILDDIR}
 
-wget https://prdownloads.sourceforge.net/tcl/tcl8.6.13-src.tar.gz
+wget -q https://prdownloads.sourceforge.net/tcl/tcl8.6.13-src.tar.gz
 tar -xf tcl*.tar.gz
 rm *.tar.gz
 cd tcl*/unix
@@ -139,7 +139,7 @@ make install
 cd ${BUILDDIR}
 
 export CFLAGS="-I${DEPSDIR}/include"
-wget -O python-cmake-buildsystem.tar.gz https://github.com/bjia56/python-cmake-buildsystem/tarball/python3.10
+wget -q -O python-cmake-buildsystem.tar.gz https://github.com/bjia56/python-cmake-buildsystem/tarball/python3.10
 tar -xf python-cmake-buildsystem.tar.gz
 rm *.tar.gz
 mv *python-cmake-buildsystem* python-cmake-buildsystem
