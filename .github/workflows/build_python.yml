@@ -18,6 +18,7 @@ env:
 
 jobs:
   build_linux_zig:
+    if: ${{ !startsWith('3.8', inputs.python_version) }}
     name: Linux ${{ inputs.python_version }} ${{ matrix.arch }}
     runs-on: ubuntu-latest
     strategy:
@@ -47,7 +48,7 @@ jobs:
           path: ./*python*.tar.gz
 
   build_linux:
-    if: false
+    if: ${{ false && startsWith('3.8', inputs.python_version) }}
     name: Linux ${{ inputs.python_version }} ${{ matrix.arch }}
     runs-on: ubuntu-latest
     strategy:
