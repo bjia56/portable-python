@@ -17,7 +17,37 @@ env:
   platform_map: '{"x86_64": "linux/amd64", "aarch64": "linux/arm64/v8", "armv7l": "linux/arm/v7"}'
 
 jobs:
+  build_linux_zig:
+    name: Linux ${{ inputs.python_version }} ${{ matrix.arch }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [ x86_64 ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build
+        run: |
+          /work/scripts/build_linux_zig.sh ${{ matrix.arch }} ${{ inputs.python_version }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: python
+          path: ./python*.zip
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        if: ${{ always() }}
+        with:
+          name: build-python
+          path: ./*python*.tar.gz
+
   build_linux:
+    if: false
     name: Linux ${{ inputs.python_version }} ${{ matrix.arch }}
     runs-on: ubuntu-latest
     strategy:
@@ -89,6 +119,7 @@ jobs:
             # ./bin/python -m test || true
 
   build_windows:
+    if: false
     name: Windows ${{ inputs.python_version }} x86_64 (build)
     runs-on: windows-latest
 
@@ -148,6 +179,7 @@ jobs:
           # ./bin/python -m test || true
 
   build_macos:
+    if: false
     name: MacOS ${{ inputs.python_version }} universal2 (build)
     runs-on: macos-latest
 
