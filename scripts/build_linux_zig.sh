@@ -272,3 +272,81 @@ CFLAGS="-I${DEPSDIR}/include" cmake \
     ../python-cmake-buildsystem
 make -j4
 make install
+
+tar -czf ${WORKDIR}/build-python-${PYTHON_FULL_VER}-linux-${ARCH}.tar.gz .
+
+echo "::endgroup::"
+#############################################
+# Check executable dependencies (pre-patch) #
+#############################################
+echo "::group::Check executable dependencies (pre-patch)"
+cd ${BUILDDIR}
+
+cd python-install
+echo "python dependencies"
+ldd -v -r ./bin/python
+echo
+echo "libpython dependencies"
+ldd -v -r ./lib/libpython${PYTHON_VER}.so
+
+echo "::endgroup::"
+################
+# Patch python #
+################
+echo "::group::Patch python"
+cd ${BUILDDIR}
+
+cd python-install
+${WORKDIR}/scripts/patch_libpython.sh ./lib/libpython${PYTHON_VER}.so ./bin/python
+patchelf --replace-needed libpython${PYTHON_VER}.so "\$ORIGIN/../lib/libpython${PYTHON_VER}.so" ./bin/python
+
+echo "::endgroup::"
+##############################################
+# Check executable dependencies (post-patch) #
+##############################################
+echo "::group::Check executable dependencies (post-patch)"
+cd ${BUILDDIR}
+
+cd python-install
+# we don't make ldd errors fatal here since sometimes ldd can
+# crash but the patched binaries still work
+echo "python dependencies"
+ldd -v -r ./bin/python || true
+echo
+echo "libpython dependencies"
+ldd -v -r ./lib/libpython${PYTHON_VER}.so || true
+
+echo "::endgroup::"
+###############
+# Test python #
+###############
+echo "::group::Test python"
+cd ${BUILDDIR}
+
+cd python-install
+./bin/python --version
+
+echo "::endgroup::"
+###############
+# Preload pip #
+###############
+echo "::group::Preload pip"
+cd ${BUILDDIR}
+
+cd python-install
+./bin/python -m ensurepip
+
+echo "::endgroup::"
+###################
+# Compress output #
+###################
+echo "::group::Compress output"
+cd ${BUILDDIR}
+
+python3 -m pip install pyclean
+python3 -m pyclean -v python-install
+mv python-install python-${PYTHON_FULL_VER}-linux-${ARCH}
+tar -czf ${WORKDIR}/python-${PYTHON_FULL_VER}-linux-${ARCH}.tar.gz python-${PYTHON_FULL_VER}-linux-${ARCH}
+zip ${WORKDIR}/python-${PYTHON_FULL_VER}-linux-${ARCH}.zip $(tar tf ${WORKDIR}/python-${PYTHON_FULL_VER}-linux-${ARCH}.tar.gz)
+
+echo "::endgroup::"
