@@ -64,7 +64,7 @@ wget -q https://github.com/openssl/openssl/archive/refs/tags/OpenSSL_1_1_1w.tar.
 tar -xf OpenSSL*.tar.gz
 rm *.tar.gz
 cd openssl-OpenSSL*
-./config no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+./config linux-${ARCH} no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 make -j4
 make install_sw
 
