@@ -24,17 +24,14 @@ case "$ARCH" in
   x86_64)
     apt -y install libc6-amd64-cross
     ln -s /usr/x86_64-linux-gnu/lib/ld-linux-x86-64.so.2 /lib/ld-linux-x86-64.so.2
-    export TARGET=${ARCH}-linux-gnu.2.17
     ;;
   aarch64)
     apt -y install libc6-arm64-cross
     ln -s /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib/ld-linux-aarch64.so.1
-    export TARGET=${ARCH}-linux-gnu.2.17
     ;;
   arm)
     apt -y install libc6-armhf-cross
     ln -s /usr/arm-linux-gnueabihf/lib/ld-linux-armhf.so.3 /lib/ld-linux-armhf.so.3
-    export TARGET=${ARCH}-linux-gnueabihf.2.17
     ;;
 esac
 
@@ -54,6 +51,7 @@ export CC=zig_cc
 export CXX=zig_cxx
 export CHOST=${ARCH}
 
+export TARGET=${ARCH}-linux-gnu.2.17
 export ZIG_TARGET=${TARGET}
 
 echo "::endgroup::"
