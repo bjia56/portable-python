@@ -31,7 +31,7 @@ case "$ARCH" in
     apt -y install libc6-armhf-cross
     ;;
 esac
-
+ln -s /usr/${ARCH}-linux-gnu/lib/ld-linux-${ARCH}.so.1 /lib/ld-linux-${ARCH}.so.1
 
 cd /
 wget -q https://ziglang.org/download/0.11.0/zig-linux-x86_64-0.11.0.tar.xz

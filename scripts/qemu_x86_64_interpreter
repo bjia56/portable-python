@@ -7,4 +7,4 @@
 patchelf --set-rpath /usr/x86_64-linux-gnu/lib/ $1
 
 # run the interpreter
-qemu-x86_64-static $1
+qemu-x86_64-static "$@"
