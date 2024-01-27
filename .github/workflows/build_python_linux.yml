@@ -21,6 +21,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Parse platform
+        id: parse_platform
+        run: |
+          PLATFORM=$(echo ${{ toJSON(env.platform_map) }} | jq -r '.["${{ inputs.arch }}"]')
+          echo "::set-output name=platform::$PLATFORM"
+
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -40,6 +46,33 @@ jobs:
         with:
           name: build-python
           path: ./*python*.tar.gz
+
+      - name: Test python in clean environment
+        uses: addnab/docker-run-action@v3
+        with:
+          image: centos:7
+          options: -v ${{ github.workspace }}:/work --workdir /tmp --platform ${{ steps.parse_platform.outputs.platform }}
+          run: |
+            set -e
+
+            if [[ "${{ inputs.arch }}" == "armv7l" ]]; then
+              echo "armhfp" > /etc/yum/vars/basearch
+              echo "armv7hl" > /etc/yum/vars/arch
+              echo "armv7hl-redhat-linux-gpu" > /etc/rpm/platform
+            fi
+
+            yum -y install unzip
+
+            cp /work/python*.zip .
+            unzip ./python*.zip
+
+            cd python-${{ inputs.python_version }}-linux-${{ inputs.arch }}
+            chmod +x ./bin/python
+            ldd -v -r ./bin/python || true
+            ./bin/python --version
+
+            # make tests nonfatal for now
+            # ./bin/python -m test || true
 
   build_linux:
     if: ${{ startsWith(inputs.python_version, '3.8') || inputs.arch == 'armv7l' }}
