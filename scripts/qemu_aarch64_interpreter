@@ -5,6 +5,7 @@
 # we need to ensure that the binary uses the correct libc
 # so first patch the program
 patchelf --add-rpath /usr/aarch64-linux-gnu/lib/ $1
+patchelf --add-needed libm.so.6 $1
 
 # run the interpreter
 qemu-aarch64-static "$@"
