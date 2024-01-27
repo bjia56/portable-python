@@ -70,6 +70,7 @@ jobs:
             chmod +x ./bin/python
             ldd -v -r ./bin/python || true
             ./bin/python --version
+            ./bin/python -c "import ssl"
 
             # make tests nonfatal for now
             # ./bin/python -m test || true
@@ -138,6 +139,7 @@ jobs:
             chmod +x ./bin/python
             ldd -v -r ./bin/python || true
             ./bin/python --version
+            ./bin/python -c "import ssl"
 
             # make tests nonfatal for now
             # ./bin/python -m test || true
