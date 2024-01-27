@@ -23,15 +23,17 @@ apt -y install wget build-essential pkg-config cmake autoconf git python3 meson 
 case "$ARCH" in
   x86_64)
     apt -y install libc6-amd64-cross
+    ln -s /usr/x86_64-linux-gnu/lib/ld-linux-x86-64.so.2 /lib/ld-linux-x86-64.so.2
     ;;
   aarch64)
     apt -y install libc6-arm64-cross
+    ln -s /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib/ld-linux-aarch64.so.1
     ;;
-  armv7l)
+  arm)
     apt -y install libc6-armhf-cross
+    ln -s /usr/arm-linux-gnueabihf/lib/ld-linux-armhf.so.3 /lib/ld-linux-armhf.so.3
     ;;
 esac
-ln -s /usr/${ARCH}-linux-gnu/lib/ld-linux-${ARCH}.so.1 /lib/ld-linux-${ARCH}.so.1
 
 cd /
 wget -q https://ziglang.org/download/0.11.0/zig-linux-x86_64-0.11.0.tar.xz
