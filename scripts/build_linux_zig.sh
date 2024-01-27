@@ -19,7 +19,7 @@ echo "::group::Install dependencies"
 
 export DEBIAN_FRONTEND=noninteractive
 apt update
-apt -y install wget build-essential pkg-config cmake autoconf git python3 meson clang patchelf
+apt -y install wget build-essential pkg-config cmake autoconf git python3 meson clang patchelf qemu-user-static
 case "$ARCH" in
   x86_64)
     apt -y install libc6-amd64-cross
