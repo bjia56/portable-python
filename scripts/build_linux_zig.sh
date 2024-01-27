@@ -49,14 +49,15 @@ mkdir ${DEPSDIR}
 export AR=zig_ar
 export CC=zig_cc
 export CXX=zig_cxx
-export CHOST=${ARCH}
 
 case "$ARCH" in
   arm)
     export ZIG_TARGET=${ARCH}-linux-gnueabihf.2.17
+    export CHOST=arm-linux-gnueabihf
     ;;
   *)
     export ZIG_TARGET=${ARCH}-linux-gnu.2.17
+    export CHOST=${ARCH}
     ;;
 esac
 
@@ -108,7 +109,7 @@ wget -q https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.t
 tar -xf libffi*.tar.gz
 rm *.tar.gz
 cd libffi*
-./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
+./configure --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
 
@@ -123,7 +124,7 @@ wget -q https://www.sqlite.org/2024/sqlite-autoconf-3450000.tar.gz
 tar -xf sqlite*.tar.gz
 rm *.tar.gz
 cd sqlite*
-./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
+./configure --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
 
@@ -138,7 +139,7 @@ wget -q https://ftp.gnu.org/gnu/readline/readline-8.2.tar.gz
 tar -xf readline*.tar.gz
 rm *.tar.gz
 cd readline*
-./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
+./configure --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
 
@@ -153,7 +154,7 @@ wget -q https://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.4.tar.gz
 tar -xf ncurses*.tar.gz
 rm *.tar.gz
 cd ncurses*
-./configure --host=${ARCH}-linux --with-normal --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
+./configure --host=${CHOST} --with-normal --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
 make -j4
 make install
 
@@ -219,7 +220,7 @@ wget -q https://ftp.gnu.org/gnu/gdbm/gdbm-1.23.tar.gz
 tar -xf gdbm*.tar.gz
 rm *.tar.gz
 cd gdbm*
-./configure --host=${ARCH}-linux --enable-libgdbm-compat --prefix=${DEPSDIR}
+./configure --host=${CHOST} --enable-libgdbm-compat --prefix=${DEPSDIR}
 make -j4
 make install
 
@@ -234,7 +235,7 @@ cd ${BUILDDIR}
 #tar -xf tcl*.tar.gz
 #rm *.tar.gz
 #cd tcl*/unix
-#./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
+#./configure --host=${CHOST} --prefix=${DEPSDIR}
 #make -j4
 #make install
 
@@ -249,7 +250,7 @@ cd ${BUILDDIR}
 #tar -xf tk*.tar.gz
 #rm *.tar.gz
 #cd tk*/unix
-#CFLAGS="-I${DEPSDIR}/include" ./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
+#CFLAGS="-I${DEPSDIR}/include" ./configure --host=${CHOST} --prefix=${DEPSDIR}
 #make -j4
 #make install
 
