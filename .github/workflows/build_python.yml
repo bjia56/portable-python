@@ -48,7 +48,7 @@ jobs:
           path: ./*python*.tar.gz
 
   build_linux:
-    if: ${{ false && startsWith(inputs.python_version, '3.8') }}
+    if: ${{ startsWith(inputs.python_version, '3.8')  || matrix.arch == 'armv7l' }}
     name: Linux ${{ inputs.python_version }} ${{ matrix.arch }}
     runs-on: ubuntu-latest
     strategy:
