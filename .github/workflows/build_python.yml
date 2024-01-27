@@ -14,7 +14,6 @@ on:
 
 jobs:
   build_linux:
-    if: ${{ !startsWith(inputs.python_version, '3.8') }}
     name: Linux ${{ inputs.python_version }} ${{ matrix.arch }}
     strategy:
       fail-fast: false
