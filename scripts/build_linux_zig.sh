@@ -20,6 +20,18 @@ echo "::group::Install dependencies"
 export DEBIAN_FRONTEND=noninteractive
 apt update
 apt -y install wget build-essential pkg-config cmake autoconf git python3 meson clang patchelf
+case "$ARCH" in
+  x86_64)
+    apt -y install libc6-amd64-cross
+    ;;
+  aarch64)
+    apt -y install libc6-arm64-cross
+    ;;
+  armv7l)
+    apt -y install libc6-armhf-cross
+    ;;
+esac
+
 
 cd /
 wget -q https://ziglang.org/download/0.11.0/zig-linux-x86_64-0.11.0.tar.xz
@@ -242,6 +254,7 @@ mkdir python-install
 cd python-build
 CFLAGS="-I${DEPSDIR}/include" cmake \
     -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
+    -DCMAKE_CROSSCOMPILING_EMULATOR=${WORKDIR}/scripts/qemu_interpreter \
     -DCMAKE_C_STANDARD=99 \
     -DPYTHON_VERSION=${PYTHON_FULL_VER} \
     -DCMAKE_BUILD_TYPE:STRING=Release \

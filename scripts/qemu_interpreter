@@ -1,0 +1,10 @@
+#!/bin/bash
+# this interpreter shim is used by cmake to run platform
+# detection programs
+
+# we need to ensure that the binary uses the correct libc
+# so first patch the program
+patchelf --set-rpath /usr/${ARCH}-linux-gnu/lib/ $1
+
+# run the interpreter
+qemu-${ARCH}-static $1
