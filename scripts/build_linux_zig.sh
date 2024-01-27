@@ -301,10 +301,10 @@ cd ${BUILDDIR}
 
 cd python-install
 echo "python dependencies"
-ldd -v -r ./bin/python
+readelf -d ./bin/python
 echo
 echo "libpython dependencies"
-ldd -v -r ./lib/libpython${PYTHON_VER}.so
+readelf -d ./lib/libpython${PYTHON_VER}.so
 
 echo "::endgroup::"
 ################
@@ -325,8 +325,8 @@ echo "::group::Check executable dependencies (post-patch)"
 cd ${BUILDDIR}
 
 cd python-install
-# we don't make ldd errors fatal here since sometimes ldd can
-# crash but the patched binaries still work
+# we don't make ldd errors fatal here since ldd doesn't work
+# when cross compiling
 echo "python dependencies"
 ldd -v -r ./bin/python || true
 echo
@@ -341,7 +341,7 @@ echo "::group::Test python"
 cd ${BUILDDIR}
 
 cd python-install
-./bin/python --version
+qemu-${ARCH}-static ./bin/python --version
 
 echo "::endgroup::"
 ###############
@@ -351,7 +351,7 @@ echo "::group::Preload pip"
 cd ${BUILDDIR}
 
 cd python-install
-./bin/python -m ensurepip
+qemu-${ARCH}-static ./bin/python -m ensurepip
 
 echo "::endgroup::"
 ###################
