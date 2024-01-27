@@ -12,115 +12,40 @@ on:
         required: true
         type: string
 
-env:
-  image_map: '{"x86_64": "debian:buster", "aarch64": "debian:buster", "armv7l": "debian:buster"}'
-  platform_map: '{"x86_64": "linux/amd64", "aarch64": "linux/arm64/v8", "armv7l": "linux/arm/v7"}'
-
 jobs:
   build_linux_zig:
     if: ${{ !startsWith(inputs.python_version, '3.8') }}
     name: Linux ${{ inputs.python_version }} ${{ matrix.arch }}
-    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         arch: [ x86_64, aarch64 ]
+    uses: ./.github/workflows/build_python_linux_zig.yml
+    with:
+      python_version: ${{ inputs.python_version }}
+      arch: ${{ matrix.arch }}
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+  build_linux_armv7l:
+    if: ${{ !startsWith(inputs.python_version, '3.8') }}
+    name: Linux ${{ inputs.python_version }} armv7l
+    uses: ./.github/workflows/build_python_linux.yml
+    with:
+      python_version: ${{ inputs.python_version }}
+      arch: armv7l
 
-      - name: Build
-        run: |
-          sudo ./scripts/build_linux_zig.sh ${{ matrix.arch }} ${{ inputs.python_version }}
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: python
-          path: ./python*.zip
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        if: ${{ always() }}
-        with:
-          name: build-python
-          path: ./*python*.tar.gz
-
-  build_linux:
-    if: ${{ false && startsWith(inputs.python_version, '3.8') }}
+  build_linux_3_8:
+    if: ${{ startsWith(inputs.python_version, '3.8') }}
     name: Linux ${{ inputs.python_version }} ${{ matrix.arch }}
-    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         arch: [ x86_64, aarch64, armv7l ]
-
-    steps:
-      - name: Parse image
-        id: parse_image
-        run: |
-          IMAGE=$(echo ${{ toJSON(env.image_map) }} | jq -r '.["${{ matrix.arch }}"]')
-          echo "::set-output name=image::$IMAGE"
-
-      - name: Parse platform
-        id: parse_platform
-        run: |
-          PLATFORM=$(echo ${{ toJSON(env.platform_map) }} | jq -r '.["${{ matrix.arch }}"]')
-          echo "::set-output name=platform::$PLATFORM"
-
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-        if: ${{ matrix.arch != 'x86_64' }}
-
-      - name: Build
-        uses: addnab/docker-run-action@v3
-        with:
-          image: ${{ steps.parse_image.outputs.image }}
-          options: -v ${{ github.workspace }}:/work --workdir /tmp --platform ${{ steps.parse_platform.outputs.platform }}
-          run: |
-            set -e
-            /work/scripts/build_linux.sh ${{ matrix.arch }} ${{ inputs.python_version }}
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: python
-          path: ./python*.zip
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        if: ${{ always() }}
-        with:
-          name: build-python
-          path: ./*python*.tar.gz
-
-      - name: Test python in clean environment
-        uses: addnab/docker-run-action@v3
-        with:
-          image: ${{ steps.parse_image.outputs.image }}
-          options: -v ${{ github.workspace }}:/work --workdir /tmp --platform ${{ steps.parse_platform.outputs.platform }}
-          run: |
-            set -e
-            apt update
-            apt install -y unzip
-
-            cp /work/python*.zip .
-            unzip ./python*.zip
-
-            cd python-${{ inputs.python_version }}-linux-${{ matrix.arch }}
-            chmod +x ./bin/python
-            ldd -v -r ./bin/python || true
-            ./bin/python --version
-
-            # make tests nonfatal for now
-            # ./bin/python -m test || true
+    uses: ./.github/workflows/build_python_linux.yml
+    with:
+      python_version: ${{ inputs.python_version }}
+      arch: ${{ matrix.arch }}
 
   build_windows:
-    if: false
     name: Windows ${{ inputs.python_version }} x86_64 (build)
     runs-on: windows-latest
 
@@ -180,7 +105,6 @@ jobs:
           # ./bin/python -m test || true
 
   build_macos:
-    if: false
     name: MacOS ${{ inputs.python_version }} universal2 (build)
     runs-on: macos-latest
 
