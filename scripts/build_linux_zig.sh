@@ -36,12 +36,12 @@ case "$ARCH" in
 esac
 
 cd /
-wget -q https://ziglang.org/download/0.10.0/zig-linux-x86_64-0.10.0.tar.xz
+wget -q https://ziglang.org/download/0.11.0/zig-linux-x86_64-0.11.0.tar.xz
 tar -xf zig*.tar.xz
 cd ${WORKDIR}
 
-cp -r zigshim/* /zig-linux-x86_64-0.10.0
-export PATH=${PATH}:/zig-linux-x86_64-0.10.0
+cp -r zigshim/* /zig-linux-x86_64-0.11.0
+export PATH=${PATH}:/zig-linux-x86_64-0.11.0
 
 mkdir ${BUILDDIR}
 mkdir ${DEPSDIR}
