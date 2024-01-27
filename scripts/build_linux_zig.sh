@@ -52,7 +52,7 @@ export CXX=zig_cxx
 
 case "$ARCH" in
   arm)
-    export ZIG_TARGET="${ARCH}-linux-gnueabihf.2.17 -mcpu=generic+v7a+vfp3-d32+thumb2-neon"
+    export ZIG_TARGET="${ARCH}-linux-gnueabihf.2.17 -march=armv6 -mfpu=vfp -mfloat-abi=hard"
     export CHOST=arm-linux-gnueabihf
     ;;
   *)
