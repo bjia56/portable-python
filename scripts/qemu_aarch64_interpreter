@@ -4,7 +4,7 @@
 
 # we need to ensure that the binary uses the correct libc
 # so first patch the program
-patchelf --set-rpath /usr/${ARCH}-linux-gnu/lib/ $1
+patchelf --set-rpath /usr/aarch64-linux-gnu/lib/ $1
 
 # run the interpreter
-qemu-${ARCH}-static $1
+qemu-aarch64-static $1
