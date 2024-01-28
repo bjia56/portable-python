@@ -40,7 +40,7 @@ sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja
 mkdir ${BUILDDIR}
 mkdir ${DEPSDIR}
 
-export TARGET=${ARCH}-linux-gnu.2.17
+export ZIG_TARGET=${ARCH}-linux-gnu.2.17
 
 export AR="${WORKDIR}/zigshim/zig_ar"
 export RANLIB="${WORKDIR}/zigshim/zig_ranlib"
