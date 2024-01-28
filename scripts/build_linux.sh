@@ -100,8 +100,8 @@ cmake \
   -DBUILD_EXTENSIONS_AS_BUILTIN=ON \
   -DBUILD_LIBPYTHON_SHARED=ON \
   "${additionalparams[@]}" \
-  -DBUILD_TESTING=${RUN_TESTS} \
-  -DINSTALL_TEST=${RUN_TESTS} \
+  -DBUILD_TESTING=${INSTALL_TEST} \
+  -DINSTALL_TEST=${INSTALL_TEST} \
   -DINSTALL_MANUAL=OFF \
   ../python-cmake-buildsystem
 make -j8
