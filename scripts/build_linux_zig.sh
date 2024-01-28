@@ -235,7 +235,6 @@ cd ${BUILDDIR}
 #make install
 
 echo "::endgroup::"
-<<<<<<< HEAD
 #############
 # mpdecimal #
 #############
@@ -250,8 +249,6 @@ make -j4
 make install
 
 echo "::endgroup::"
-=======
->>>>>>> parent of 4b35623 (use shared libs instead)
 ##########
 # Python #
 ##########
