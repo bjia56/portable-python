@@ -42,10 +42,18 @@ mkdir ${DEPSDIR}
 
 export ZIG_TARGET=${ARCH}-linux-gnu.2.17
 
-export AR="${WORKDIR}/zigshim/zig_ar"
-export RANLIB="${WORKDIR}/zigshim/zig_ranlib"
-export CC="${WORKDIR}/zigshim/zig_cc"
-export CXX="${WORKDIR}/zigshim/zig_cxx"
+# Python's sysconfig module will retain references to these compiler values, which cause
+# problems when sysconfig is used to pick a compiler during binary extension builds.
+# Since clang (zig) is a drop-in replacement for gcc, we set these so the final sysconfig
+# will work on other platforms.
+export PATH="${WORKDIR}/zigshim:${PATH}"
+cp ${WORKDIR}/zigshim/zig_ar ${WORKDIR}/zigshim/${ARCH}-linux-gnu-gcc-ar
+cp ${WORKDIR}/zigshim/zig_cc ${WORKDIR}/zigshim/${ARCH}-linux-gnu-gcc
+cp ${WORKDIR}/zigshim/zig_cxx ${WORKDIR}/zigshim/${ARCH}-linux-gnu-g++
+
+export AR="${ARCH}-linux-gnu-gcc-ar"
+export CC="${ARCH}-linux-gnu-gcc"
+export CXX="${ARCH}-linux-gnu-g++"
 export CHOST=${ARCH}
 
 echo "::endgroup::"
