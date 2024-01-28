@@ -19,7 +19,7 @@ echo "::group::Install dependencies"
 
 export DEBIAN_FRONTEND=noninteractive
 apt update
-apt -y install wget build-essential pkg-config cmake autoconf git python3 meson clang patchelf qemu-user-static
+apt -y install wget build-essential pkg-config cmake autoconf git python3 python3-pip clang patchelf qemu-user-static
 case "$ARCH" in
   x86_64)
     apt -y install libc6-amd64-cross
@@ -34,6 +34,7 @@ case "$ARCH" in
     ln -s /usr/arm-linux-gnueabihf/lib/ld-linux-armhf.so.3 /lib/ld-linux-armhf.so.3
     ;;
 esac
+pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja
 
 cd /
 wget -q https://ziglang.org/download/0.11.0/zig-linux-x86_64-0.11.0.tar.xz

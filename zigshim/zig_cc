@@ -1,7 +1,2 @@
 #!/bin/bash
-if [ "$1" == "-Wl,--version" ]; then
-    # hack for meson to detect ld correctly
-    clang "$@"
-else
-    zig cc -target $ZIG_TARGET "$@"
-fi
+zig cc -target $ZIG_TARGET "$@"
