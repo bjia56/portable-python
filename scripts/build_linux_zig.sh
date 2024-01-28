@@ -5,6 +5,7 @@ PYTHON_FULL_VER=$2
 PYTHON_VER=$(echo ${PYTHON_FULL_VER} | cut -d "." -f 1-2)
 
 set -ex
+zig version
 
 WORKDIR=$(pwd)
 BUILDDIR=${WORKDIR}/build
