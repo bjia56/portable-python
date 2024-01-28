@@ -35,7 +35,7 @@ jobs:
 
       - name: Build
         run: |
-          sudo -E ./scripts/build_linux_zig.sh ${{ inputs.arch }} ${{ inputs.python_version }}
+          sudo ./scripts/build_linux_zig.sh ${{ inputs.arch }} ${{ inputs.python_version }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
