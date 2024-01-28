@@ -36,24 +36,15 @@ case "$ARCH" in
 esac
 pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja
 
-cd /
-wget -q https://ziglang.org/download/0.11.0/zig-linux-x86_64-0.11.0.tar.xz
-tar -xf zig*.tar.xz
-cd ${WORKDIR}
-
-cp -r zigshim/* /zig-linux-x86_64-0.11.0
-export PATH=${PATH}:/zig-linux-x86_64-0.11.0
-
 mkdir ${BUILDDIR}
 mkdir ${DEPSDIR}
 
-export AR=zig_ar
-export CC=zig_cc
-export CXX=zig_cxx
-export CHOST=${ARCH}
-
 export TARGET=${ARCH}-linux-gnu.2.17
-export ZIG_TARGET=${TARGET}
+
+export AR="zig ar"
+export CC="zig cc -target ${TARGET}"
+export CXX="zig c++ -target ${TARGET}"
+export CHOST=${ARCH}
 
 echo "::endgroup::"
 ########

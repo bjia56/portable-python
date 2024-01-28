@@ -27,6 +27,9 @@ jobs:
           PLATFORM=$(echo ${{ toJSON(env.platform_map) }} | jq -r '.["${{ inputs.arch }}"]')
           echo "::set-output name=platform::$PLATFORM"
 
+      - name: Set up zig
+        uses: goto-bus-stop/setup-zig@v2
+
       - name: Checkout
         uses: actions/checkout@v3
 
