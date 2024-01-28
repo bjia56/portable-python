@@ -7,6 +7,10 @@ on:
   pull_request:
     paths: ["scripts/**", ".github/workflows/**"]
   workflow_dispatch:
+    inputs:
+      run_tests:
+        required: false
+        type: boolean
 
 jobs:
   build:

@@ -9,6 +9,9 @@ on:
       arch:
         required: true
         type: string
+      run_tests:
+        required: false
+        type: boolean
 
 env:
   image_map: '{"x86_64": "debian:buster", "aarch64": "debian:buster", "armv7l": "debian:buster"}'
@@ -72,8 +75,9 @@ jobs:
             ./bin/python --version
             ./bin/python -c "import ssl"
 
-            # make tests nonfatal for now
-            # ./bin/python -m test || true
+            if [[ "${{ inputs.run_tests }}" == "true" ]]; then
+              ./bin/python -m test
+            fi
 
   build_linux:
     if: ${{ startsWith(inputs.python_version, '3.8') || inputs.arch == 'armv7l' }}
@@ -141,5 +145,6 @@ jobs:
             ./bin/python --version
             ./bin/python -c "import ssl"
 
-            # make tests nonfatal for now
-            # ./bin/python -m test || true
+            if [[ "${{ inputs.run_tests }}" == "true" ]]; then
+              ./bin/python -m test
+            fi

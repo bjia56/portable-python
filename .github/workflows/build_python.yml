@@ -6,11 +6,17 @@ on:
       python_version:
         required: true
         type: string
+      run_tests:
+        required: false
+        type: boolean
   workflow_call:
     inputs:
       python_version:
         required: true
         type: string
+      run_tests:
+        required: false
+        type: boolean
 
 jobs:
   build_linux:
@@ -23,6 +29,7 @@ jobs:
     with:
       python_version: ${{ inputs.python_version }}
       arch: ${{ matrix.arch }}
+      run_tests: ${{ inputs.run_tests }}
 
   build_windows:
     name: Windows ${{ inputs.python_version }} x86_64 (build)
@@ -80,8 +87,9 @@ jobs:
           bin/python --version
           ./bin/python -c "import ssl"
 
-          # make tests nonfatal for now
-          # ./bin/python -m test || true
+          if [[ "${{ inputs.run_tests }}" == "true" ]]; then
+            ./bin/python -m test
+          fi
 
   build_macos:
     name: MacOS ${{ inputs.python_version }} universal2 (build)
@@ -131,5 +139,6 @@ jobs:
           ./bin/python --version
           ./bin/python -c "import ssl"
 
-          # make tests nonfatal for now
-          # ./bin/python -m test || true
+          if [[ "${{ inputs.run_tests }}" == "true" ]]; then
+            ./bin/python -m test
+          fi
