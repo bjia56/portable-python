@@ -19,23 +19,23 @@ trap "cd ${BUILDDIR}/python-build && tar -czf ${WORKDIR}/build-python-${PYTHON_F
 echo "::group::Install dependencies"
 
 export DEBIAN_FRONTEND=noninteractive
-apt update
-apt -y install wget build-essential pkg-config cmake autoconf git python3 python3-pip clang patchelf qemu-user-static
+sudo apt update
+sudo apt -y install wget build-essential pkg-config cmake autoconf git python3 python3-pip clang patchelf qemu-user-static
 case "$ARCH" in
   x86_64)
-    apt -y install libc6-amd64-cross
-    ln -s /usr/x86_64-linux-gnu/lib/ld-linux-x86-64.so.2 /lib/ld-linux-x86-64.so.2
+    sudo apt -y install libc6-amd64-cross
+    sudo ln -s /usr/x86_64-linux-gnu/lib/ld-linux-x86-64.so.2 /lib/ld-linux-x86-64.so.2
     ;;
   aarch64)
-    apt -y install libc6-arm64-cross
-    ln -s /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib/ld-linux-aarch64.so.1
+    sudo apt -y install libc6-arm64-cross
+    sudo ln -s /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib/ld-linux-aarch64.so.1
     ;;
   arm)
-    apt -y install libc6-armhf-cross
-    ln -s /usr/arm-linux-gnueabihf/lib/ld-linux-armhf.so.3 /lib/ld-linux-armhf.so.3
+    sudo apt -y install libc6-armhf-cross
+    sudo ln -s /usr/arm-linux-gnueabihf/lib/ld-linux-armhf.so.3 /lib/ld-linux-armhf.so.3
     ;;
 esac
-pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja
+sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja
 
 mkdir ${BUILDDIR}
 mkdir ${DEPSDIR}
