@@ -74,7 +74,7 @@ wget -q https://github.com/openssl/openssl/archive/refs/tags/OpenSSL_1_1_1w.tar.
 tar -xf OpenSSL*.tar.gz
 rm *.tar.gz
 cd openssl-OpenSSL*
-./Configure shared linux-${ARCH} --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+./Configure linux-${ARCH} no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 make -j4
 make install_sw
 
@@ -185,7 +185,7 @@ rm *.tar.gz
 cd libuuid*
 mkdir build
 cd build
-cmake -DCMAKE_LINKER=ld -DCMAKE_SYSTEM_PROCESSOR=${ARCH} -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DLIBUUID_SHARED=OFF -DLIBUUID_STATIC=ON ..
+cmake -DCMAKE_SYSTEM_PROCESSOR=${ARCH} -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DLIBUUID_SHARED=OFF -DLIBUUID_STATIC=ON ..
 make -j4
 make install
 
@@ -235,6 +235,7 @@ cd ${BUILDDIR}
 #make install
 
 echo "::endgroup::"
+<<<<<<< HEAD
 #############
 # mpdecimal #
 #############
@@ -249,6 +250,8 @@ make -j4
 make install
 
 echo "::endgroup::"
+=======
+>>>>>>> parent of 4b35623 (use shared libs instead)
 ##########
 # Python #
 ##########
@@ -268,21 +271,41 @@ mv *python-cmake-buildsystem* python-cmake-buildsystem
 mkdir python-build
 mkdir python-install
 cd python-build
-CFLAGS="-I${DEPSDIR}/include" LDFLAGS="-L${DEPSDIR}/lib" cmake \
-  -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
-  -DCMAKE_CROSSCOMPILING_EMULATOR=${WORKDIR}/scripts/qemu_${ARCH}_interpreter \
-  -DCMAKE_C_STANDARD=99 \
-  -DCMAKE_LIBRARY_PATH=${DEPSDIR}/lib \
-  -DPYTHON_VERSION=${PYTHON_FULL_VER} \
-  -DCMAKE_BUILD_TYPE:STRING=Release \
-  -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install \
-  -DBUILD_EXTENSIONS_AS_BUILTIN=ON \
-  -DBUILD_LIBPYTHON_SHARED=ON \
-  -DUSE_SYSTEM_LIBMPDEC=ON \
-  -DBUILD_TESTING=${INSTALL_TEST} \
-  -DINSTALL_TEST=${INSTALL_TEST} \
-  -DINSTALL_MANUAL=OFF \
-  ../python-cmake-buildsystem
+CFLAGS="-I${DEPSDIR}/include" cmake \
+    -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
+    -DCMAKE_CROSSCOMPILING_EMULATOR=${WORKDIR}/scripts/qemu_${ARCH}_interpreter \
+    -DCMAKE_C_STANDARD=99 \
+    -DPYTHON_VERSION=${PYTHON_FULL_VER} \
+    -DCMAKE_BUILD_TYPE:STRING=Release \
+    -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install \
+    -DBUILD_EXTENSIONS_AS_BUILTIN=ON \
+    -DBUILD_LIBPYTHON_SHARED=ON \
+    -DUSE_SYSTEM_LIBRARIES=OFF \
+    -DBUILD_TESTING=ON \
+    -DINSTALL_TEST=OFF \
+    -DINSTALL_MANUAL=OFF \
+    -DOPENSSL_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+    -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/libssl.a;${DEPSDIR}/lib/libcrypto.a" \
+    -DSQLite3_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+    -DSQLite3_LIBRARY:FILEPATH=${DEPSDIR}/lib/libsqlite3.a \
+    -DZLIB_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+    -DZLIB_LIBRARY:FILEPATH=${DEPSDIR}/lib/libz.a \
+    -DLZMA_INCLUDE_PATH:PATH=${DEPSDIR}/include \
+    -DLZMA_LIBRARY:FILEPATH=${DEPSDIR}/lib/liblzma.a \
+    -DBZIP2_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+    -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libbz2.a \
+    -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+    -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.a \
+    -DREADLINE_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/readline/readline.h \
+    -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.a \
+    -DUUID_LIBRARY:FILEPATH=${DEPSDIR}/lib/libuuid_static.a \
+    -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.a \
+    -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.a \
+    -DGDBM_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/gdbm.h \
+    -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.a \
+    -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.a \
+    -DNDBM_TAG=NDBM \
+    ../python-cmake-buildsystem
 make -j4
 make install
 
