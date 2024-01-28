@@ -244,7 +244,7 @@ cd ${BUILDDIR}
 wget -q https://www.bytereef.org/software/mpdecimal/releases/mpdecimal-2.5.0.tar.gz
 tar -xzf mpdecimal*.tar.gz
 cd mpdecimal-2.5.0
-./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
+./configure --disable-cxx --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
 make install
 
