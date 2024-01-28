@@ -18,6 +18,9 @@ on:
         required: false
         type: boolean
 
+env:
+  RUN_TESTS: ${{ inputs.run_tests }}
+
 jobs:
   build_linux:
     name: Linux ${{ inputs.python_version }} ${{ matrix.arch }}

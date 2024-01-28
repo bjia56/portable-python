@@ -85,6 +85,13 @@ if [[ "${ARCH}" == "armv7l" ]]; then
   additionalparams+=(-DUSE_SYSTEM_LIBMPDEC=ON)
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 fi
+
+if [[ "${RUN_TESTS}" == "true" ]]; then
+  INSTALL_TEST="ON"
+else
+  INSTALL_TEST="OFF"
+fi
+
 #cmake --trace-expand \
 cmake \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
@@ -93,8 +100,8 @@ cmake \
   -DBUILD_EXTENSIONS_AS_BUILTIN=ON \
   -DBUILD_LIBPYTHON_SHARED=ON \
   "${additionalparams[@]}" \
-  -DBUILD_TESTING=ON \
-  -DINSTALL_TEST=OFF \
+  -DBUILD_TESTING=${RUN_TESTS} \
+  -DINSTALL_TEST=${RUN_TESTS} \
   -DINSTALL_MANUAL=OFF \
   ../python-cmake-buildsystem
 make -j8

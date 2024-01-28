@@ -254,6 +254,12 @@ echo "::endgroup::"
 echo "::group::Python"
 cd ${BUILDDIR}
 
+if [[ "${RUN_TESTS}" == "true" ]]; then
+  INSTALL_TEST="ON"
+else
+  INSTALL_TEST="OFF"
+fi
+
 wget -q -O python-cmake-buildsystem.tar.gz https://github.com/bjia56/python-cmake-buildsystem/tarball/portable-python
 tar -xf python-cmake-buildsystem.tar.gz
 rm *.tar.gz
@@ -262,19 +268,19 @@ mkdir python-build
 mkdir python-install
 cd python-build
 CFLAGS="-I${DEPSDIR}/include" LDFLAGS="-L${DEPSDIR}/lib" cmake \
-    -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
-    -DCMAKE_CROSSCOMPILING_EMULATOR=${WORKDIR}/scripts/qemu_${ARCH}_interpreter \
-    -DCMAKE_C_STANDARD=99 \
-    -DPYTHON_VERSION=${PYTHON_FULL_VER} \
-    -DCMAKE_BUILD_TYPE:STRING=Release \
-    -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install \
-    -DBUILD_EXTENSIONS_AS_BUILTIN=ON \
-    -DBUILD_LIBPYTHON_SHARED=ON \
-    -DUSE_SYSTEM_LIBMPDEC=ON \
-    -DBUILD_TESTING=ON \
-    -DINSTALL_TEST=OFF \
-    -DINSTALL_MANUAL=OFF \
-    ../python-cmake-buildsystem
+  -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
+  -DCMAKE_CROSSCOMPILING_EMULATOR=${WORKDIR}/scripts/qemu_${ARCH}_interpreter \
+  -DCMAKE_C_STANDARD=99 \
+  -DPYTHON_VERSION=${PYTHON_FULL_VER} \
+  -DCMAKE_BUILD_TYPE:STRING=Release \
+  -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install \
+  -DBUILD_EXTENSIONS_AS_BUILTIN=ON \
+  -DBUILD_LIBPYTHON_SHARED=ON \
+  -DUSE_SYSTEM_LIBMPDEC=ON \
+  -DBUILD_TESTING=${INSTALL_TEST} \
+  -DINSTALL_TEST=${INSTALL_TEST} \
+  -DINSTALL_MANUAL=OFF \
+  ../python-cmake-buildsystem
 make -j4
 make install
 

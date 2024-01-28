@@ -168,6 +168,12 @@ echo "::endgroup::"
 echo "::group::Build"
 cd ${WORKDIR}
 
+if [[ "${RUN_TESTS}" == "true" ]]; then
+  INSTALL_TEST="ON"
+else
+  INSTALL_TEST="OFF"
+fi
+
 cd python-build
 cmake \
   -G "Unix Makefiles" \
@@ -179,8 +185,8 @@ cmake \
   -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/python-install \
   -DBUILD_EXTENSIONS_AS_BUILTIN=OFF \
   -DBUILD_LIBPYTHON_SHARED=ON \
-  -DBUILD_TESTING=ON \
-  -DINSTALL_TEST=OFF \
+  -DBUILD_TESTING=${INSTALL_TEST} \
+  -DINSTALL_TEST=${INSTALL_TEST} \
   -DINSTALL_MANUAL=OFF \
   -DOPENSSL_ROOT_DIR:PATH=${WORKDIR}/deps/openssl \
   -DSQLite3_INCLUDE_DIR:PATH=${WORKDIR}/deps/sqlite3/include \
