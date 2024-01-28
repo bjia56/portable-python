@@ -46,10 +46,9 @@ export ZIG_TARGET=${ARCH}-linux-gnu.2.17
 # problems when sysconfig is used to pick a compiler during binary extension builds.
 # Since clang (zig) is a drop-in replacement for gcc, we set these so the final sysconfig
 # will work on other platforms.
-export PATH="${WORKDIR}/zigshim:${PATH}"
-cp ${WORKDIR}/zigshim/zig_ar ${WORKDIR}/zigshim/${ARCH}-linux-gnu-gcc-ar
-cp ${WORKDIR}/zigshim/zig_cc ${WORKDIR}/zigshim/${ARCH}-linux-gnu-gcc
-cp ${WORKDIR}/zigshim/zig_cxx ${WORKDIR}/zigshim/${ARCH}-linux-gnu-g++
+sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/${ARCH}-linux-gnu-gcc-ar
+sudo cp ${WORKDIR}/zigshim/zig_cc /usr/bin/${ARCH}-linux-gnu-gcc
+sudo cp ${WORKDIR}/zigshim/zig_cxx /usr/bin/${ARCH}-linux-gnu-g++
 
 export AR="${ARCH}-linux-gnu-gcc-ar"
 export CC="${ARCH}-linux-gnu-gcc"
