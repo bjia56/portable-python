@@ -43,6 +43,7 @@ mkdir ${DEPSDIR}
 export TARGET=${ARCH}-linux-gnu.2.17
 
 export AR="zig ar"
+export RANLIB="zig ranlib"
 export CC="zig cc -target ${TARGET}"
 export CXX="zig c++ -target ${TARGET}"
 export CHOST=${ARCH}
