@@ -117,6 +117,21 @@ make -j4
 make install
 
 echo "::endgroup::"
+#########
+# expat #
+#########
+echo "::group::expat"
+cd ${BUILDDIR}
+
+wget -q https://github.com/libexpat/libexpat/releases/download/R_2_5_0/expat-2.5.0.tar.gz
+tar -xf expat*.tar.gz
+rm *.tar.gz
+cd expat*
+./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
+make -j4
+make install
+
+echo "::endgroup::"
 ############
 # readline #
 ############
