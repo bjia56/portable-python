@@ -9,6 +9,7 @@ patchelf --add-needed libm.so.6 $1
 patchelf --add-needed libpthread.so.0 $1
 patchelf --add-needed libdl.so.2 $1
 patchelf --add-needed libutil.so.1 $1
+patchelf --add-needed librt.so.1 $1
 
 # run the interpreter
 qemu-aarch64-static "$@"
