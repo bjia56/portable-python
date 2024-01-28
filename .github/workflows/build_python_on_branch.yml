@@ -22,4 +22,4 @@ jobs:
     uses: ./.github/workflows/build_python.yml
     with:
       python_version: ${{ matrix.python_version }}
-      run_tests: ${{ inputs.run_tests }}
+      run_tests: ${{ inputs.run_tests || false }}
