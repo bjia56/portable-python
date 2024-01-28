@@ -42,9 +42,9 @@ mkdir ${DEPSDIR}
 
 export TARGET=${ARCH}-linux-gnu.2.17
 
-export AR="${WORKDIR}/zigshim/zig_ar"
-export CC="${WORKDIR}/zigshim/zig_cc"
-export CXX="${WORKDIR}/zigshim/zig_cxx"
+export AR="zig ar"
+export CC="zig cc -target ${TARGET}"
+export CXX="zig c++ -target ${TARGET}"
 export CHOST=${ARCH}
 
 echo "::endgroup::"
