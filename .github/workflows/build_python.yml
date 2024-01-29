@@ -108,7 +108,7 @@ jobs:
           ./scripts/build_macos.sh universal2 ${{ inputs.python_version }}
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: python-darwin-universal2-${{ inputs.python_version }}
           path: ./python*.zip
