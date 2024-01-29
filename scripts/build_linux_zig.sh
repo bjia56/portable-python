@@ -72,7 +72,7 @@ wget -q https://zlib.net/fossils/zlib-1.3.tar.gz
 tar -xf zlib*.tar.gz
 rm *.tar.gz
 cd zlib*
-./configure --prefix=${DEPSDIR}
+./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
 make install
 
