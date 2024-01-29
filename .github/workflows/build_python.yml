@@ -91,7 +91,7 @@ jobs:
           ./bin/python -c "import ssl"
 
           if [[ "${{ inputs.run_tests }}" == "true" ]]; then
-            ./bin/python -m test
+            ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata
           fi
 
   build_macos:
@@ -143,5 +143,5 @@ jobs:
           ./bin/python -c "import ssl"
 
           if [[ "${{ inputs.run_tests }}" == "true" ]]; then
-            ./bin/python -m test
+            ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata
           fi

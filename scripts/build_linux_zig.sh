@@ -42,10 +42,17 @@ mkdir ${DEPSDIR}
 
 export ZIG_TARGET=${ARCH}-linux-gnu.2.17
 
-export AR="${WORKDIR}/zigshim/zig_ar"
-export RANLIB="${WORKDIR}/zigshim/zig_ranlib"
-export CC="${WORKDIR}/zigshim/zig_cc"
-export CXX="${WORKDIR}/zigshim/zig_cxx"
+# Python's sysconfig module will retain references to these compiler values, which cause
+# problems when sysconfig is used to pick a compiler during binary extension builds.
+# Since clang (zig) is a drop-in replacement for gcc, we set these so the final sysconfig
+# will work on other platforms.
+sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/${ARCH}-linux-gnu-gcc-ar
+sudo cp ${WORKDIR}/zigshim/zig_cc /usr/bin/${ARCH}-linux-gnu-gcc
+sudo cp ${WORKDIR}/zigshim/zig_cxx /usr/bin/${ARCH}-linux-gnu-g++
+
+export AR="${ARCH}-linux-gnu-gcc-ar"
+export CC="${ARCH}-linux-gnu-gcc"
+export CXX="${ARCH}-linux-gnu-g++"
 export CHOST=${ARCH}
 
 echo "::endgroup::"
@@ -104,6 +111,21 @@ wget -q https://www.sqlite.org/2024/sqlite-autoconf-3450000.tar.gz
 tar -xf sqlite*.tar.gz
 rm *.tar.gz
 cd sqlite*
+./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
+make -j4
+make install
+
+echo "::endgroup::"
+#########
+# expat #
+#########
+echo "::group::expat"
+cd ${BUILDDIR}
+
+wget -q https://github.com/libexpat/libexpat/releases/download/R_2_5_0/expat-2.5.0.tar.gz
+tar -xf expat*.tar.gz
+rm *.tar.gz
+cd expat*
 ./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
 make install
@@ -269,40 +291,40 @@ mkdir python-build
 mkdir python-install
 cd python-build
 CFLAGS="-I${DEPSDIR}/include" cmake \
-    -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
-    -DCMAKE_CROSSCOMPILING_EMULATOR=${WORKDIR}/scripts/qemu_${ARCH}_interpreter \
-    -DCMAKE_C_STANDARD=99 \
-    -DPYTHON_VERSION=${PYTHON_FULL_VER} \
-    -DCMAKE_BUILD_TYPE:STRING=Release \
-    -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install \
-    -DBUILD_EXTENSIONS_AS_BUILTIN=ON \
-    -DBUILD_LIBPYTHON_SHARED=ON \
-    -DUSE_SYSTEM_LIBRARIES=OFF \
-    -DBUILD_TESTING=${INSTALL_TEST} \
-    -DINSTALL_TEST=${INSTALL_TEST} \
-    -DINSTALL_MANUAL=OFF \
-    -DOPENSSL_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-    -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/libssl.a;${DEPSDIR}/lib/libcrypto.a" \
-    -DSQLite3_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-    -DSQLite3_LIBRARY:FILEPATH=${DEPSDIR}/lib/libsqlite3.a \
-    -DZLIB_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-    -DZLIB_LIBRARY:FILEPATH=${DEPSDIR}/lib/libz.a \
-    -DLZMA_INCLUDE_PATH:PATH=${DEPSDIR}/include \
-    -DLZMA_LIBRARY:FILEPATH=${DEPSDIR}/lib/liblzma.a \
-    -DBZIP2_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-    -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libbz2.a \
-    -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-    -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.a \
-    -DREADLINE_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/readline/readline.h \
-    -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.a \
-    -DUUID_LIBRARY:FILEPATH=${DEPSDIR}/lib/libuuid_static.a \
-    -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.a \
-    -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.a \
-    -DGDBM_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/gdbm.h \
-    -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.a \
-    -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.a \
-    -DNDBM_TAG=NDBM \
-    ../python-cmake-buildsystem
+  -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
+  -DCMAKE_CROSSCOMPILING_EMULATOR=${WORKDIR}/scripts/qemu_${ARCH}_interpreter \
+  -DCMAKE_C_STANDARD=99 \
+  -DPYTHON_VERSION=${PYTHON_FULL_VER} \
+  -DCMAKE_BUILD_TYPE:STRING=Release \
+  -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install \
+  -DBUILD_EXTENSIONS_AS_BUILTIN=ON \
+  -DBUILD_LIBPYTHON_SHARED=ON \
+  -DUSE_SYSTEM_LIBRARIES=OFF \
+  -DBUILD_TESTING=${INSTALL_TEST} \
+  -DINSTALL_TEST=${INSTALL_TEST} \
+  -DINSTALL_MANUAL=OFF \
+  -DOPENSSL_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+  -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/libssl.a;${DEPSDIR}/lib/libcrypto.a" \
+  -DSQLite3_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+  -DSQLite3_LIBRARY:FILEPATH=${DEPSDIR}/lib/libsqlite3.a \
+  -DZLIB_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+  -DZLIB_LIBRARY:FILEPATH=${DEPSDIR}/lib/libz.a \
+  -DLZMA_INCLUDE_PATH:PATH=${DEPSDIR}/include \
+  -DLZMA_LIBRARY:FILEPATH=${DEPSDIR}/lib/liblzma.a \
+  -DBZIP2_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+  -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libbz2.a \
+  -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+  -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.a \
+  -DREADLINE_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/readline/readline.h \
+  -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.a \
+  -DUUID_LIBRARY:FILEPATH=${DEPSDIR}/lib/libuuid_static.a \
+  -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.a \
+  -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.a \
+  -DGDBM_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/gdbm.h \
+  -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.a \
+  -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.a \
+  -DNDBM_TAG=NDBM \
+  ../python-cmake-buildsystem
 make -j4
 make install
 

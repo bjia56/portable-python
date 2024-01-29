@@ -20,7 +20,7 @@ env:
 
 jobs:
   build_linux_zig:
-    if: ${{ !startsWith(inputs.python_version, '3.8') && inputs.arch != 'armv7l' }}
+    if: ${{ inputs.arch != 'armv7l' }}
     name: Linux (Zig) ${{ inputs.python_version }} ${{ inputs.arch }}
     runs-on: ubuntu-latest
 
@@ -81,11 +81,11 @@ jobs:
             ./bin/python -c "import ssl"
 
             if [[ "${{ inputs.run_tests }}" == "true" ]]; then
-              ./bin/python -m test
+              ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata
             fi
 
   build_linux:
-    if: ${{ startsWith(inputs.python_version, '3.8') || inputs.arch == 'armv7l' }}
+    if: ${{ inputs.arch == 'armv7l' }}
     name: Linux (Docker) ${{ inputs.python_version }} ${{ inputs.arch }}
     runs-on: ubuntu-latest
 
@@ -153,5 +153,5 @@ jobs:
             ./bin/python -c "import ssl"
 
             if [[ "${{ inputs.run_tests }}" == "true" ]]; then
-              ./bin/python -m test
+              ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata
             fi
