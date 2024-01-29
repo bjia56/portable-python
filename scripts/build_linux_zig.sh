@@ -198,6 +198,23 @@ make -j4
 make install
 
 echo "::endgroup::"
+##########
+# Brotli #
+##########
+echo "::group::Brotli"
+cd ${BUILDDIR}
+
+wget -q https://github.com/google/brotli/archive/refs/tags/v1.1.0.tar.gz
+tar -xf *.tar.gz
+rm *.tar.gz
+cd brotli*
+mkdir build
+cd build
+cmake -DCMAKE_SYSTEM_PROCESSOR=${ARCH} -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
+make -j4
+make install
+
+echo "::endgroup::"
 ########
 # uuid #
 ########
@@ -206,6 +223,7 @@ cd ${BUILDDIR}
 
 wget -q https://github.com/util-linux/util-linux/archive/refs/tags/v2.39.3.tar.gz
 tar -xf *.tar.gz
+rm *.tar.gz
 cd util-linux*
 ./autogen.sh
 ./configure --host=${ARCH}-linux --disable-all-programs --enable-libuuid --prefix=${DEPSDIR}
