@@ -59,6 +59,7 @@ jobs:
         with:
           image: centos:7
           options: -v ${{ github.workspace }}:/work --workdir /tmp --platform ${{ steps.parse_platform.outputs.platform }}
+          shell: bash
           run: |
             set -e
 
@@ -113,6 +114,7 @@ jobs:
         with:
           image: ${{ steps.parse_image.outputs.image }}
           options: -v ${{ github.workspace }}:/work --workdir /tmp --platform ${{ steps.parse_platform.outputs.platform }}
+          shell: bash
           run: |
             set -e
             /work/scripts/build_linux.sh ${{ inputs.arch }} ${{ inputs.python_version }}
@@ -135,6 +137,7 @@ jobs:
         with:
           image: ${{ steps.parse_image.outputs.image }}
           options: -v ${{ github.workspace }}:/work --workdir /tmp --platform ${{ steps.parse_platform.outputs.platform }}
+          shell: bash
           run: |
             set -e
             apt update
