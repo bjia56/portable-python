@@ -57,16 +57,16 @@ jobs:
           ./scripts/build_windows.sh x86_64 ${{ inputs.python_version }}
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: python
+          name: python-windows-x86_64-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
-          name: build-python
+          name: build-python-windows-x86_64-${{ inputs.python_version }}
           path: ./*python*.tar.gz
 
   test_windows:
@@ -76,9 +76,9 @@ jobs:
 
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: python
+          name: python-windows-x86_64-${{ inputs.python_version }}
           path: ./python/
 
       - name: Test python in clean environment
@@ -110,14 +110,14 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: python
+          name: python-darwin-universal2-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
-          name: build-python
+          name: build-python-darwin-universal2-${{ inputs.python_version }}
           path: ./*python*.tar.gz
 
   test_macos:
@@ -127,9 +127,9 @@ jobs:
 
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: python
+          name: python-darwin-universal2-${{ inputs.python_version }}
           path: ./python/
 
       - name: Test python in clean environment

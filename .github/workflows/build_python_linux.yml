@@ -42,16 +42,16 @@ jobs:
           ./scripts/build_linux_zig.sh ${{ inputs.arch }} ${{ inputs.python_version }}
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: python
+          name: python-linux-${{ inputs.arch }}-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
-          name: build-python
+          name: build-python-linux-${{ inputs.arch }}-${{ inputs.python_version }}
           path: ./*python*.tar.gz
 
       - name: Test python in clean environment
@@ -120,16 +120,16 @@ jobs:
             /work/scripts/build_linux.sh ${{ inputs.arch }} ${{ inputs.python_version }}
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: python
+          name: python-linux-${{ inputs.arch }}-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
-          name: build-python
+          name: build-python-linux-${{ inputs.arch }}-${{ inputs.python_version }}
           path: ./*python*.tar.gz
 
       - name: Test python in clean environment
