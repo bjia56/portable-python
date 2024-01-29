@@ -263,7 +263,7 @@ wget -q https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.10.3.tar.bz2
 tar -xf libgcrypt*.tar.bz2
 rm *.tar.bz2
 cd libgcrypt*
-CFLAGS="-I${DEPSDIR}/include" LDFLAGS="-L${DEPSDIR}/lib -Wl,--undefined-version" ./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
+CFLAGS="-I${DEPSDIR}/include" LDFLAGS="-L${DEPSDIR}/lib -Wl,--undefined-version" ./configure --disable-asm --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
 make install
 
