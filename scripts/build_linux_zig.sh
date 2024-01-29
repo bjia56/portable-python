@@ -158,7 +158,7 @@ echo "::endgroup::"
 echo "::group::ncurses"
 cd ${BUILDDIR}
 
-wget -q https://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.4.tar.gz
+wget -q https://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.2.tar.gz
 tar -xf ncurses*.tar.gz
 rm *.tar.gz
 cd ncurses*
