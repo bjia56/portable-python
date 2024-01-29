@@ -11,7 +11,7 @@ WORKDIR=$(pwd)
 BUILDDIR=${WORKDIR}/build
 DEPSDIR=${WORKDIR}/deps
 
-trap "cd ${BUILDDIR}/python-build && tar -czf ${WORKDIR}/build-python-${PYTHON_FULL_VER}-linux-${ARCH}.tar.gz ." EXIT
+trap "cd ${BUILDDIR} && tar -czf ${WORKDIR}/build-python-${PYTHON_FULL_VER}-linux-${ARCH}.tar.gz ." EXIT
 
 ########################
 # Install dependencies #
