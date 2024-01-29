@@ -23,7 +23,7 @@ sudo apt update
 sudo apt -y install \
   wget build-essential pkg-config cmake autoconf git \
   python2 python3 python3-pip clang patchelf qemu-user-static \
-  gettext bison libtool autopoint gperf zlib1g-dev
+  gettext bison libtool autopoint gperf ncurses-bin
 case "$ARCH" in
   x86_64)
     sudo apt -y install libc6-amd64-cross
