@@ -274,7 +274,7 @@ wget -q http://prdownloads.sourceforge.net/libpng/libpng-1.6.41.tar.gz
 tar -xf libpng*.tar.gz
 rm *.tar.gz
 cd libpng*
-./configure --host=${ARCH}-linux --with-zlib-prefix=${DEPSDIR} --prefix=${DEPSDIR}
+./configure --host=${ARCH}-linux --with-zlib-prefix=${DEPSDIR} --disable-tools --prefix=${DEPSDIR}
 make -j4
 make install
 
