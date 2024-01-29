@@ -20,7 +20,10 @@ echo "::group::Install dependencies"
 
 export DEBIAN_FRONTEND=noninteractive
 sudo apt update
-sudo apt -y install wget build-essential pkg-config cmake autoconf git python3 python3-pip clang patchelf qemu-user-static
+sudo apt -y install \
+  wget build-essential pkg-config cmake autoconf git \
+  python2 python3 python3-pip clang patchelf qemu-user-static \
+  gettext bison libtool autopoint gperf
 case "$ARCH" in
   x86_64)
     sudo apt -y install libc6-amd64-cross
@@ -201,13 +204,11 @@ echo "::endgroup::"
 echo "::group::uuid"
 cd ${BUILDDIR}
 
-wget -q -O libuuid-cmake.tar.gz https://github.com/gershnik/libuuid-cmake/archive/refs/tags/v2.39.3.tar.gz
-tar -xf libuuid*tar.gz
-rm *.tar.gz
-cd libuuid*
-mkdir build
-cd build
-cmake -DCMAKE_SYSTEM_PROCESSOR=${ARCH} -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DLIBUUID_SHARED=OFF -DLIBUUID_STATIC=ON ..
+wget -q https://github.com/util-linux/util-linux/archive/refs/tags/v2.39.3.tar.gz
+tar -xf *.tar.gz
+cd util-linux*
+./autogen.sh
+./configure --disable-all-programs --enable-libuuid --prefix=${DEPSDIR}
 make -j4
 make install
 
@@ -227,19 +228,109 @@ make -j4
 make install
 
 echo "::endgroup::"
+###########
+# libxml2 #
+###########
+echo "::group::libxml2"
+cd ${BUILDDIR}
+
+wget -q https://download.gnome.org/sources/libxml2/2.12/libxml2-2.12.4.tar.xz
+tar -xf libxml2*.tar.xz
+rm *.tar.xz
+cd libxml2*
+CFLAGS="-I${DEPSDIR}/include" LDFLAGS="-L${DEPSDIR}/lib" ./configure --without-python --prefix=${DEPSDIR}
+make -j4
+make install
+
+echo "::endgroup::"
+###########
+# libxslt #
+###########
+echo "::group::libxslt"
+cd ${BUILDDIR}
+
+wget -q https://download.gnome.org/sources/libxslt/1.1/libxslt-1.1.39.tar.xz
+tar -xf libxslt*.tar.xz
+rm *.tar.xz
+cd libxslt*
+CFLAGS="-I${DEPSDIR}/include -I${DEPSDIR}/include/libxml2" LDFLAGS="-L${DEPSDIR}/lib" ./configure --with-libxml-prefix=${DEPSDIR} --without-python --prefix=${DEPSDIR}
+make -j4
+make install
+
+echo "::endgroup::"
+############
+# freetype #
+############
+echo "::group::freetype"
+cd ${BUILDDIR}
+
+wget -q https://download.savannah.gnu.org/releases/freetype/freetype-2.13.2.tar.gz
+tar -xf freetype*.tar.gz
+rm *.tar.gz
+cd freetype*
+CFLAGS="-I${DEPSDIR}/include" LDFLAGS="-L${DEPSDIR}/lib" ./configure --prefix=${DEPSDIR}
+make -j4
+make install
+
+echo "::endgroup::"
+##############
+# fontconfig #
+##############
+echo "::group::fontconfig"
+cd ${BUILDDIR}
+
+wget -q https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.15.0.tar.gz
+tar -xf fontconfig*.tar.gz
+rm *.tar.gz
+cd fontconfig*
+CFLAGS="-I${DEPSDIR}/include" LDFLAGS="-L${DEPSDIR}/lib"  PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig" ./configure --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
+make -j4
+make install
+
+echo "::endgroup::"
+#######
+# X11 #
+#######
+echo "::group::X11"
+cd ${BUILDDIR}
+
+wget -q https://www.x.org/releases/individual/lib/libXau-1.0.11.tar.gz
+wget -q https://www.x.org/releases/individual/lib/libXdmcp-1.1.2.tar.gz
+wget -q https://www.x.org/releases/individual/lib/libX11-1.8.7.tar.gz
+wget -q https://www.x.org/releases/individual/lib/libXext-1.3.5.tar.gz
+wget -q https://www.x.org/releases/individual/lib/libICE-1.0.7.tar.gz
+wget -q https://www.x.org/releases/individual/lib/libSM-1.2.2.tar.gz
+wget -q https://www.x.org/releases/individual/lib/libXrender-0.9.11.tar.gz
+wget -q https://www.x.org/releases/individual/lib/libXft-2.3.8.tar.gz
+wget -q https://www.x.org/releases/individual/lib/libXScrnSaver-1.2.4.tar.gz
+wget -q https://www.x.org/releases/individual/lib/xtrans-1.5.0.tar.gz
+wget -q https://www.x.org/releases/individual/proto/xproto-7.0.31.tar.gz
+wget -q https://www.x.org/releases/individual/proto/xextproto-7.3.0.tar.gz
+wget -q https://www.x.org/releases/individual/proto/xcb-proto-1.16.0.tar.gz
+wget -q https://www.x.org/releases/individual/proto/kbproto-1.0.7.tar.gz
+wget -q https://www.x.org/releases/individual/proto/inputproto-2.3.2.tar.gz
+wget -q https://www.x.org/releases/individual/proto/renderproto-0.11.1.tar.gz
+wget -q https://www.x.org/releases/individual/proto/scrnsaverproto-1.2.2.tar.gz
+wget -q https://www.x.org/releases/individual/xcb/libxcb-1.16.tar.gz
+wget -q https://www.x.org/releases/individual/xcb/libpthread-stubs-0.5.tar.gz
+git clone git://anongit.freedesktop.org/git/xorg/util/modular util/modular
+CFLAGS="-I${DEPSDIR}/include" LDFLAGS="-L${DEPSDIR}/lib" ./util/modular/build.sh --modfile ${WORKDIR}/scripts/x11_modfile.txt ${DEPSDIR}
+rm *.tar.gz
+
+echo "::endgroup::"
 #######
 # tcl #
 #######
 echo "::group::tcl"
 cd ${BUILDDIR}
 
-#wget -q https://prdownloads.sourceforge.net/tcl/tcl8.6.13-src.tar.gz
-#tar -xf tcl*.tar.gz
-#rm *.tar.gz
-#cd tcl*/unix
-#./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
-#make -j4
-#make install
+wget -q https://prdownloads.sourceforge.net/tcl/tcl8.6.13-src.tar.gz
+tar -xf tcl*.tar.gz
+rm *.tar.gz
+cd tcl*/unix
+./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
+make -j4
+make install
 
 echo "::endgroup::"
 ######
@@ -248,13 +339,13 @@ echo "::endgroup::"
 echo "::group::tk"
 cd ${BUILDDIR}
 
-#wget -q https://prdownloads.sourceforge.net/tcl/tk8.6.13-src.tar.gz
-#tar -xf tk*.tar.gz
-#rm *.tar.gz
-#cd tk*/unix
-#CFLAGS="-I${DEPSDIR}/include" ./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
-#make -j4
-#make install
+wget -q https://prdownloads.sourceforge.net/tcl/tk8.6.13-src.tar.gz
+tar -xf tk*.tar.gz
+rm *.tar.gz
+cd tk*/unix
+CFLAGS="-I${DEPSDIR}/include" ./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
+make -j4
+make install
 
 echo "::endgroup::"
 #############
