@@ -57,6 +57,9 @@ export AR="${ARCH}-linux-gnu-gcc-ar"
 export CC="${ARCH}-linux-gnu-gcc"
 export CXX="${ARCH}-linux-gnu-g++"
 export CHOST=${ARCH}
+export CFLAGS="-I${DEPSDIR}/include"
+export LDFLAGS="-L${DEPSDIR}/lib"
+export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig"
 
 echo "::endgroup::"
 ########
@@ -256,7 +259,7 @@ wget -q https://download.gnome.org/sources/libxml2/2.12/libxml2-2.12.4.tar.xz
 tar -xf libxml2*.tar.xz
 rm *.tar.xz
 cd libxml2*
-CFLAGS="-I${DEPSDIR}/include" LDFLAGS="-L${DEPSDIR}/lib" ./configure --host=${ARCH}-linux --without-python --prefix=${DEPSDIR}
+./configure --host=${ARCH}-linux --without-python --prefix=${DEPSDIR}
 make -j4
 make install
 
@@ -296,7 +299,7 @@ wget -q https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.10.3.tar.bz2
 tar -xf libgcrypt*.tar.bz2
 rm *.tar.bz2
 cd libgcrypt*
-CFLAGS="-I${DEPSDIR}/include" LDFLAGS="-L${DEPSDIR}/lib -Wl,--undefined-version" ./configure --disable-asm --host=${ARCH}-linux --prefix=${DEPSDIR}
+LDFLAGS="${LDFLAGS} -Wl,--undefined-version" ./configure --disable-asm --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
 make install
 
@@ -311,7 +314,7 @@ wget -q https://download.gnome.org/sources/libxslt/1.1/libxslt-1.1.39.tar.xz
 tar -xf libxslt*.tar.xz
 rm *.tar.xz
 cd libxslt*
-CFLAGS="-I${DEPSDIR}/include -I${DEPSDIR}/include/libxml2" LDFLAGS="-L${DEPSDIR}/lib" ./configure --host=${ARCH}-linux --with-libxml-prefix=${DEPSDIR} --without-python --prefix=${DEPSDIR}
+CFLAGS="${CFLAGS} -I${DEPSDIR}/include/libxml2" ./configure --host=${ARCH}-linux --with-libxml-prefix=${DEPSDIR} --without-python --prefix=${DEPSDIR}
 make -j4
 make install
 
@@ -326,7 +329,7 @@ wget -q https://download.savannah.gnu.org/releases/freetype/freetype-2.13.2.tar.
 tar -xf freetype*.tar.gz
 rm *.tar.gz
 cd freetype*
-CFLAGS="-I${DEPSDIR}/include" LDFLAGS="-L${DEPSDIR}/lib" ./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
+./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
 make install
 
@@ -341,7 +344,7 @@ wget -q https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.15.
 tar -xf fontconfig*.tar.gz
 rm *.tar.gz
 cd fontconfig*
-CFLAGS="-I${DEPSDIR}/include" LDFLAGS="-L${DEPSDIR}/lib"  PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig" ./configure --host=${ARCH}-linux --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
+./configure --host=${ARCH}-linux --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
 make -j4
 make install
 
@@ -372,7 +375,7 @@ wget -q https://www.x.org/releases/individual/proto/scrnsaverproto-1.2.2.tar.gz
 wget -q https://www.x.org/releases/individual/xcb/libxcb-1.16.tar.gz
 wget -q https://www.x.org/releases/individual/xcb/libpthread-stubs-0.5.tar.gz
 git clone git://anongit.freedesktop.org/git/xorg/util/modular util/modular
-CFLAGS="-I${DEPSDIR}/include" LDFLAGS="-L${DEPSDIR}/lib" ./util/modular/build.sh --modfile ${WORKDIR}/scripts/x11_modfile.txt ${DEPSDIR}
+./util/modular/build.sh --modfile ${WORKDIR}/scripts/x11_modfile.txt ${DEPSDIR}
 rm *.tar.gz
 
 echo "::endgroup::"
@@ -401,7 +404,7 @@ wget -q https://prdownloads.sourceforge.net/tcl/tk8.6.13-src.tar.gz
 tar -xf tk*.tar.gz
 rm *.tar.gz
 cd tk*/unix
-CFLAGS="-I${DEPSDIR}/include" ./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
+./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
 make install
 
