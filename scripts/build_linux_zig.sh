@@ -23,7 +23,7 @@ sudo apt update
 sudo apt -y install \
   wget build-essential pkg-config cmake autoconf git \
   python2 python3 python3-pip clang patchelf qemu-user-static \
-  gettext bison libtool autopoint gperf
+  gettext bison libtool autopoint gperf zlib1g-dev
 case "$ARCH" in
   x86_64)
     sudo apt -y install libc6-amd64-cross
@@ -278,7 +278,7 @@ wget -q http://prdownloads.sourceforge.net/libpng/libpng-1.6.41.tar.gz
 tar -xf libpng*.tar.gz
 rm *.tar.gz
 cd libpng*
-PNG_COPTS="${CFLAGS}" ./configure --host=${ARCH}-linux --with-zlib-prefix=${DEPSDIR} --disable-tools --prefix=${DEPSDIR}
+./configure --host=${ARCH}-linux --with-zlib-prefix=${DEPSDIR} --disable-tools --prefix=${DEPSDIR}
 make -j4
 make install
 
