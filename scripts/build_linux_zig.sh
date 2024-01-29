@@ -253,7 +253,7 @@ wget -q https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.47.tar.bz2
 tar -xf libgpg-error*.tar.bz2
 rm *.tar.bz2
 cd libgpg-error*
-./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
+CFLAGS="-I${DEPSDIR}/include" LDFLAGS="-L${DEPSDIR}/lib" ./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
 make install
 
