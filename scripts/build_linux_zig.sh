@@ -377,7 +377,7 @@ wget -q https://www.x.org/releases/individual/proto/scrnsaverproto-1.2.2.tar.gz
 wget -q https://www.x.org/releases/individual/xcb/libxcb-1.16.tar.gz
 wget -q https://www.x.org/releases/individual/xcb/libpthread-stubs-0.5.tar.gz
 git clone git://anongit.freedesktop.org/git/xorg/util/modular util/modular
-./util/modular/build.sh --host ${ARCH}-linux --modfile ${WORKDIR}/scripts/x11_modfile.txt ${DEPSDIR}
+./util/modular/build.sh --host ${ARCH}-unknown-linux-gnu --build x86_84-unknown-linux-gnu --modfile ${WORKDIR}/scripts/x11_modfile.txt ${DEPSDIR}
 rm *.tar.gz
 
 echo "::endgroup::"
