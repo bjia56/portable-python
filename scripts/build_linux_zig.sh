@@ -158,7 +158,7 @@ echo "::endgroup::"
 echo "::group::ncurses"
 cd ${BUILDDIR}
 
-wget -q https://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.2.tar.gz
+wget -q https://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.4.tar.gz
 tar -xf ncurses*.tar.gz
 rm *.tar.gz
 cd ncurses*
@@ -274,7 +274,7 @@ wget -q http://prdownloads.sourceforge.net/libpng/libpng-1.6.41.tar.gz
 tar -xf libpng*.tar.gz
 rm *.tar.gz
 cd libpng*
-./configure --host=${ARCH}-linux --with-zlib-prefix=${DEPSDIR} --disable-tools --prefix=${DEPSDIR}
+PNG_COPTS="${CFLAGS}" ./configure --host=${ARCH}-linux --with-zlib-prefix=${DEPSDIR} --disable-tools --prefix=${DEPSDIR}
 make -j4
 make install
 
