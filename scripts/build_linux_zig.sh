@@ -58,6 +58,8 @@ export CC="${ARCH}-linux-gnu-gcc"
 export CXX="${ARCH}-linux-gnu-g++"
 export CHOST=${ARCH}
 export CFLAGS="-I${DEPSDIR}/include"
+export CPPFLAGS="-I${DEPSDIR}/include"
+export CXXFLAGS="${CPPFLAGS}"
 export LDFLAGS="-L${DEPSDIR}/lib"
 export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig"
 
