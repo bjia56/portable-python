@@ -164,7 +164,7 @@ wget -q https://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.4.tar.gz
 tar -xf ncurses*.tar.gz
 rm *.tar.gz
 cd ncurses*
-./configure --host=${ARCH}-linux --with-normal --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
+./configure --host=${ARCH}-linux --with-normal --without-progs --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
 make -j4
 make install
 
