@@ -259,7 +259,7 @@ make install
 
 cd ${BUILDDIR}
 
-wget -q https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.11.tar.bz2
+wget -q https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.10.3.tar.bz2
 tar -xf libgcrypt*.tar.bz2
 rm *.tar.bz2
 cd libgcrypt*
