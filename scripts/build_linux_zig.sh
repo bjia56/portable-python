@@ -208,7 +208,7 @@ wget -q https://github.com/util-linux/util-linux/archive/refs/tags/v2.39.3.tar.g
 tar -xf *.tar.gz
 cd util-linux*
 ./autogen.sh
-./configure --disable-all-programs --enable-libuuid --prefix=${DEPSDIR}
+./configure --host=${ARCH}-linux --disable-all-programs --enable-libuuid --prefix=${DEPSDIR}
 make -j4
 make install
 
@@ -238,7 +238,7 @@ wget -q https://download.gnome.org/sources/libxml2/2.12/libxml2-2.12.4.tar.xz
 tar -xf libxml2*.tar.xz
 rm *.tar.xz
 cd libxml2*
-CFLAGS="-I${DEPSDIR}/include" LDFLAGS="-L${DEPSDIR}/lib" ./configure --without-python --prefix=${DEPSDIR}
+CFLAGS="-I${DEPSDIR}/include" LDFLAGS="-L${DEPSDIR}/lib" ./configure --host=${ARCH}-linux --without-python --prefix=${DEPSDIR}
 make -j4
 make install
 
@@ -253,7 +253,7 @@ wget -q https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.11.tar.bz2
 tar -xf libgcrypt*.tar.bz2
 rm *.tar.bz2
 cd libgcrypt*
-./configure --prefix=${DEPSDIR}
+./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
 make install
 
@@ -268,7 +268,7 @@ wget -q https://download.gnome.org/sources/libxslt/1.1/libxslt-1.1.39.tar.xz
 tar -xf libxslt*.tar.xz
 rm *.tar.xz
 cd libxslt*
-CFLAGS="-I${DEPSDIR}/include -I${DEPSDIR}/include/libxml2" LDFLAGS="-L${DEPSDIR}/lib" ./configure --with-libxml-prefix=${DEPSDIR} --without-python --prefix=${DEPSDIR}
+CFLAGS="-I${DEPSDIR}/include -I${DEPSDIR}/include/libxml2" LDFLAGS="-L${DEPSDIR}/lib" ./configure --host=${ARCH}-linux --with-libxml-prefix=${DEPSDIR} --without-python --prefix=${DEPSDIR}
 make -j4
 make install
 
@@ -283,7 +283,7 @@ wget -q https://download.savannah.gnu.org/releases/freetype/freetype-2.13.2.tar.
 tar -xf freetype*.tar.gz
 rm *.tar.gz
 cd freetype*
-CFLAGS="-I${DEPSDIR}/include" LDFLAGS="-L${DEPSDIR}/lib" ./configure --prefix=${DEPSDIR}
+CFLAGS="-I${DEPSDIR}/include" LDFLAGS="-L${DEPSDIR}/lib" ./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
 make install
 
@@ -298,7 +298,7 @@ wget -q https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.15.
 tar -xf fontconfig*.tar.gz
 rm *.tar.gz
 cd fontconfig*
-CFLAGS="-I${DEPSDIR}/include" LDFLAGS="-L${DEPSDIR}/lib"  PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig" ./configure --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
+CFLAGS="-I${DEPSDIR}/include" LDFLAGS="-L${DEPSDIR}/lib"  PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig" ./configure --host=${ARCH}-linux --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
 make -j4
 make install
 
