@@ -261,6 +261,21 @@ make -j4
 make install
 
 echo "::endgroup::"
+############
+# libpng16 #
+############
+echo "::group::libpng16"
+cd ${BUILDDIR}
+
+wget -q http://prdownloads.sourceforge.net/libpng/libpng-1.6.41.tar.gz
+tar -xf libpng*.tar.gz
+rm *.tar.gz
+cd libpng*
+./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
+make -j4
+make install
+
+echo "::endgroup::"
 #############
 # libgcrypt #
 #############
