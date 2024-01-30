@@ -360,7 +360,7 @@ download_and_verify scrnsaverproto-1.2.2.tar.gz
 download_and_verify libxcb-1.16.tar.gz
 download_and_verify libpthread-stubs-0.5.tar.gz
 git clone git://anongit.freedesktop.org/git/xorg/util/modular util/modular
-./util/modular/build.sh --host ${ARCH}-linux --modfile ${WORKDIR}/scripts/x11_modfile.txt ${DEPSDIR}
+CONFFLAGS="--host=${ARCH}-linux-gnu" ./util/modular/build.sh --modfile ${WORKDIR}/scripts/x11_modfile.txt ${DEPSDIR}
 rm *.tar.gz
 
 echo "::endgroup::"
