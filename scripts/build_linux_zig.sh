@@ -42,7 +42,7 @@ sudo apt update
 sudo apt -y install \
   wget build-essential pkg-config cmake autoconf git \
   python2 python3 python3-pip clang patchelf qemu-user-static \
-  gettext bison libtool autopoint gperf ncurses-bin
+  gettext bison libtool autopoint gperf ncurses-bin xutils-dev
 case "$ARCH" in
   x86_64)
     sudo apt -y install libc6-amd64-cross
@@ -160,7 +160,7 @@ cd ncurses*
 make -j4
 make install
 
-echo "::endgroup::" 
+echo "::endgroup::"
 ############
 # readline #
 ############
@@ -173,7 +173,7 @@ cd readline*
 make -j4
 make install
 
-echo "::endgroup::" 
+echo "::endgroup::"
 #########
 # bzip2 #
 #########
@@ -340,28 +340,40 @@ echo "::endgroup::"
 echo "::group::X11"
 cd ${BUILDDIR}
 
-download_and_verify libXau-1.0.11.tar.gz
-download_and_verify libXdmcp-1.1.2.tar.gz
-download_and_verify libX11-1.8.7.tar.gz
-download_and_verify libXext-1.3.5.tar.gz
-download_and_verify libICE-1.0.7.tar.gz
-download_and_verify libSM-1.2.2.tar.gz
-download_and_verify libXrender-0.9.11.tar.gz
-download_and_verify libXft-2.3.8.tar.gz
-download_and_verify libXScrnSaver-1.2.4.tar.gz
-download_and_verify xtrans-1.5.0.tar.gz
-download_and_verify xproto-7.0.31.tar.gz
-download_and_verify xextproto-7.3.0.tar.gz
-download_and_verify xcb-proto-1.16.0.tar.gz
-download_and_verify kbproto-1.0.7.tar.gz
-download_and_verify inputproto-2.3.2.tar.gz
-download_and_verify renderproto-0.11.1.tar.gz
-download_and_verify scrnsaverproto-1.2.2.tar.gz
-download_and_verify libxcb-1.16.tar.gz
-download_and_verify libpthread-stubs-0.5.tar.gz
-git clone git://anongit.freedesktop.org/git/xorg/util/modular util/modular
-CONFFLAGS="--host=${ARCH}-linux-gnu" ./util/modular/build.sh --modfile ${WORKDIR}/scripts/x11_modfile.txt ${DEPSDIR}
-rm *.tar.gz
+function build_x11_lib () {
+  cd ${BUILDDIR}
+
+  pkg=$1
+  file=$pkg.tar.gz
+  download_and_verify $file
+  cd $pkg
+  autoreconf -vfi
+  ./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
+  make -j4
+  make install
+
+  cd ${BUILDDIR}
+}
+
+build_x11_lib xproto-7.0.31
+build_x11_lib xextproto-7.3.0
+build_x11_lib kbproto-1.0.7
+build_x11_lib inputproto-2.3.2
+build_x11_lib renderproto-0.11.1
+build_x11_lib scrnsaverproto-1.2.2
+build_x11_lib xcb-proto-1.16.0
+build_x11_lib libpthread-stubs-0.5
+build_x11_lib xtrans-1.5.0
+build_x11_lib libXau-1.0.11
+build_x11_lib libxcb-1.16
+build_x11_lib libXdmcp-1.1.2
+build_x11_lib libX11-1.8.7
+build_x11_lib libXext-1.3.5
+build_x11_lib libICE-1.0.7
+build_x11_lib libSM-1.2.2
+build_x11_lib libXrender-0.9.11
+build_x11_lib libXft-2.3.8
+build_x11_lib libXScrnSaver-1.2.4
 
 echo "::endgroup::"
 #######
