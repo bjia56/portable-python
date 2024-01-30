@@ -102,6 +102,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Install coreutils
+        run: brew install coreutils
+
       - name: Build
         run: |
           set -ex

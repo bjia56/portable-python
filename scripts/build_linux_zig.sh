@@ -1,36 +1,11 @@
 #!/bin/bash
 
-ARCH=$1
-PYTHON_FULL_VER=$2
-PYTHON_VER=$(echo ${PYTHON_FULL_VER} | cut -d "." -f 1-2)
+PLATFORM=linux
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+source ${SCRIPT_DIR}/utils.sh
 
-set -ex
 zig version
 
-WORKDIR=$(pwd)
-BUILDDIR=${WORKDIR}/build
-DEPSDIR=${WORKDIR}/deps
-
-function verify_checksum () {
-  file=$1
-  filename=$(basename $file)
-  sha256sum -c ${WORKDIR}/checksums/$file.sha256
-}
-
-function download_and_verify () {
-  file=$1
-  wget --no-verbose https://github.com/bjia56/portable-python/releases/download/build-dependencies/$file
-  verify_checksum $file
-}
-
-function download_verify_extract () {
-  file=$1
-  download_and_verify $1
-  tar -xf $file
-  rm $file
-}
-
-trap "cd ${BUILDDIR} && tar -czf ${WORKDIR}/build-python-${PYTHON_FULL_VER}-linux-${ARCH}.tar.gz ." EXIT
 
 ########################
 # Install dependencies #

@@ -1,10 +1,9 @@
 #!/bin/bash
 
-ARCH=$1
-PYTHON_FULL_VER=$2
-PYTHON_VER=$(echo ${PYTHON_FULL_VER} | cut -d "." -f 1-2)
+PLATFORM=darwin
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+source ${SCRIPT_DIR}/utils.sh
 
-WORKDIR=$(pwd)
 NPROC=$(sysctl -n hw.ncpu)
 
 set -ex
@@ -29,8 +28,7 @@ echo "::endgroup::"
 echo "::group::OpenSSL"
 cd ${WORKDIR}
 
-wget -q https://www.openssl.org/source/openssl-1.1.1w.tar.gz
-tar -xf openssl-1.1.1w.tar.gz
+download_verify_extract openssl-1.1.1w.tar.gz
 
 mkdir deps/openssl
 cd openssl-1.1.1w
@@ -99,10 +97,9 @@ echo "::endgroup::"
 echo "::group::sqlite3"
 cd ${WORKDIR}
 
-wget -q https://www.sqlite.org/2023/sqlite-autoconf-3430100.tar.gz
-tar -xf sqlite-autoconf-3430100.tar.gz
+download_verify_extract sqlite-autoconf-3450000.tar.gz
 mkdir deps/sqlite3
-cd sqlite-autoconf-3430100
+cd sqlite-autoconf-3450000
 CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --prefix ${WORKDIR}/deps/sqlite3
 make -j${NPROC}
 make install
@@ -116,10 +113,9 @@ echo "::endgroup::"
 echo "::group::zlib"
 cd ${WORKDIR}
 
-curl -L https://zlib.net/fossils/zlib-1.3.tar.gz --output zlib.tar.gz
-tar -xf zlib.tar.gz
+download_verify_extract zlib-1.3.1.tar.gz
 mkdir deps/zlib
-cd zlib-1.3
+cd zlib-1.3.1
 mkdir build
 cd build
 cmake \
