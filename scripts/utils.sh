@@ -12,7 +12,7 @@ function verify_checksum () {
 
 function download_and_verify () {
   file=$1
-  curl -s -o $file https://github.com/bjia56/portable-python/releases/download/build-dependencies/$file
+  curl -s -L -o $file https://github.com/bjia56/portable-python/releases/download/build-dependencies/$file
   verify_checksum $file
 }
 
