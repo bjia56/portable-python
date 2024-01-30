@@ -349,7 +349,7 @@ function build_x11_lib () {
   download_verify_extract $file
   cd $pkg
   autoreconf -vfi
-  ./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
+  ./configure --enable-malloc0returnsnull --host=${ARCH}-linux --prefix=${DEPSDIR}
   make -j4
   make install
 
