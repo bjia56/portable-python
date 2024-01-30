@@ -304,7 +304,7 @@ cd ${BUILDDIR}
 
 download_verify_extract fontconfig-2.15.0.tar.gz
 cd fontconfig*
-./configure --host=${ARCH}-linux --enable-static --disable-shared --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
+LDFLAGS="${LDFLAGS} -l:libxml2.a" ./configure --host=${ARCH}-linux --enable-static --disable-shared --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
 make -j4
 make install
 
