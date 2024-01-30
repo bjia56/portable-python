@@ -80,7 +80,7 @@ export CFLAGS="-I${DEPSDIR}/include"
 export CPPFLAGS="-I${DEPSDIR}/include"
 export CXXFLAGS="${CPPFLAGS}"
 export LDFLAGS="-L${DEPSDIR}/lib"
-export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig"
+export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig:${DEPSDIR}/share/pkgconfig"
 
 echo "::endgroup::"
 ########
