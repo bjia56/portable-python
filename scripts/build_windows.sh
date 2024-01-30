@@ -85,7 +85,7 @@ echo "::endgroup::"
 echo "::group::zlib"
 cd ${WORKDIR}
 
-download_verify_extract https://zlib.net/fossils/zlib-1.3.1.tar.gz
+download_verify_extract zlib-1.3.1.tar.gz
 mkdir deps/zlib
 cd zlib-1.3.1
 mkdir build
