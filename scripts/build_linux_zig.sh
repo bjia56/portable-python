@@ -375,7 +375,7 @@ cd ${BUILDDIR}
 
 download_verify_extract tk8.6.13-src.tar.gz
 cd tk*/unix
-./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
+./configure --disable-shared --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
 make install
 
