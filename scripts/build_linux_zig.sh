@@ -345,11 +345,12 @@ function build_x11_lib () {
   cd ${BUILDDIR}
 
   pkg=$1
+  ext_flags="$2"
   file=$pkg.tar.gz
   download_verify_extract $file
   cd $pkg
   autoreconf -vfi
-  ./configure --enable-malloc0returnsnull --host=${ARCH}-linux --prefix=${DEPSDIR}
+  ./configure $ext_flags --host=${ARCH}-linux --prefix=${DEPSDIR}
   make -j4
   make install
 
@@ -369,13 +370,13 @@ build_x11_lib xtrans-1.5.0
 build_x11_lib libXau-1.0.11
 build_x11_lib libxcb-1.16
 build_x11_lib libXdmcp-1.1.2
-build_x11_lib libX11-1.8.7
-build_x11_lib libXext-1.3.5
+build_x11_lib libX11-1.8.7 --enable-malloc0returnsnull
+build_x11_lib libXext-1.3.5 --enable-malloc0returnsnull
 build_x11_lib libICE-1.0.7
 build_x11_lib libSM-1.2.2
-build_x11_lib libXrender-0.9.11
+build_x11_lib libXrender-0.9.11 --enable-malloc0returnsnull
 build_x11_lib libXft-2.3.8
-build_x11_lib libXScrnSaver-1.2.4
+build_x11_lib libXScrnSaver-1.2.4 --enable-malloc0returnsnull
 
 #echo "::endgroup::"
 #######
