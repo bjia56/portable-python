@@ -412,7 +412,7 @@ mv *python-cmake-buildsystem* python-cmake-buildsystem
 mkdir python-build
 mkdir python-install
 cd python-build
-cmake \
+CFLAGS="" CPPFLAGS="" CXXFLAGS="" LDFLAGS="" PKG_CONFIG_PATH="" cmake \
   -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
   -DCMAKE_CROSSCOMPILING_EMULATOR=${WORKDIR}/scripts/qemu_${ARCH}_interpreter \
   -DCMAKE_C_STANDARD=99 \
