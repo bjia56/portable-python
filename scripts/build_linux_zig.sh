@@ -337,10 +337,11 @@ echo "::endgroup::"
 #######
 # X11 #
 #######
-echo "::group::X11"
-cd ${BUILDDIR}
+#echo "::group::X11"
+#cd ${BUILDDIR}
 
 function build_x11_lib () {
+  echo "::group::$1"
   cd ${BUILDDIR}
 
   pkg=$1
@@ -352,7 +353,7 @@ function build_x11_lib () {
   make -j4
   make install
 
-  cd ${BUILDDIR}
+  echo "::endgroup::"
 }
 
 build_x11_lib xorgproto-2023.2
@@ -376,7 +377,7 @@ build_x11_lib libXrender-0.9.11
 build_x11_lib libXft-2.3.8
 build_x11_lib libXScrnSaver-1.2.4
 
-echo "::endgroup::"
+#echo "::endgroup::"
 #######
 # tcl #
 #######
@@ -435,7 +436,7 @@ mv *python-cmake-buildsystem* python-cmake-buildsystem
 mkdir python-build
 mkdir python-install
 cd python-build
-CFLAGS="-I${DEPSDIR}/include" cmake \
+cmake \
   -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
   -DCMAKE_CROSSCOMPILING_EMULATOR=${WORKDIR}/scripts/qemu_${ARCH}_interpreter \
   -DCMAKE_C_STANDARD=99 \
