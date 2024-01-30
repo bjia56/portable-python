@@ -231,7 +231,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libxml2-2.12.4.tar.xz
 cd libxml2*
-./configure --host=${ARCH}-linux --without-python --prefix=${DEPSDIR}
+./configure --host=${ARCH}-linux --enable-static --disable-shared --without-python --prefix=${DEPSDIR}
 make -j4
 make install
 
