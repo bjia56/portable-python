@@ -11,6 +11,25 @@ WORKDIR=$(pwd)
 BUILDDIR=${WORKDIR}/build
 DEPSDIR=${WORKDIR}/deps
 
+function verify_checksum () {
+  file=$1
+  filename=$(basename $file)
+  sha256sum -c ${WORKDIR}/checksums/$file.sha256
+}
+
+function download_and_verify () {
+  file=$1
+  wget --no-verbose https://github.com/bjia56/portable-python/releases/download/build-dependencies/$file
+  verify_checksum $file
+}
+
+function download_verify_extract () {
+  file=$1
+  download_and_verify $1
+  tar -xf $file
+  rm $file
+}
+
 trap "cd ${BUILDDIR} && tar -czf ${WORKDIR}/build-python-${PYTHON_FULL_VER}-linux-${ARCH}.tar.gz ." EXIT
 
 ########################
@@ -70,9 +89,7 @@ echo "::endgroup::"
 echo "::group::zlib"
 cd ${BUILDDIR}
 
-wget -q https://zlib.net/fossils/zlib-1.3.tar.gz
-tar -xf zlib*.tar.gz
-rm *.tar.gz
+download_verify_extract zlib-1.3.1.tar.gz
 cd zlib*
 ./configure --prefix=${DEPSDIR}
 make -j4
@@ -85,10 +102,8 @@ echo "::endgroup::"
 echo "::group::OpenSSL"
 cd ${BUILDDIR}
 
-wget -q https://github.com/openssl/openssl/archive/refs/tags/OpenSSL_1_1_1w.tar.gz
-tar -xf OpenSSL*.tar.gz
-rm *.tar.gz
-cd openssl-OpenSSL*
+download_verify_extract openssl-1.1.1w.tar.gz
+cd openssl*
 ./Configure linux-${ARCH} no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 make -j4
 make install_sw
@@ -100,9 +115,7 @@ echo "::endgroup::"
 echo "::group::libffi"
 cd ${BUILDDIR}
 
-wget -q https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.tar.gz
-tar -xf libffi*.tar.gz
-rm *.tar.gz
+download_verify_extract libffi-3.4.2.tar.gz
 cd libffi*
 ./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
@@ -115,9 +128,7 @@ echo "::endgroup::"
 echo "::group::sqlite3"
 cd ${BUILDDIR}
 
-wget -q https://www.sqlite.org/2024/sqlite-autoconf-3450000.tar.gz
-tar -xf sqlite*.tar.gz
-rm *.tar.gz
+download_verify_extract sqlite-autoconf-3450000.tar.gz
 cd sqlite*
 ./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
@@ -130,9 +141,7 @@ echo "::endgroup::"
 echo "::group::expat"
 cd ${BUILDDIR}
 
-wget -q https://github.com/libexpat/libexpat/releases/download/R_2_5_0/expat-2.5.0.tar.gz
-tar -xf expat*.tar.gz
-rm *.tar.gz
+download_verify_extract expat-2.5.0.tar.gz
 cd expat*
 ./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
@@ -145,9 +154,7 @@ echo "::endgroup::"
 echo "::group::readline"
 cd ${BUILDDIR}
 
-wget -q https://ftp.gnu.org/gnu/readline/readline-8.2.tar.gz
-tar -xf readline*.tar.gz
-rm *.tar.gz
+download_verify_extract readline-8.2.tar.gz
 cd readline*
 ./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
@@ -160,9 +167,7 @@ echo "::endgroup::"
 echo "::group::ncurses"
 cd ${BUILDDIR}
 
-wget -q https://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.4.tar.gz
-tar -xf ncurses*.tar.gz
-rm *.tar.gz
+download_verify_extract ncurses-6.4.tar.gz
 cd ncurses*
 ./configure --host=${ARCH}-linux --with-normal --without-progs --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
 make -j4
@@ -175,7 +180,7 @@ echo "::endgroup::"
 echo "::group::bzip2"
 cd ${BUILDDIR}
 
-wget -q -O bzip2.tar.gz https://github.com/commontk/bzip2/tarball/master
+wget --no-verbose -O bzip2.tar.gz https://github.com/commontk/bzip2/tarball/master
 tar -xf bzip2*.tar.gz
 rm *.tar.gz
 cd commontk-bzip2*
@@ -192,9 +197,7 @@ echo "::endgroup::"
 echo "::group::xz"
 cd ${BUILDDIR}
 
-wget -q https://github.com/tukaani-project/xz/releases/download/v5.4.5/xz-5.4.5.tar.gz
-tar -xf xz*.tar.gz
-rm *.tar.gz
+download_verify_extract xz-5.4.5.tar.gz
 cd xz*
 mkdir build
 cd build
@@ -209,9 +212,7 @@ echo "::endgroup::"
 echo "::group::Brotli"
 cd ${BUILDDIR}
 
-wget -q https://github.com/google/brotli/archive/refs/tags/v1.1.0.tar.gz
-tar -xf *.tar.gz
-rm *.tar.gz
+download_verify_extract brotli-1.1.0.tar.gz
 cd brotli*
 mkdir build
 cd build
@@ -226,9 +227,7 @@ echo "::endgroup::"
 echo "::group::uuid"
 cd ${BUILDDIR}
 
-wget -q https://github.com/util-linux/util-linux/archive/refs/tags/v2.39.3.tar.gz
-tar -xf *.tar.gz
-rm *.tar.gz
+download_verify_extract util-linux-2.39.3.tar.gz
 cd util-linux*
 ./autogen.sh
 ./configure --host=${ARCH}-linux --disable-all-programs --enable-libuuid --prefix=${DEPSDIR}
@@ -242,9 +241,7 @@ echo "::endgroup::"
 echo "::group::gdbm"
 cd ${BUILDDIR}
 
-wget -q https://ftp.gnu.org/gnu/gdbm/gdbm-1.23.tar.gz
-tar -xf gdbm*.tar.gz
-rm *.tar.gz
+download_verify_extract gdbm-1.23.tar.gz
 cd gdbm*
 ./configure --host=${ARCH}-linux --enable-libgdbm-compat --prefix=${DEPSDIR}
 make -j4
@@ -257,9 +254,7 @@ echo "::endgroup::"
 echo "::group::libxml2"
 cd ${BUILDDIR}
 
-wget -q https://download.gnome.org/sources/libxml2/2.12/libxml2-2.12.4.tar.xz
-tar -xf libxml2*.tar.xz
-rm *.tar.xz
+download_verify_extract libxml2-2.12.4.tar.xz
 cd libxml2*
 ./configure --host=${ARCH}-linux --without-python --prefix=${DEPSDIR}
 make -j4
@@ -272,9 +267,7 @@ echo "::endgroup::"
 echo "::group::libpng16"
 cd ${BUILDDIR}
 
-wget -q http://prdownloads.sourceforge.net/libpng/libpng-1.6.41.tar.gz
-tar -xf libpng*.tar.gz
-rm *.tar.gz
+download_verify_extract libpng-1.6.41.tar.gz
 cd libpng*
 ./configure --host=${ARCH}-linux --with-zlib-prefix=${DEPSDIR} --disable-tools --prefix=${DEPSDIR}
 make -j4
@@ -287,9 +280,7 @@ echo "::endgroup::"
 echo "::group::libgcrypt"
 cd ${BUILDDIR}
 
-wget -q https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.47.tar.bz2
-tar -xf libgpg-error*.tar.bz2
-rm *.tar.bz2
+download_verify_extract libgpg-error-1.47.tar.bz2
 cd libgpg-error*
 ./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
@@ -297,9 +288,7 @@ make install
 
 cd ${BUILDDIR}
 
-wget -q https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.10.3.tar.bz2
-tar -xf libgcrypt*.tar.bz2
-rm *.tar.bz2
+download_verify_extract libgcrypt-1.10.3.tar.bz2
 cd libgcrypt*
 LDFLAGS="${LDFLAGS} -Wl,--undefined-version" ./configure --disable-asm --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
@@ -312,9 +301,7 @@ echo "::endgroup::"
 echo "::group::libxslt"
 cd ${BUILDDIR}
 
-wget -q https://download.gnome.org/sources/libxslt/1.1/libxslt-1.1.39.tar.xz
-tar -xf libxslt*.tar.xz
-rm *.tar.xz
+download_verify_extract libxslt-1.1.39.tar.xz
 cd libxslt*
 CFLAGS="${CFLAGS} -I${DEPSDIR}/include/libxml2" ./configure --host=${ARCH}-linux --with-libxml-prefix=${DEPSDIR} --without-python --prefix=${DEPSDIR}
 make -j4
@@ -327,9 +314,7 @@ echo "::endgroup::"
 echo "::group::freetype"
 cd ${BUILDDIR}
 
-wget -q https://download.savannah.gnu.org/releases/freetype/freetype-2.13.2.tar.gz
-tar -xf freetype*.tar.gz
-rm *.tar.gz
+download_verify_extract freetype-2.13.2.tar.gz
 cd freetype*
 ./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
@@ -342,9 +327,7 @@ echo "::endgroup::"
 echo "::group::fontconfig"
 cd ${BUILDDIR}
 
-wget -q https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.15.0.tar.gz
-tar -xf fontconfig*.tar.gz
-rm *.tar.gz
+download_verify_extract fontconfig-2.15.0.tar.gz
 cd fontconfig*
 ./configure --host=${ARCH}-linux --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
 make -j4
@@ -357,25 +340,25 @@ echo "::endgroup::"
 echo "::group::X11"
 cd ${BUILDDIR}
 
-wget -q https://www.x.org/releases/individual/lib/libXau-1.0.11.tar.gz
-wget -q https://www.x.org/releases/individual/lib/libXdmcp-1.1.2.tar.gz
-wget -q https://www.x.org/releases/individual/lib/libX11-1.8.7.tar.gz
-wget -q https://www.x.org/releases/individual/lib/libXext-1.3.5.tar.gz
-wget -q https://www.x.org/releases/individual/lib/libICE-1.0.7.tar.gz
-wget -q https://www.x.org/releases/individual/lib/libSM-1.2.2.tar.gz
-wget -q https://www.x.org/releases/individual/lib/libXrender-0.9.11.tar.gz
-wget -q https://www.x.org/releases/individual/lib/libXft-2.3.8.tar.gz
-wget -q https://www.x.org/releases/individual/lib/libXScrnSaver-1.2.4.tar.gz
-wget -q https://www.x.org/releases/individual/lib/xtrans-1.5.0.tar.gz
-wget -q https://www.x.org/releases/individual/proto/xproto-7.0.31.tar.gz
-wget -q https://www.x.org/releases/individual/proto/xextproto-7.3.0.tar.gz
-wget -q https://www.x.org/releases/individual/proto/xcb-proto-1.16.0.tar.gz
-wget -q https://www.x.org/releases/individual/proto/kbproto-1.0.7.tar.gz
-wget -q https://www.x.org/releases/individual/proto/inputproto-2.3.2.tar.gz
-wget -q https://www.x.org/releases/individual/proto/renderproto-0.11.1.tar.gz
-wget -q https://www.x.org/releases/individual/proto/scrnsaverproto-1.2.2.tar.gz
-wget -q https://www.x.org/releases/individual/xcb/libxcb-1.16.tar.gz
-wget -q https://www.x.org/releases/individual/xcb/libpthread-stubs-0.5.tar.gz
+download_and_verify libXau-1.0.11.tar.gz
+download_and_verify libXdmcp-1.1.2.tar.gz
+download_and_verify libX11-1.8.7.tar.gz
+download_and_verify libXext-1.3.5.tar.gz
+download_and_verify libICE-1.0.7.tar.gz
+download_and_verify libSM-1.2.2.tar.gz
+download_and_verify libXrender-0.9.11.tar.gz
+download_and_verify libXft-2.3.8.tar.gz
+download_and_verify libXScrnSaver-1.2.4.tar.gz
+download_and_verify xtrans-1.5.0.tar.gz
+download_and_verify xproto-7.0.31.tar.gz
+download_and_verify xextproto-7.3.0.tar.gz
+download_and_verify xcb-proto-1.16.0.tar.gz
+download_and_verify kbproto-1.0.7.tar.gz
+download_and_verify inputproto-2.3.2.tar.gz
+download_and_verify renderproto-0.11.1.tar.gz
+download_and_verify scrnsaverproto-1.2.2.tar.gz
+download_and_verify libxcb-1.16.tar.gz
+download_and_verify libpthread-stubs-0.5.tar.gz
 git clone git://anongit.freedesktop.org/git/xorg/util/modular util/modular
 ./util/modular/build.sh --host ${ARCH}-linux --modfile ${WORKDIR}/scripts/x11_modfile.txt ${DEPSDIR}
 rm *.tar.gz
@@ -387,9 +370,7 @@ echo "::endgroup::"
 echo "::group::tcl"
 cd ${BUILDDIR}
 
-wget -q https://prdownloads.sourceforge.net/tcl/tcl8.6.13-src.tar.gz
-tar -xf tcl*.tar.gz
-rm *.tar.gz
+download_verify_extract tcl8.6.13-src.tar.gz
 cd tcl*/unix
 ./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
@@ -402,9 +383,7 @@ echo "::endgroup::"
 echo "::group::tk"
 cd ${BUILDDIR}
 
-wget -q https://prdownloads.sourceforge.net/tcl/tk8.6.13-src.tar.gz
-tar -xf tk*.tar.gz
-rm *.tar.gz
+download_verify_extract tk8.6.13-src.tar.gz
 cd tk*/unix
 ./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
@@ -417,9 +396,8 @@ echo "::endgroup::"
 echo "::group::mpdecimal"
 cd ${BUILDDIR}
 
-wget -q https://www.bytereef.org/software/mpdecimal/releases/mpdecimal-2.5.0.tar.gz
-tar -xzf mpdecimal*.tar.gz
-cd mpdecimal-2.5.0
+download_verify_extract mpdecimal-2.5.0.tar.gz
+cd mpdecimal*
 ./configure --disable-cxx --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
 make install
@@ -437,7 +415,7 @@ else
   INSTALL_TEST="OFF"
 fi
 
-wget -q -O python-cmake-buildsystem.tar.gz https://github.com/bjia56/python-cmake-buildsystem/tarball/portable-python
+wget --no-verbose -O python-cmake-buildsystem.tar.gz https://github.com/bjia56/python-cmake-buildsystem/tarball/portable-python
 tar -xf python-cmake-buildsystem.tar.gz
 rm *.tar.gz
 mv *python-cmake-buildsystem* python-cmake-buildsystem
