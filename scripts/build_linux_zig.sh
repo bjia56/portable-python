@@ -362,7 +362,7 @@ cd ${BUILDDIR}
 
 download_verify_extract tcl8.6.13-src.tar.gz
 cd tcl*/unix
-./configure --disable-shared --host=${ARCH}-linux --prefix=${DEPSDIR}
+LDFLAGS="${LDFLAGS} -lexpat" ./configure --disable-shared --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
 make install
 
