@@ -415,6 +415,7 @@ cd python-build
 cmake \
   -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
   -DCMAKE_CROSSCOMPILING_EMULATOR=${WORKDIR}/scripts/qemu_${ARCH}_interpreter \
+  -DCMAKE_IGNORE_PATH=/usr/include \
   -DCMAKE_C_STANDARD=99 \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
   -DCMAKE_BUILD_TYPE:STRING=Release \
