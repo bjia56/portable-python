@@ -148,19 +148,6 @@ make -j4
 make install
 
 echo "::endgroup::"
-############
-# readline #
-############
-echo "::group::readline"
-cd ${BUILDDIR}
-
-download_verify_extract readline-8.2.tar.gz
-cd readline*
-./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
-make -j4
-make install
-
-echo "::endgroup::"
 ###########
 # ncurses #
 ###########
@@ -173,7 +160,20 @@ cd ncurses*
 make -j4
 make install
 
-echo "::endgroup::"
+echo "::endgroup::" 
+############
+# readline #
+############
+echo "::group::readline"
+cd ${BUILDDIR}
+
+download_verify_extract readline-8.2.tar.gz
+cd readline*
+./configure --with-curses --host=${ARCH}-linux --prefix=${DEPSDIR}
+make -j4
+make install
+
+echo "::endgroup::" 
 #########
 # bzip2 #
 #########
