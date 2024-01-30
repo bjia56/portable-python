@@ -345,7 +345,7 @@ function build_x11_lib () {
 
   pkg=$1
   file=$pkg.tar.gz
-  download_and_verify $file
+  download_verify_extract $file
   cd $pkg
   autoreconf -vfi
   ./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
