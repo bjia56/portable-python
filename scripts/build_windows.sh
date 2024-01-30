@@ -72,7 +72,7 @@ echo "::group::sqlite3"
 cd ${WORKDIR}
 
 download_and_verify sqlite-amalgamation-3430100.zip
-unzip -qq sqlite3-*.zip
+unzip -qq sqlite-amalgamation-3430100.zip
 mv sqlite-amalgamation-3430100 deps/sqlite3
 cd deps/sqlite3
 cl //c sqlite3.c

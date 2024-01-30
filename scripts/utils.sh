@@ -5,20 +5,20 @@ set -e
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 
 function verify_checksum () {
-  file=$1
+  file="$1"
   filename=$(basename $file)
   sha256sum -c ${SCRIPT_DIR}/../checksums/$file.sha256
 }
 
 function download_and_verify () {
-  file=$1
+  file="$1"
   curl -s -L -o $file https://github.com/bjia56/portable-python/releases/download/build-dependencies/$file
   verify_checksum $file
 }
 
 function download_verify_extract () {
-  file=$1
-  download_and_verify $1
+  file="$1"
+  download_and_verify $file
   tar -xf $file
   rm $file
 }
