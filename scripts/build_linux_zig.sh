@@ -355,6 +355,7 @@ function build_x11_lib () {
   cd ${BUILDDIR}
 }
 
+build_x11_lib xorgproto-2023.2
 build_x11_lib xproto-7.0.31
 build_x11_lib xextproto-7.3.0
 build_x11_lib kbproto-1.0.7
