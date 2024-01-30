@@ -169,7 +169,7 @@ cd ${BUILDDIR}
 
 download_verify_extract ncurses-6.4.tar.gz
 cd ncurses*
-./configure --host=${ARCH}-linux --with-normal --without-progs --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
+./configure --host=${ARCH}-linux --with-normal --with-shared --without-progs --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
 make -j4
 make install
 
