@@ -67,7 +67,7 @@ jobs:
           run: |
             set -e
 
-            if [[ "${{ inputs.arch }}" == "armv7l" ]]; then
+            if [[ "${{ inputs.arch }}" == "arm" ]]; then
               echo "armhfp" > /etc/yum/vars/basearch
               echo "armv7hl" > /etc/yum/vars/arch
               echo "armv7hl-redhat-linux-gpu" > /etc/rpm/platform
