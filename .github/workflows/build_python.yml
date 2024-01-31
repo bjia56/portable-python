@@ -34,7 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [ x86_64, aarch64, armv7l ]
+        arch: [ x86_64, aarch64, arm ]
     uses: ./.github/workflows/build_python_linux.yml
     with:
       python_version: ${{ inputs.python_version }}
