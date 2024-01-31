@@ -451,6 +451,10 @@ LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
 make -j4
 make install
 
+cd ${BUILDDIR}
+cp -r ${DEPSDIR}/lib/tcl8.6 ./python-install/lib
+cp -r ${DEPSDIR}/lib/tk8.6 ./python-install/lib
+
 echo "::endgroup::"
 #############################################
 # Check executable dependencies (pre-patch) #
