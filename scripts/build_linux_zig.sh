@@ -304,7 +304,7 @@ cd ${BUILDDIR}
 
 download_verify_extract fontconfig-2.15.0.tar.gz
 cd fontconfig*
-LDFLAGS="${LDFLAGS} -l:libxml2.a" ./configure --host=${ARCH}-linux --enable-static --disable-shared --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
+LDFLAGS="${LDFLAGS} -lxml2" ./configure --host=${ARCH}-linux --enable-static --disable-shared --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
 make -j4
 make install
 
@@ -362,7 +362,7 @@ cd ${BUILDDIR}
 
 download_verify_extract tcl8.6.13-src.tar.gz
 cd tcl*/unix
-LDFLAGS="${LDFLAGS} -lexpat" ./configure --disable-shared --host=${ARCH}-linux --prefix=${DEPSDIR}
+LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
 make install
 
@@ -375,7 +375,7 @@ cd ${BUILDDIR}
 
 download_verify_extract tk8.6.13-src.tar.gz
 cd tk*/unix
-LDFLAGS="${LDFLAGS} -lexpat" ./configure --disable-shared --host=${ARCH}-linux --prefix=${DEPSDIR}
+LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --host=${ARCH}-linux --prefix=${DEPSDIR}
 make -j4
 make install
 
