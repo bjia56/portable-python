@@ -65,7 +65,7 @@ if [[ "${ARCH}" == "arm" ]]; then
   export CXX="${ARCH}-linux-gnueabihf-g++"
   export ZIG_TARGET=${ARCH}-linux-gnueabihf.2.17
   export CHOST=${ARCH}-linux-gnueabihf
-  export CFLAGS="-mcpu=generic+v7a+vfp3+d32+thumb2+neon -mfpu=neon -mfloat-abi=hard ${CFLAGS}"
+  export CFLAGS="-mfpu=vfp -march=armv6zk -mtune=arm1176jzf_s ${CFLAGS}"
 else
   # See above comment
   sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/${ARCH}-linux-gnu-gcc-ar
