@@ -509,6 +509,17 @@ echo "::group::Patch python"
 cd ${BUILDDIR}
 
 cd python-install
+case "$ARCH" in
+  x86_64)
+    patchelf --set-rpath /usr/x86_64-linux-gnu/lib/ ./bin/python
+    ;;
+  aarch64)
+    patchelf --set-rpath /usr/aarch64-linux-gnu/lib/ ./bin/python
+    ;;
+  arm)
+    patchelf --set-rpath /usr/arm-linux-gnueabihf/lib/ ./bin/python
+    ;;
+esac
 ${WORKDIR}/scripts/patch_libpython.sh ./lib/libpython${PYTHON_VER}.so ./bin/python
 patchelf --replace-needed libpython${PYTHON_VER}.so "\$ORIGIN/../lib/libpython${PYTHON_VER}.so" ./bin/python
 
