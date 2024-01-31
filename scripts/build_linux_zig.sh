@@ -118,7 +118,7 @@ cd ${BUILDDIR}
 
 download_verify_extract expat-2.5.0.tar.gz
 cd expat*
-./configure --host=${ARCH}-linux --prefix=${DEPSDIR}
+./configure --host=${ARCH}-linux --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
 
