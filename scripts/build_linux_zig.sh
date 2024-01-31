@@ -36,9 +36,10 @@ sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja
 
 # patchelf
 patchelf_ver=0.17.2
-cd /tmp
+mkdir patchelf
+cd patchelf
 wget -q https://github.com/NixOS/patchelf/releases/download/${patchelf_ver}/patchelf-${patchelf_ver}-x86_64.tar.gz
-sudo tar -xzf patchelf*.tar.gz
+tar -xf patchelf*.tar.gz
 sudo mv ./bin/patchelf /usr/local/bin/patchelf 
 cd ${WORKDIR}
 
