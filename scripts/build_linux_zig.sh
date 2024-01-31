@@ -536,7 +536,7 @@ echo "::group::Test python"
 cd ${BUILDDIR}
 
 cd python-install
-qemu-${ARCH}-static ./bin/python --version
+${WORKDIR}/scripts/qemu_${ARCH}_interpreter ./bin/python --version
 
 echo "::endgroup::"
 ###############
@@ -546,7 +546,7 @@ echo "::group::Preload pip"
 cd ${BUILDDIR}
 
 cd python-install
-qemu-${ARCH}-static ./bin/python -m ensurepip
+${WORKDIR}/scripts/qemu_${ARCH}_interpreter ./bin/python -m ensurepip
 
 echo "::endgroup::"
 ###################
