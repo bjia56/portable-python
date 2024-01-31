@@ -6,7 +6,6 @@ source ${SCRIPT_DIR}/utils.sh
 
 zig version
 
-
 ########################
 # Install dependencies #
 ########################
@@ -32,16 +31,7 @@ case "$ARCH" in
     sudo ln -s /usr/arm-linux-gnueabihf/lib/ld-linux-armhf.so.3 /lib/ld-linux-armhf.so.3
     ;;
 esac
-sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja
-
-# patchelf
-patchelf_ver=0.17.2
-mkdir patchelf
-cd patchelf
-wget -q https://github.com/NixOS/patchelf/releases/download/${patchelf_ver}/patchelf-${patchelf_ver}-x86_64.tar.gz
-tar -xf patchelf*.tar.gz
-sudo mv ./bin/patchelf /usr/local/bin/patchelf
-cd ${WORKDIR}
+sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja patchelf==0.15.0.0
 
 mkdir ${BUILDDIR}
 mkdir ${DEPSDIR}
