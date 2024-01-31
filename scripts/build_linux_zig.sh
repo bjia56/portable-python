@@ -16,7 +16,7 @@ export DEBIAN_FRONTEND=noninteractive
 sudo apt update
 sudo apt -y install \
   wget build-essential pkg-config cmake autoconf git \
-  python2 python3 python3-pip clang patchelf qemu-user-static \
+  python2 python3 python3-pip clang qemu-user-static \
   gettext bison libtool autopoint gperf ncurses-bin xutils-dev
 case "$ARCH" in
   x86_64)
@@ -33,6 +33,14 @@ case "$ARCH" in
     ;;
 esac
 sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja
+
+# patchelf
+patchelf_ver=0.17.2
+cd /tmp
+wget -q https://github.com/NixOS/patchelf/releases/download/${patchelf_ver}/patchelf-${patchelf_ver}-x86_64.tar.gz
+tar -xzf patchelf*.tar.gz
+sudo mv ./bin/patchelf /usr/local/bin/patchelf 
+cd ${WORKDIR}
 
 mkdir ${BUILDDIR}
 mkdir ${DEPSDIR}
