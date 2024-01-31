@@ -40,7 +40,7 @@ mkdir patchelf
 cd patchelf
 wget -q https://github.com/NixOS/patchelf/releases/download/${patchelf_ver}/patchelf-${patchelf_ver}-x86_64.tar.gz
 tar -xf patchelf*.tar.gz
-sudo mv ./bin/patchelf /usr/local/bin/patchelf 
+sudo mv ./bin/patchelf /usr/local/bin/patchelf
 cd ${WORKDIR}
 
 mkdir ${BUILDDIR}
@@ -509,7 +509,7 @@ echo "::group::Patch python"
 cd ${BUILDDIR}
 
 cd python-install
-${WORKDIR}/scripts/patch_libpython.sh ./lib/libpython${PYTHON_VER}.so ./bin/python
+#${WORKDIR}/scripts/patch_libpython.sh ./lib/libpython${PYTHON_VER}.so ./bin/python
 patchelf --replace-needed libpython${PYTHON_VER}.so "\$ORIGIN/../lib/libpython${PYTHON_VER}.so" ./bin/python
 
 echo "::endgroup::"
@@ -520,13 +520,11 @@ echo "::group::Check executable dependencies (post-patch)"
 cd ${BUILDDIR}
 
 cd python-install
-# we don't make ldd errors fatal here since ldd doesn't work
-# when cross compiling
 echo "python dependencies"
-ldd -v -r ./bin/python || true
+readelf -d ./bin/python
 echo
 echo "libpython dependencies"
-ldd -v -r ./lib/libpython${PYTHON_VER}.so || true
+readelf -d ./lib/libpython${PYTHON_VER}.so
 
 echo "::endgroup::"
 ###############
