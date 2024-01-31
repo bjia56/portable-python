@@ -37,6 +37,12 @@ sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja
 mkdir ${BUILDDIR}
 mkdir ${DEPSDIR}
 
+export CFLAGS="-I${DEPSDIR}/include"
+export CPPFLAGS="-I${DEPSDIR}/include"
+export CXXFLAGS="${CPPFLAGS}"
+export LDFLAGS="-L${DEPSDIR}/lib"
+export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig:${DEPSDIR}/share/pkgconfig"
+
 if [[ "${ARCH}" == "arm" ]]; then
   # Python's sysconfig module will retain references to these compiler values, which cause
   # problems when sysconfig is used to pick a compiler during binary extension builds.
@@ -50,6 +56,7 @@ if [[ "${ARCH}" == "arm" ]]; then
   export CXX="${ARCH}-linux-gnueabihf-g++"
   export ZIG_TARGET=${ARCH}-linux-gnueabihf.2.17
   export CHOST=${ARCH}-linux-gnueabihf
+  export CFLAGS="-mcpu=generic+v7a+vfp3+d32+thumb2+neon -mfpu=neon -mfloat-abi=hard ${CFLAGS}"
 else
   # See above comment
   sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/${ARCH}-linux-gnu-gcc-ar
@@ -61,12 +68,6 @@ else
   export ZIG_TARGET=${ARCH}-linux-gnu.2.17
   export CHOST=${ARCH}-linux-gnu
 fi
-
-export CFLAGS="-I${DEPSDIR}/include"
-export CPPFLAGS="-I${DEPSDIR}/include"
-export CXXFLAGS="${CPPFLAGS}"
-export LDFLAGS="-L${DEPSDIR}/lib"
-export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig:${DEPSDIR}/share/pkgconfig"
 
 echo "::endgroup::"
 ########
