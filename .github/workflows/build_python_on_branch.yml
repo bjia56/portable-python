@@ -7,6 +7,13 @@ on:
   pull_request:
     paths: ["scripts/**", ".github/workflows/**"]
   workflow_dispatch:
+    inputs:
+      run_tests:
+        required: false
+        type: boolean
+      debug:
+        required: false
+        type: boolean
 
 jobs:
   build:
@@ -14,7 +21,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python_version: [ 3.9.17, 3.10.13 ]
+        python_version: [ 3.8.17, 3.9.17, 3.10.13 ]
     uses: ./.github/workflows/build_python.yml
     with:
       python_version: ${{ matrix.python_version }}
+      run_tests: ${{ inputs.run_tests || false }}
+      debug: ${{ inputs.debug || false }}

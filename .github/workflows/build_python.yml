@@ -6,93 +6,52 @@ on:
       python_version:
         required: true
         type: string
+      run_tests:
+        required: false
+        type: boolean
+      debug:
+        required: false
+        type: boolean
   workflow_call:
     inputs:
       python_version:
         required: true
         type: string
+      run_tests:
+        required: false
+        type: boolean
+      debug:
+        required: false
+        type: boolean
 
 env:
-  image_map: '{"x86_64": "debian:buster", "aarch64": "debian:buster", "armv7l": "debian:buster"}'
-  platform_map: '{"x86_64": "linux/amd64", "aarch64": "linux/arm64/v8", "armv7l": "linux/arm/v7"}'
+  RUN_TESTS: ${{ inputs.run_tests }}
+  DEBUG_CI: ${{ inputs.debug }}
 
 jobs:
   build_linux:
     name: Linux ${{ inputs.python_version }} ${{ matrix.arch }}
-    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         arch: [ x86_64, aarch64, armv7l ]
-
-    steps:
-      - name: Parse image
-        id: parse_image
-        run: |
-          IMAGE=$(echo ${{ toJSON(env.image_map) }} | jq -r '.["${{ matrix.arch }}"]')
-          echo "::set-output name=image::$IMAGE"
-
-      - name: Parse platform
-        id: parse_platform
-        run: |
-          PLATFORM=$(echo ${{ toJSON(env.platform_map) }} | jq -r '.["${{ matrix.arch }}"]')
-          echo "::set-output name=platform::$PLATFORM"
-
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-        if: ${{ matrix.arch != 'x86_64' }}
-
-      - name: Build
-        uses: addnab/docker-run-action@v3
-        with:
-          image: ${{ steps.parse_image.outputs.image }}
-          options: -v ${{ github.workspace }}:/work --workdir /tmp --platform ${{ steps.parse_platform.outputs.platform }}
-          run: |
-            set -e
-            /work/scripts/build_linux.sh ${{ matrix.arch }} ${{ inputs.python_version }}
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: python
-          path: ./python*.zip
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        if: ${{ always() }}
-        with:
-          name: build-python
-          path: ./*python*.tar.gz
-
-      - name: Test python in clean environment
-        uses: addnab/docker-run-action@v3
-        with:
-          image: ${{ steps.parse_image.outputs.image }}
-          options: -v ${{ github.workspace }}:/work --workdir /tmp --platform ${{ steps.parse_platform.outputs.platform }}
-          run: |
-            set -e
-            apt update
-            apt install -y unzip
-
-            cp /work/python*.zip .
-            unzip ./python*.zip
-
-            cd python-${{ inputs.python_version }}-linux-${{ matrix.arch }}
-            chmod +x ./bin/python
-            ldd -v -r ./bin/python || true
-            ./bin/python --version
-
-            # make tests nonfatal for now
-            # ./bin/python -m test || true
+    uses: ./.github/workflows/build_python_linux.yml
+    with:
+      python_version: ${{ inputs.python_version }}
+      arch: ${{ matrix.arch }}
+      run_tests: ${{ inputs.run_tests }}
+      debug: ${{ inputs.debug }}
 
   build_windows:
     name: Windows ${{ inputs.python_version }} x86_64 (build)
     runs-on: windows-latest
 
     steps:
+      - name: Set git to use LF
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -111,16 +70,16 @@ jobs:
           ./scripts/build_windows.sh x86_64 ${{ inputs.python_version }}
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: python
+          name: python-windows-x86_64-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        if: ${{ always() && inputs.debug }}
         with:
-          name: build-python
+          name: build-python-windows-x86_64-${{ inputs.python_version }}
           path: ./*python*.tar.gz
 
   test_windows:
@@ -130,9 +89,9 @@ jobs:
 
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: python
+          name: python-windows-x86_64-${{ inputs.python_version }}
           path: ./python/
 
       - name: Test python in clean environment
@@ -144,8 +103,9 @@ jobs:
           bin/python --version
           ./bin/python -c "import ssl"
 
-          # make tests nonfatal for now
-          # ./bin/python -m test || true
+          if [[ "${{ inputs.run_tests }}" == "true" ]]; then
+            ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata
+          fi
 
   build_macos:
     name: MacOS ${{ inputs.python_version }} universal2 (build)
@@ -155,22 +115,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Install coreutils
+        run: brew install coreutils
+
       - name: Build
         run: |
           set -ex
           ./scripts/build_macos.sh universal2 ${{ inputs.python_version }}
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: python
+          name: python-darwin-universal2-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        if: ${{ always() && inputs.debug }}
         with:
-          name: build-python
+          name: build-python-darwin-universal2-${{ inputs.python_version }}
           path: ./*python*.tar.gz
 
   test_macos:
@@ -180,9 +143,9 @@ jobs:
 
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: python
+          name: python-darwin-universal2-${{ inputs.python_version }}
           path: ./python/
 
       - name: Test python in clean environment
@@ -195,5 +158,6 @@ jobs:
           ./bin/python --version
           ./bin/python -c "import ssl"
 
-          # make tests nonfatal for now
-          # ./bin/python -m test || true
+          if [[ "${{ inputs.run_tests }}" == "true" ]]; then
+            ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata
+          fi

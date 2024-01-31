@@ -1,10 +1,8 @@
 #!/bin/bash
 
-ARCH=$1
-PYTHON_FULL_VER=$2
-PYTHON_VER=$(echo ${PYTHON_FULL_VER} | cut -d "." -f 1-2)
-
-set -ex
+PLATFORM=linux
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+source ${SCRIPT_DIR}/utils.sh
 
 ########################
 # Install dependencies #
@@ -34,7 +32,7 @@ case "$ARCH" in
     wget -q https://files.pythonhosted.org/packages/0d/41/85549e9645097cddc7279886eafeafc7462215f309133ea2eae4941f9c35/cmake-3.26.4-py2.py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl
     ;;
   armv7l)
-    wget -q https://www.piwheels.org/simple/cmake/cmake-3.26.4-cp37-cp37m-linux_armv7l.whl
+    wget -q https://github.com/bjia56/armv7l-wheels/releases/download/cmake-3.26.4-cpython3.7/cmake-3.26.4-cp37-cp37m-manylinux_2_17_armv7l.manylinux2014_armv7l.whl
     ;;
 esac
 mv cmake*.whl cmake-3.26.4-py2.py3-none-any.whl
@@ -60,8 +58,7 @@ cd /build
 mkdir python-build
 mkdir python-install
 
-git clone https://github.com/bjia56/python-cmake-buildsystem.git --branch python3.10 --single-branch --depth 1
-#git clone https://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
+git clone https://github.com/bjia56/python-cmake-buildsystem.git --branch portable-python --single-branch --depth 1
 
 echo "::endgroup::"
 #############
@@ -71,7 +68,7 @@ echo "::group::Run build"
 
 if [[ "${ARCH}" == "armv7l" ]]; then
   cd /tmp
-  wget -q https://www.bytereef.org/software/mpdecimal/releases/mpdecimal-2.5.0.tar.gz
+  wget -q https://github.com/bjia56/portable-python/releases/download/build-dependencies/mpdecimal-2.5.0.tar.gz
   tar -xzf mpdecimal*.tar.gz
   cd mpdecimal-2.5.0
   ./configure
@@ -86,6 +83,7 @@ if [[ "${ARCH}" == "armv7l" ]]; then
   additionalparams+=(-DUSE_SYSTEM_LIBMPDEC=ON)
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 fi
+
 #cmake --trace-expand \
 cmake \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
@@ -94,8 +92,8 @@ cmake \
   -DBUILD_EXTENSIONS_AS_BUILTIN=ON \
   -DBUILD_LIBPYTHON_SHARED=ON \
   "${additionalparams[@]}" \
-  -DBUILD_TESTING=ON \
-  -DINSTALL_TEST=OFF \
+  -DBUILD_TESTING=${INSTALL_TEST} \
+  -DINSTALL_TEST=${INSTALL_TEST} \
   -DINSTALL_MANUAL=OFF \
   ../python-cmake-buildsystem
 make -j8

@@ -1,0 +1,161 @@
+name: Build Python
+
+on:
+  workflow_call:
+    inputs:
+      python_version:
+        required: true
+        type: string
+      arch:
+        required: true
+        type: string
+      run_tests:
+        required: false
+        type: boolean
+      debug:
+        required: false
+        type: boolean
+
+env:
+  image_map: '{"x86_64": "debian:buster", "aarch64": "debian:buster", "armv7l": "debian:buster"}'
+  platform_map: '{"x86_64": "linux/amd64", "aarch64": "linux/arm64/v8", "armv7l": "linux/arm/v7"}'
+  RUN_TESTS: ${{ inputs.run_tests }}
+  DEBUG_CI: ${{ inputs.debug }}
+
+jobs:
+  build_linux_zig:
+    if: ${{ inputs.arch != 'armv7l' }}
+    name: Linux (Zig) ${{ inputs.python_version }} ${{ inputs.arch }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Parse platform
+        id: parse_platform
+        run: |
+          PLATFORM=$(echo ${{ toJSON(env.platform_map) }} | jq -r '.["${{ inputs.arch }}"]')
+          echo "::set-output name=platform::$PLATFORM"
+
+      - name: Set up zig
+        uses: goto-bus-stop/setup-zig@v2
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build
+        run: |
+          ./scripts/build_linux_zig.sh ${{ inputs.arch }} ${{ inputs.python_version }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-linux-${{ inputs.arch }}-${{ inputs.python_version }}
+          path: ./python*.zip
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        if: ${{ always() && inputs.debug }}
+        with:
+          name: build-python-linux-${{ inputs.arch }}-${{ inputs.python_version }}
+          path: ./*python*.tar.gz
+
+      - name: Test python in clean environment
+        uses: addnab/docker-run-action@v3
+        with:
+          image: centos:7
+          options: -v ${{ github.workspace }}:/work --workdir /tmp --platform ${{ steps.parse_platform.outputs.platform }}
+          shell: bash
+          run: |
+            set -e
+
+            if [[ "${{ inputs.arch }}" == "armv7l" ]]; then
+              echo "armhfp" > /etc/yum/vars/basearch
+              echo "armv7hl" > /etc/yum/vars/arch
+              echo "armv7hl-redhat-linux-gpu" > /etc/rpm/platform
+            fi
+
+            yum -y install unzip
+
+            cp /work/python*.zip .
+            unzip ./python*.zip
+
+            cd python-${{ inputs.python_version }}-linux-${{ inputs.arch }}
+            chmod +x ./bin/python
+            ldd -v -r ./bin/python || true
+            ./bin/python --version
+            ./bin/python -c "import ssl"
+
+            if [[ "${{ inputs.run_tests }}" == "true" ]]; then
+              ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata
+            fi
+
+  build_linux:
+    if: ${{ inputs.arch == 'armv7l' }}
+    name: Linux (Docker) ${{ inputs.python_version }} ${{ inputs.arch }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Parse image
+        id: parse_image
+        run: |
+          IMAGE=$(echo ${{ toJSON(env.image_map) }} | jq -r '.["${{ inputs.arch }}"]')
+          echo "::set-output name=image::$IMAGE"
+
+      - name: Parse platform
+        id: parse_platform
+        run: |
+          PLATFORM=$(echo ${{ toJSON(env.platform_map) }} | jq -r '.["${{ inputs.arch }}"]')
+          echo "::set-output name=platform::$PLATFORM"
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        if: ${{ inputs.arch != 'x86_64' }}
+
+      - name: Build
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ${{ steps.parse_image.outputs.image }}
+          options: -v ${{ github.workspace }}:/work --workdir /tmp --platform ${{ steps.parse_platform.outputs.platform }}
+          shell: bash
+          run: |
+            set -e
+            /work/scripts/build_linux.sh ${{ inputs.arch }} ${{ inputs.python_version }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-linux-${{ inputs.arch }}-${{ inputs.python_version }}
+          path: ./python*.zip
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        if: ${{ always() && inputs.debug }}
+        with:
+          name: build-python-linux-${{ inputs.arch }}-${{ inputs.python_version }}
+          path: ./*python*.tar.gz
+
+      - name: Test python in clean environment
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ${{ steps.parse_image.outputs.image }}
+          options: -v ${{ github.workspace }}:/work --workdir /tmp --platform ${{ steps.parse_platform.outputs.platform }}
+          shell: bash
+          run: |
+            set -e
+            apt update
+            apt install -y unzip
+
+            cp /work/python*.zip .
+            unzip ./python*.zip
+
+            cd python-${{ inputs.python_version }}-linux-${{ inputs.arch }}
+            chmod +x ./bin/python
+            ldd -v -r ./bin/python || true
+            ./bin/python --version
+            ./bin/python -c "import ssl"
+
+            if [[ "${{ inputs.run_tests }}" == "true" ]]; then
+              ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata
+            fi

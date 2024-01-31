@@ -1,11 +1,8 @@
 #!/bin/bash
 
-ARCH=$1
-PYTHON_FULL_VER=$2
-
-WORKDIR=$(pwd)
-
-set -ex
+PLATFORM=windows
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+source ${SCRIPT_DIR}/utils.sh
 
 ##############
 # Initialize #
@@ -16,8 +13,7 @@ mkdir python-build
 mkdir python-install
 mkdir deps
 
-git clone https://github.com/bjia56/python-cmake-buildsystem.git --branch python3.10 --single-branch --depth 1
-#git clone https://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
+git clone https://github.com/bjia56/python-cmake-buildsystem.git --branch portable-python --single-branch --depth 1
 
 echo "::endgroup::"
 ###########
@@ -75,8 +71,8 @@ echo "::endgroup::"
 echo "::group::sqlite3"
 cd ${WORKDIR}
 
-curl -L https://www.sqlite.org/2023/sqlite-amalgamation-3430100.zip --output sqlite3-src.zip
-unzip -qq sqlite3-src.zip
+download_and_verify sqlite-amalgamation-3430100.zip
+unzip -qq sqlite-amalgamation-3430100.zip
 mv sqlite-amalgamation-3430100 deps/sqlite3
 cd deps/sqlite3
 cl //c sqlite3.c
@@ -89,10 +85,9 @@ echo "::endgroup::"
 echo "::group::zlib"
 cd ${WORKDIR}
 
-curl -L https://zlib.net/fossils/zlib-1.3.tar.gz --output zlib.tar.gz
-tar -xf zlib.tar.gz
+download_verify_extract zlib-1.3.1.tar.gz
 mkdir deps/zlib
-cd zlib-1.3
+cd zlib-1.3.1
 mkdir build
 cd build
 cmake \
@@ -137,8 +132,8 @@ cmake \
   -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/python-install \
   -DBUILD_EXTENSIONS_AS_BUILTIN=OFF \
   -DBUILD_LIBPYTHON_SHARED=ON \
-  -DBUILD_TESTING=ON \
-  -DINSTALL_TEST=OFF \
+  -DBUILD_TESTING=${INSTALL_TEST} \
+  -DINSTALL_TEST=${INSTALL_TEST} \
   -DINSTALL_MANUAL=OFF \
   -DBUILD_WININST=OFF \
   -DINSTALL_WINDOWS_TRADITIONAL:BOOL=OFF \
