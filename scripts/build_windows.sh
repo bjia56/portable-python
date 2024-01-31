@@ -123,12 +123,6 @@ echo "::endgroup::"
 echo "::group::Build"
 cd ${WORKDIR}
 
-if [[ "${RUN_TESTS}" == "true" ]]; then
-  INSTALL_TEST="ON"
-else
-  INSTALL_TEST="OFF"
-fi
-
 cd python-build
 cmake \
   -G "Visual Studio 17 2022" -A x64 \

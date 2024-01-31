@@ -11,6 +11,9 @@ on:
       run_tests:
         required: false
         type: boolean
+      debug:
+        required: false
+        type: boolean
 
 jobs:
   build:
@@ -23,3 +26,4 @@ jobs:
     with:
       python_version: ${{ matrix.python_version }}
       run_tests: ${{ inputs.run_tests || false }}
+      debug: ${{ inputs.debug || false }}

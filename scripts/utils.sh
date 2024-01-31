@@ -31,4 +31,12 @@ WORKDIR=$(pwd)
 BUILDDIR=${WORKDIR}/build
 DEPSDIR=${WORKDIR}/deps
 
-trap "cd ${BUILDDIR} && tar -czf ${WORKDIR}/build-python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz ." EXIT
+if [[ "${RUN_TESTS}" == "true" ]]; then
+  INSTALL_TEST="ON"
+else
+  INSTALL_TEST="OFF"
+fi
+
+if [[ "${DEBUG_CI}" == "true" ]]; then
+  trap "cd ${BUILDDIR} && tar -czf ${WORKDIR}/build-python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz ." EXIT
+fi

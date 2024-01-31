@@ -9,6 +9,9 @@ on:
       run_tests:
         required: false
         type: boolean
+      debug:
+        required: false
+        type: boolean
   workflow_call:
     inputs:
       python_version:
@@ -17,9 +20,13 @@ on:
       run_tests:
         required: false
         type: boolean
+      debug:
+        required: false
+        type: boolean
 
 env:
   RUN_TESTS: ${{ inputs.run_tests }}
+  DEBUG_CI: ${{ inputs.debug }}
 
 jobs:
   build_linux:
@@ -33,6 +40,7 @@ jobs:
       python_version: ${{ inputs.python_version }}
       arch: ${{ matrix.arch }}
       run_tests: ${{ inputs.run_tests }}
+      debug: ${{ inputs.debug }}
 
   build_windows:
     name: Windows ${{ inputs.python_version }} x86_64 (build)
@@ -69,7 +77,7 @@ jobs:
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
-        if: ${{ always() }}
+        if: ${{ always() && inputs.debug }}
         with:
           name: build-python-windows-x86_64-${{ inputs.python_version }}
           path: ./*python*.tar.gz
@@ -123,7 +131,7 @@ jobs:
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
-        if: ${{ always() }}
+        if: ${{ always() && inputs.debug }}
         with:
           name: build-python-darwin-universal2-${{ inputs.python_version }}
           path: ./*python*.tar.gz

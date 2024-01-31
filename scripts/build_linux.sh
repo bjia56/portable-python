@@ -84,12 +84,6 @@ if [[ "${ARCH}" == "armv7l" ]]; then
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 fi
 
-if [[ "${RUN_TESTS}" == "true" ]]; then
-  INSTALL_TEST="ON"
-else
-  INSTALL_TEST="OFF"
-fi
-
 #cmake --trace-expand \
 cmake \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \

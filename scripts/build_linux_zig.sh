@@ -399,12 +399,6 @@ echo "::endgroup::"
 echo "::group::Python"
 cd ${BUILDDIR}
 
-if [[ "${RUN_TESTS}" == "true" ]]; then
-  INSTALL_TEST="ON"
-else
-  INSTALL_TEST="OFF"
-fi
-
 wget --no-verbose -O python-cmake-buildsystem.tar.gz https://github.com/bjia56/python-cmake-buildsystem/tarball/portable-python
 tar -xf python-cmake-buildsystem.tar.gz
 rm *.tar.gz

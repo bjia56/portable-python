@@ -12,11 +12,15 @@ on:
       run_tests:
         required: false
         type: boolean
+      debug:
+        required: false
+        type: boolean
 
 env:
   image_map: '{"x86_64": "debian:buster", "aarch64": "debian:buster", "armv7l": "debian:buster"}'
   platform_map: '{"x86_64": "linux/amd64", "aarch64": "linux/arm64/v8", "armv7l": "linux/arm/v7"}'
   RUN_TESTS: ${{ inputs.run_tests }}
+  DEBUG_CI: ${{ inputs.debug }}
 
 jobs:
   build_linux_zig:
@@ -49,7 +53,7 @@ jobs:
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
-        if: ${{ always() }}
+        if: ${{ always() && inputs.debug }}
         with:
           name: build-python-linux-${{ inputs.arch }}-${{ inputs.python_version }}
           path: ./*python*.tar.gz
@@ -127,7 +131,7 @@ jobs:
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
-        if: ${{ always() }}
+        if: ${{ always() && inputs.debug }}
         with:
           name: build-python-linux-${{ inputs.arch }}-${{ inputs.python_version }}
           path: ./*python*.tar.gz
