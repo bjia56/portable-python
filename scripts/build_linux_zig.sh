@@ -22,20 +22,14 @@ case "$ARCH" in
   x86_64)
     sudo apt -y install libc6-amd64-cross
     sudo ln -s /usr/x86_64-linux-gnu/lib/ld-linux-x86-64.so.2 /lib/ld-linux-x86-64.so.2
-    export ZIG_TARGET=${ARCH}-linux-gnu.2.17
-    export CHOST=${ARCH}-linux-gnu
     ;;
   aarch64)
     sudo apt -y install libc6-arm64-cross
     sudo ln -s /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib/ld-linux-aarch64.so.1
-    export ZIG_TARGET=${ARCH}-linux-gnu.2.17
-    export CHOST=${ARCH}-linux-gnu
     ;;
   arm)
     sudo apt -y install libc6-armhf-cross
     sudo ln -s /usr/arm-linux-gnueabihf/lib/ld-linux-armhf.so.3 /lib/ld-linux-armhf.so.3
-    export ZIG_TARGET=${ARCH}-linux-gnueabihf.2.17
-    export CHOST=${ARCH}-linux-gnueabihf
     ;;
 esac
 sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja
@@ -43,18 +37,31 @@ sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja
 mkdir ${BUILDDIR}
 mkdir ${DEPSDIR}
 
+if [[ "${ARCH}" == "arm" ]]; then
+  # Python's sysconfig module will retain references to these compiler values, which cause
+  # problems when sysconfig is used to pick a compiler during binary extension builds.
+  # Since clang (zig) is a drop-in replacement for gcc, we set these so the final sysconfig
+  # will work on other platforms.
+  sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/${ARCH}-linux-gnueabihf-gcc-ar
+  sudo cp ${WORKDIR}/zigshim/zig_cc /usr/bin/${ARCH}-linux-gnueabihf-gcc
+  sudo cp ${WORKDIR}/zigshim/zig_cxx /usr/bin/${ARCH}-linux-gnueabihf-g++
+  export AR="${ARCH}-linux-gnueabihf-gcc-ar"
+  export CC="${ARCH}-linux-gnueabihf-gcc"
+  export CXX="${ARCH}-linux-gnueabihf-g++"
+  export ZIG_TARGET=${ARCH}-linux-gnueabihf.2.17
+  export CHOST=${ARCH}-linux-gnueabihf
+else
+  # See above comment
+  sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/${ARCH}-linux-gnu-gcc-ar
+  sudo cp ${WORKDIR}/zigshim/zig_cc /usr/bin/${ARCH}-linux-gnu-gcc
+  sudo cp ${WORKDIR}/zigshim/zig_cxx /usr/bin/${ARCH}-linux-gnu-g++
+  export AR="${ARCH}-linux-gnu-gcc-ar"
+  export CC="${ARCH}-linux-gnu-gcc"
+  export CXX="${ARCH}-linux-gnu-g++"
+  export ZIG_TARGET=${ARCH}-linux-gnu.2.17
+  export CHOST=${ARCH}-linux-gnu
+fi
 
-# Python's sysconfig module will retain references to these compiler values, which cause
-# problems when sysconfig is used to pick a compiler during binary extension builds.
-# Since clang (zig) is a drop-in replacement for gcc, we set these so the final sysconfig
-# will work on other platforms.
-sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/${ARCH}-linux-gnu-gcc-ar
-sudo cp ${WORKDIR}/zigshim/zig_cc /usr/bin/${ARCH}-linux-gnu-gcc
-sudo cp ${WORKDIR}/zigshim/zig_cxx /usr/bin/${ARCH}-linux-gnu-g++
-
-export AR="${ARCH}-linux-gnu-gcc-ar"
-export CC="${ARCH}-linux-gnu-gcc"
-export CXX="${ARCH}-linux-gnu-g++"
 export CFLAGS="-I${DEPSDIR}/include"
 export CPPFLAGS="-I${DEPSDIR}/include"
 export CXXFLAGS="${CPPFLAGS}"
