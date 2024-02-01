@@ -25,22 +25,84 @@ on:
         type: boolean
 
 env:
+  image_map: '{"x86_64": "centos:7", "aarch64": "centos:7", "arm": "debian:bullseye"}'
+  platform_map: '{"x86_64": "linux/amd64", "aarch64": "linux/arm64/v8", "arm": "linux/arm/v7"}'
   RUN_TESTS: ${{ inputs.run_tests }}
   DEBUG_CI: ${{ inputs.debug }}
 
 jobs:
   build_linux:
     name: Linux ${{ inputs.python_version }} ${{ matrix.arch }}
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        arch: [ x86_64, aarch64, armv7l ]
-    uses: ./.github/workflows/build_python_linux.yml
-    with:
-      python_version: ${{ inputs.python_version }}
-      arch: ${{ matrix.arch }}
-      run_tests: ${{ inputs.run_tests }}
-      debug: ${{ inputs.debug }}
+        arch: [ x86_64, aarch64, arm ]
+
+    steps:
+      - name: Parse platform
+        id: parse_platform
+        run: |
+          PLATFORM=$(echo ${{ toJSON(env.platform_map) }} | jq -r '.["${{ matrix.arch }}"]')
+          echo "::set-output name=platform::$PLATFORM"
+          
+      - name: Parse image
+        id: parse_image
+        run: |
+          IMAGE=$(echo ${{ toJSON(env.image_map) }} | jq -r '.["${{ matrix.arch }}"]')
+          echo "::set-output name=image::$IMAGE"
+
+      - name: Set up zig
+        uses: goto-bus-stop/setup-zig@v2
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build
+        run: |
+          ./scripts/build_linux_zig.sh ${{ matrix.arch }} ${{ inputs.python_version }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-linux-${{ matrix.arch }}-${{ inputs.python_version }}
+          path: ./python*.zip
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        if: ${{ always() && inputs.debug }}
+        with:
+          name: build-python-linux-${{ matrix.arch }}-${{ inputs.python_version }}
+          path: ./*python*.tar.gz
+
+      - name: Test python in clean environment
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ${{ steps.parse_image.outputs.image }}
+          options: -v ${{ github.workspace }}:/work --workdir /tmp --platform ${{ steps.parse_platform.outputs.platform }}
+          shell: bash
+          run: |
+            set -e
+
+            if [[ "${{ matrix.arch }}" == "arm" ]]; then
+              apt update
+              apt -y install unzip
+            else
+              yum -y install unzip
+            fi
+
+            cp /work/python*.zip .
+            unzip ./python*.zip
+
+            cd python-${{ inputs.python_version }}-linux-${{ matrix.arch }}
+            chmod +x ./bin/python
+            ldd -v -r ./bin/python
+            ./bin/python --version
+            ./bin/python -c "import ssl"
+
+            if [[ "${{ inputs.run_tests }}" == "true" ]]; then
+              ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata
+            fi
 
   build_windows:
     name: Windows ${{ inputs.python_version }} x86_64 (build)
