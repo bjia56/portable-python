@@ -34,7 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [ arm ]
+        arch: [ x86_64, aarch64, arm ]
     uses: ./.github/workflows/build_python_linux.yml
     with:
       python_version: ${{ inputs.python_version }}
@@ -43,7 +43,6 @@ jobs:
       debug: ${{ inputs.debug }}
 
   build_windows:
-    if: false
     name: Windows ${{ inputs.python_version }} x86_64 (build)
     runs-on: windows-latest
 
@@ -109,7 +108,6 @@ jobs:
           fi
 
   build_macos:
-    if: false
     name: MacOS ${{ inputs.python_version }} universal2 (build)
     runs-on: macos-latest
 
