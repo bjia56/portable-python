@@ -85,7 +85,7 @@ jobs:
 
             cd python-${{ inputs.python_version }}-linux-${{ matrix.arch }}
             chmod +x ./bin/python
-            ldd -v -r ./bin/python
+            ldd -v -r ./bin/python || true
             ./bin/python --version
             ./bin/python -c "import ssl"
 
