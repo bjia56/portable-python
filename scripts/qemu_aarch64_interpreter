@@ -1,11 +1,4 @@
 #!/bin/bash
 # this interpreter shim is used by cmake to run platform
 # detection programs
-
-# we need to ensure that the binary uses the correct libc
-# so first patch the program
-patchelf --add-rpath /usr/aarch64-linux-gnu/lib/ $1
-patchelf --add-needed libm.so.6 --add-needed libpthread.so.0 --add-needed libdl.so.2 --add-needed libutil.so.1 --add-needed librt.so.1 $1
-
-# run the interpreter
-qemu-aarch64-static "$@"
+LD_LIBRARY_PATH=/usr/aarch64-linux-gnu/lib qemu-aarch64-static "$@"

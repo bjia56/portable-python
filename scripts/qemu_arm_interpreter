@@ -1,16 +1,4 @@
 #!/bin/bash
 # this interpreter shim is used by cmake to run platform
 # detection programs
-
-prog=$1
-cp $prog $prog.old
-
-trap "mv $prog.old $prog" EXIT
-
-# we need to ensure that the binary uses the correct libc
-# so first patch the program
-patchelf --set-rpath /usr/arm-linux-gnueabihf/lib/ $prog
-patchelf --add-needed libm.so.6 --add-needed libpthread.so.0 --add-needed libdl.so.2 --add-needed libutil.so.1 --add-needed librt.so.1 $prog
-
-# run the interpreter
-qemu-arm-static "$@"
+LD_LIBRARY_PATH=/usr/arm-linux-gnueabihf/lib qemu-arm-static "$@"
