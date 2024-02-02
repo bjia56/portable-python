@@ -16,6 +16,7 @@ echo "::group::Initialize"
 mkdir python-build
 mkdir python-install
 mkdir deps
+mkdir ${LICENSEDIR}
 
 export MACOSX_DEPLOYMENT_TARGET=10.5
 
@@ -35,6 +36,7 @@ cd openssl-1.1.1w
 CC=${WORKDIR}/scripts/cc ./Configure enable-rc5 zlib no-asm darwin64-x86_64-cc --prefix=${WORKDIR}/deps/openssl
 make -j${NPROC}
 make install_sw
+install_license
 
 file ${WORKDIR}/deps/openssl/lib/libcrypto.a
 file ${WORKDIR}/deps/openssl/lib/libssl.a
@@ -64,6 +66,8 @@ cmake \
   ..
 make -j${NPROC}
 make install
+cd ..
+install_license
 
 file ${WORKDIR}/deps/bzip2/lib/libbz2.a
 
@@ -87,6 +91,8 @@ cmake \
   ..
 make -j${NPROC}
 make install
+cd ..
+install_license
 
 file ${WORKDIR}/deps/xz/lib/liblzma.a
 
@@ -126,6 +132,8 @@ cmake \
   ..
 make -j${NPROC}
 make install
+cd ..
+install_license
 
 file ${WORKDIR}/deps/zlib/lib/libz.a
 
@@ -150,6 +158,7 @@ cd libffi-3.4.2-arm64
 CC="/usr/bin/cc" CFLAGS="-target arm64-apple-macos11" ./configure --prefix ${WORKDIR}/libffi-arm64-out --build=aarch64-apple-darwin --host=aarch64
 make -j${NPROC}
 make install
+install_license
 
 cd ${WORKDIR}
 lipo -create -output libffi.a ${WORKDIR}/deps/libffi/lib/libffi.a ${WORKDIR}/libffi-arm64-out/lib/libffi.a
@@ -192,6 +201,7 @@ cmake \
   ../python-cmake-buildsystem
 make -j${NPROC}
 make install
+cp -r ${LICENSEDIR} ${WORKDIR}/python-install
 cd ${WORKDIR}
 
 echo "::endgroup::"

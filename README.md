@@ -47,4 +47,4 @@ Currently, Python 3.8, 3.9, and 3.10 are built for the following targets:
 
 ## Licensing
 
-The build scripts and code in this repository are available under the Apache-2.0 License. Note that compilation of Python involves linking against other libraries, some of which may include different licensing terms.
+The build scripts and code in this repository are available under the Apache-2.0 License. Note that compilation of Python involves linking against other libraries, some of which may include different licensing terms. Copies of the licenses from known dependencies are included under the `licenses` directory of each Python distribution.

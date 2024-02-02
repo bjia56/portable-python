@@ -12,6 +12,7 @@ echo "::group::Initialize"
 mkdir python-build
 mkdir python-install
 mkdir deps
+mkdir ${LICENSEDIR}
 
 git clone https://github.com/bjia56/python-cmake-buildsystem.git --branch portable-python --single-branch --depth 1
 
@@ -25,6 +26,10 @@ cd ${WORKDIR}
 curl -L https://github.com/Slicer/Slicer-OpenSSL/releases/download/1.1.1g/OpenSSL_1_1_1g-install-msvc1900-64-Release.tar.gz --output openssl.tar.gz
 tar -xf openssl.tar.gz
 mv OpenSSL_1_1_1g-install-msvc1900-64-Release deps/openssl
+mkdir openssl-1.1.1g
+cd openssl-1.1.1g
+curl -L https://www.openssl.org/source/license-openssl-ssleay.txt --output LICENSE
+install_license
 
 echo "::endgroup::"
 #########
@@ -44,6 +49,8 @@ cmake \
   ..
 cmake --build . --config Release -- /property:Configuration=Release
 cmake --build . --target INSTALL -- /property:Configuration=Release
+cd ..
+install_license
 
 echo "::endgroup::"
 ########
@@ -63,6 +70,8 @@ cmake \
   ..
 cmake --build . --config Release -- /property:Configuration=Release
 cmake --build . --target INSTALL -- /property:Configuration=Release
+cd ..
+install_license
 
 echo "::endgroup::"
 ###########
@@ -96,6 +105,8 @@ cmake \
   ..
 cmake --build . --config Release -- /property:Configuration=Release
 cmake --build . --target INSTALL -- /property:Configuration=Release
+cd ..
+install_license
 
 echo "::endgroup::"
 ##########
@@ -115,6 +126,8 @@ cmake \
   ..
 cmake --build . --config Release -- /property:Configuration=Release
 cmake --build . --target INSTALL -- /property:Configuration=Release
+cd ..
+install_license
 
 echo "::endgroup::"
 #########
@@ -151,6 +164,7 @@ cmake \
   ../python-cmake-buildsystem
 cmake --build . --config Release -- /property:Configuration=Release
 cmake --build . --target INSTALL -- /property:Configuration=Release
+cp -r ${LICENSEDIR} ${WORKDIR}/python-install
 cd ${WORKDIR}
 
 # Need to bundle openssl with the executable
