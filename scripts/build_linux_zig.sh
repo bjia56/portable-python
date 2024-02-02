@@ -406,7 +406,7 @@ cd tcl*/unix
 LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
-install_license ./license.terms
+install_license ../license.terms
 
 echo "::endgroup::"
 ######
@@ -420,7 +420,7 @@ cd tk*/unix
 LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
-install_license ./license.terms
+install_license ../license.terms
 
 echo "::endgroup::"
 #############
