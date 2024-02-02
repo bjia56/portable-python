@@ -187,7 +187,7 @@ cmake -DCMAKE_SYSTEM_PROCESSOR=${ARCH} -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
 make -j4
 make install
 cd ..
-install_license
+install_license ./LICENSE bzip2-1.0.8
 
 echo "::endgroup::"
 ######
@@ -236,7 +236,7 @@ cd util-linux*
 ./configure --host=${CHOST} --disable-all-programs --enable-libuuid --prefix=${DEPSDIR}
 make -j4
 make install
-install_license ./Documentation/licenses/COPYING.BSD-3-Clause
+install_license ./Documentation/licenses/COPYING.BSD-3-Clause libuuid-2.39.3
 
 echo "::endgroup::"
 ########
@@ -406,7 +406,8 @@ cd tcl*/unix
 LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
-install_license ../license.terms
+cd .. 
+install_license ./license.terms
 
 echo "::endgroup::"
 ######
@@ -420,7 +421,8 @@ cd tk*/unix
 LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
-install_license ../license.terms
+cd .. 
+install_license ./license.terms
 
 echo "::endgroup::"
 #############
