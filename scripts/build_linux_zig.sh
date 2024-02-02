@@ -80,6 +80,7 @@ cd zlib*
 ./configure --prefix=${DEPSDIR}
 make -j4
 make install
+install_license
 
 echo "::endgroup::"
 ###########
@@ -97,6 +98,7 @@ else
 fi
 make -j4
 make install_sw
+install_license
 
 echo "::endgroup::"
 ##########
@@ -110,6 +112,7 @@ cd libffi*
 CFLAGS="${CFLAGS} -Wl,--undefined-version" ./configure --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
+install_license
 
 echo "::endgroup::"
 ###########
@@ -136,6 +139,7 @@ cd expat*
 ./configure --host=${CHOST} --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
+install_license
 
 echo "::endgroup::"
 ###########
@@ -149,6 +153,7 @@ cd ncurses*
 ./configure --host=${CHOST} --with-normal --without-progs --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
 make -j4
 make install
+install_license
 
 echo "::endgroup::"
 ############
@@ -162,6 +167,7 @@ cd readline*
 ./configure --with-curses --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
+install_license
 
 echo "::endgroup::"
 #########
@@ -179,6 +185,8 @@ cd build
 cmake -DCMAKE_SYSTEM_PROCESSOR=${ARCH} -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
 make -j4
 make install
+cd ..
+install_license
 
 echo "::endgroup::"
 ######
@@ -194,6 +202,8 @@ cd build
 cmake -DCMAKE_SYSTEM_PROCESSOR=${ARCH} -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
 make -j4
 make install
+cd ..
+install_license
 
 echo "::endgroup::"
 ##########
@@ -209,6 +219,8 @@ cd build
 cmake -DCMAKE_SYSTEM_PROCESSOR=${ARCH} -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
 make -j4
 make install
+cd ..
+install_license
 
 echo "::endgroup::"
 ########
@@ -223,6 +235,7 @@ cd util-linux*
 ./configure --host=${CHOST} --disable-all-programs --enable-libuuid --prefix=${DEPSDIR}
 make -j4
 make install
+install_license ./Documentation/licenses/COPYING.BSD-3-Clause
 
 echo "::endgroup::"
 ########
@@ -236,6 +249,7 @@ cd gdbm*
 ./configure --host=${CHOST} --enable-libgdbm-compat --prefix=${DEPSDIR}
 make -j4
 make install
+install_license
 
 echo "::endgroup::"
 ###########
@@ -249,6 +263,7 @@ cd libxml2*
 ./configure --host=${CHOST} --enable-static --disable-shared --without-python --prefix=${DEPSDIR}
 make -j4
 make install
+install_license ./Copyright
 
 echo "::endgroup::"
 ############
@@ -275,6 +290,7 @@ cd libgpg-error*
 ./configure --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
+install_license ./COPYING.LIB
 
 cd ${BUILDDIR}
 
@@ -283,6 +299,7 @@ cd libgcrypt*
 LDFLAGS="${LDFLAGS} -Wl,--undefined-version" ./configure --disable-asm --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
+install_license ./COPYING.LIB
 
 echo "::endgroup::"
 ###########
@@ -296,6 +313,7 @@ cd libxslt*
 CFLAGS="${CFLAGS} -I${DEPSDIR}/include/libxml2" ./configure --host=${CHOST} --with-libxml-prefix=${DEPSDIR} --without-python --prefix=${DEPSDIR}
 make -j4
 make install
+install_license
 
 echo "::endgroup::"
 ############
@@ -309,6 +327,7 @@ cd freetype*
 ./configure --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
+install_license LICENSE.TXT
 
 echo "::endgroup::"
 ##############
@@ -322,6 +341,7 @@ cd fontconfig*
 LDFLAGS="${LDFLAGS} -lxml2" ./configure --host=${CHOST} --enable-static --disable-shared --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
 make -j4
 make install
+install_license
 
 echo "::endgroup::"
 #######
@@ -343,6 +363,7 @@ function build_x11_lib () {
   ./configure $ext_flags --host=${CHOST} --prefix=${DEPSDIR}
   make -j4
   make install
+  install_license
 
   echo "::endgroup::"
 }
@@ -380,6 +401,7 @@ cd tcl*/unix
 LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
+install_license ./license.terms
 
 echo "::endgroup::"
 ######
@@ -393,21 +415,25 @@ cd tk*/unix
 LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
+install_license ./license.terms
 
 echo "::endgroup::"
 #############
 # mpdecimal #
 #############
-echo "::group::mpdecimal"
-cd ${BUILDDIR}
+if [[ "${ARCH}" == "arm" ]]; then
+  echo "::group::mpdecimal"
+  cd ${BUILDDIR}
 
-download_verify_extract mpdecimal-2.5.0.tar.gz
-cd mpdecimal*
-./configure --disable-cxx --host=${CHOST} --prefix=${DEPSDIR}
-make -j4
-make install
+  download_verify_extract mpdecimal-2.5.0.tar.gz
+  cd mpdecimal*
+  ./configure --disable-cxx --host=${CHOST} --prefix=${DEPSDIR}
+  make -j4
+  make install
+  install_license ./LICENSE.txt
 
-echo "::endgroup::"
+  echo "::endgroup::"
+fi
 ##########
 # Python #
 ##########
@@ -476,6 +502,7 @@ make install
 cd ${BUILDDIR}
 cp -r ${DEPSDIR}/lib/tcl8.6 ./python-install/lib
 cp -r ${DEPSDIR}/lib/tk8.6 ./python-install/lib
+cp -r ${LICENSEDIR} ./python-install
 
 echo "::endgroup::"
 #############################################
