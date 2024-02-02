@@ -76,5 +76,5 @@ fi
 
 cmake_debug_flags=()
 if [[ "${DEBUG_CI}" == "true" ]]; then
-  cmake_debug_flags+=(--trace-expand)
+  cmake_debug_flags+=(--trace-expand --debug-find)
 fi
