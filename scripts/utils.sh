@@ -43,14 +43,14 @@ function install_license () {
   file=$1
   if [[ "$file" != "" ]]; then
     if test -f $file; then
-      cp $1 ${DEPSDIR}/$project.txt
+      cp $1 ${LICENSEDIR}/$project.txt
       set +x
       return 0
     fi
   else
     while read license_file; do
       if test -f $license_file; then
-        cp $license_file ${DEPSDIR}/$project.txt
+        cp $license_file ${LICENSEDIR}/$project.txt
         set +x
         return 0
       fi
