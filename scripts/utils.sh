@@ -41,6 +41,9 @@ function install_license () {
   set -x
   project=$(basename $(pwd))
   file=$1
+  if [[ "$2" != "" ]]; then
+    project=$2
+  fi
   if [[ "$file" != "" ]]; then
     if test -f $file; then
       cp $1 ${LICENSEDIR}/$project.txt
