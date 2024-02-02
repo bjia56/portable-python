@@ -36,12 +36,12 @@ console.log(child_process.execSync(`${pythonExe} --version`).toString());
 Currently, Python 3.8, 3.9, and 3.10 are built for the following targets:
 - Linux x86_64
 - Linux aarch64
-- Linux arm [^1]
+- Linux arm
 - Windows x86_64
 - MacOS x86_64
 - MacOS arm64
 
-[^1] The arm builds target armv6, specifically the configuration of the Raspberry Pi 1. Current arm builds do not work properly on old glibc, but a recent version of Raspbian like Debian bullseye should provide a new enough glibc to work.
+Note: The arm builds target armv6, specifically the configuration of the Raspberry Pi 1. Current arm builds do not work properly on old glibc, but a recent version of Raspbian like Debian bullseye should provide a new enough glibc to work.
 
 ## Licensing
 
