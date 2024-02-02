@@ -152,14 +152,14 @@ make install
 
 echo "::endgroup::"
 ############
-# readline #
+# editline #
 ############
-echo "::group::readline"
+echo "::group::editline"
 cd ${BUILDDIR}
 
-download_verify_extract readline-8.2.tar.gz
-cd readline*
-./configure --with-curses --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
+download_verify_extract libedit-20230828-3.1.tar.gz
+cd libedit*
+./configure --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
 
@@ -442,6 +442,7 @@ LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
   -DINSTALL_TEST=${INSTALL_TEST} \
   -DINSTALL_MANUAL=OFF \
   "${additionalparams[@]}" \
+  -DUSE_LIBEDIT=ON \
   -DOPENSSL_INCLUDE_DIR:PATH=${DEPSDIR}/include \
   -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/libssl.a;${DEPSDIR}/lib/libcrypto.a" \
   -DSQLite3_INCLUDE_DIR:PATH=${DEPSDIR}/include \
