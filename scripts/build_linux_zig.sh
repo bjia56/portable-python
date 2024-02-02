@@ -406,7 +406,7 @@ cd tcl*/unix
 LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
-cd .. 
+cd ..
 install_license ./license.terms
 
 echo "::endgroup::"
@@ -421,7 +421,7 @@ cd tk*/unix
 LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
-cd .. 
+cd ..
 install_license ./license.terms
 
 echo "::endgroup::"
@@ -453,7 +453,7 @@ if [[ "${ARCH}" == "arm" ]]; then
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${DEPSDIR}/lib
 fi
 
-wget --no-verbose -O python-cmake-buildsystem.tar.gz https://github.com/bjia56/python-cmake-buildsystem/tarball/portable-python
+wget --no-verbose -O python-cmake-buildsystem.tar.gz https://github.com/bjia56/python-cmake-buildsystem/tarball/portable-python-dev
 tar -xf python-cmake-buildsystem.tar.gz
 rm *.tar.gz
 mv *python-cmake-buildsystem* python-cmake-buildsystem
