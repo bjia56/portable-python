@@ -39,8 +39,9 @@ END
 )
 function install_license () {
   project=$(basename $(pwd))
-  if [[ "$1" != "" ]]; then
-    if test -f $1; do
+  file=$1
+  if [[ "$file" != "" ]]; then
+    if test -f $file; then
       cp $1 ${DEPSDIR}/$project
       return 0
     fi
