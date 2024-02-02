@@ -16,6 +16,7 @@ echo "::group::Initialize"
 mkdir python-build
 mkdir python-install
 mkdir deps
+mkdir ${LICENSEDIR}
 
 export MACOSX_DEPLOYMENT_TARGET=10.5
 

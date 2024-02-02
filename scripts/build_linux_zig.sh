@@ -35,6 +35,7 @@ sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja p
 
 mkdir ${BUILDDIR}
 mkdir ${DEPSDIR}
+mkdir ${LICENSEDIR}
 
 export CFLAGS="-I${DEPSDIR}/include"
 export CPPFLAGS="-I${DEPSDIR}/include"

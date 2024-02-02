@@ -12,6 +12,7 @@ echo "::group::Initialize"
 mkdir python-build
 mkdir python-install
 mkdir deps
+mkdir ${LICENSEDIR}
 
 git clone https://github.com/bjia56/python-cmake-buildsystem.git --branch portable-python --single-branch --depth 1
 
