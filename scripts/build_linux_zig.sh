@@ -328,7 +328,7 @@ cd freetype*
 ./configure --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
-install_license LICENSE.TXT
+install_license ./docs/FTL.TXT
 
 echo "::endgroup::"
 ##############
