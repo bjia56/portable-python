@@ -461,6 +461,7 @@ mkdir python-build
 mkdir python-install
 cd python-build
 LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
+  "${cmake_debug_flags[@]}" \
   -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
   -DCMAKE_CROSSCOMPILING_EMULATOR=${WORKDIR}/scripts/qemu_${ARCH}_interpreter \
   -DCMAKE_IGNORE_PATH=/usr/include \
