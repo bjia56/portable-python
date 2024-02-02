@@ -351,7 +351,7 @@ echo "::endgroup::"
 #echo "::group::X11"
 #cd ${BUILDDIR}
 
-function build_x11_lib () {
+function build_x11_lib_core() {
   echo "::group::$1"
   cd ${BUILDDIR}
 
@@ -364,12 +364,16 @@ function build_x11_lib () {
   ./configure $ext_flags --host=${CHOST} --prefix=${DEPSDIR}
   make -j4
   make install
-  install_license
 
   echo "::endgroup::"
 }
 
-build_x11_lib xorgproto-2023.2
+function build_x11_lib () {
+  build_x11_lib_core "$1" "$2"
+  install_license
+}
+
+build_x11_lib_core xorgproto-2023.2
 build_x11_lib xproto-7.0.31
 build_x11_lib xextproto-7.3.0
 build_x11_lib kbproto-1.0.7
