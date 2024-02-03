@@ -74,7 +74,7 @@ if [[ "${DEBUG_CI}" == "true" ]]; then
   trap "cd ${BUILDDIR} && tar -czf ${WORKDIR}/build-python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz ." EXIT
 fi
 
-cmake_debug_flags=()
-if [[ "${DEBUG_CI}" == "true" ]]; then
-  cmake_debug_flags+=(--trace-expand --debug-find)
+cmake_verbose_flags=()
+if [[ "${VERBOSE_CI}" == "true" ]]; then
+  cmake_verbose_flags+=(--trace-expand --debug-find)
 fi
