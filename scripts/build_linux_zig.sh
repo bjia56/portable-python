@@ -4,6 +4,7 @@ PLATFORM=linux
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 source ${SCRIPT_DIR}/utils.sh
 
+which zig
 zig version
 
 ########################
@@ -71,6 +72,7 @@ else
   export CXX="${ARCH}-linux-gnu-g++"
   if [[ "${ARCH}" == "riscv64" ]]; then
     export ZIG_TARGET=riscv64-linux-gnu.2.34
+    export CFLAGS="-mabi=lp64 ${CFLAGS}"
   else
     export ZIG_TARGET=${ARCH}-linux-gnu.2.17
   fi
