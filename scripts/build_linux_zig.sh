@@ -79,6 +79,16 @@ else
   export CHOST=${ARCH}-linux-gnu
 fi
 
+# RISC-V hack for zig's glibc
+# https://github.com/ziglang/zig/issues/3340
+if [[ "${ARCH}" == "riscv64" ]]; then
+  cd /tmp
+  wget -O glibc.patch https://github.com/zatrazz/glibc/commit/588566c11723bce5dc2169f897f55bc5e0cfb6fc.patch
+  cd $(dirname $(which zig))/lib/libc/glibc
+  patch -p1 -t < /tmp/glibc.patch
+  cd ${WORKDIR}
+fi
+
 echo "::endgroup::"
 ########
 # zlib #
