@@ -30,6 +30,10 @@ case "$ARCH" in
     sudo apt -y install libc6-armhf-cross
     sudo ln -s /usr/arm-linux-gnueabihf/lib/ld-linux-armhf.so.3 /lib/ld-linux-armhf.so.3
     ;;
+  riscv64)
+    sudo apt -y install libc6-riscv64-cross
+    sudo ln -s /usr/riscv64-linux-gnu/lib/ld-linux-riscv64-lp64d.so.1 /lib/ld-linux-riscv64-lp64d.so.1
+    ;;
 esac
 sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja patchelf==0.15.0.0
 
