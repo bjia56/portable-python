@@ -37,9 +37,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [] #[ x86_64, aarch64, arm ]
-        include:
-          - arch: riscv64
+        arch: [ riscv64 ]
 
     steps:
       - name: Parse platform
