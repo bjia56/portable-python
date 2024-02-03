@@ -70,7 +70,7 @@ else
   export CC="${ARCH}-linux-gnu-gcc"
   export CXX="${ARCH}-linux-gnu-g++"
   if [[ "${ARCH}" == "riscv64" ]]; then
-    export ZIG_TARGET=riscv64-linux-gnu
+    export ZIG_TARGET=riscv64-linux-gnu.2.34
   else
     export ZIG_TARGET=${ARCH}-linux-gnu.2.17
   fi
