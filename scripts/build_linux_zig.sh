@@ -114,6 +114,8 @@ download_verify_extract openssl-1.1.1w.tar.gz
 cd openssl*
 if [[ "${ARCH}" == "arm" ]]; then
   ./Configure linux-generic32 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+elif [[ "${ARCH}" == "riscv64" ]]; then
+  ./Configure linux-generic64 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 else
   ./Configure linux-${ARCH} no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 fi
