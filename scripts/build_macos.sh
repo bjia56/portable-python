@@ -175,6 +175,7 @@ cd ${WORKDIR}
 
 cd python-build
 cmake \
+  "${cmake_debug_flags[@]}" \
   -G "Unix Makefiles" \
   "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET} \
