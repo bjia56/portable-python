@@ -83,9 +83,9 @@ fi
 # https://github.com/ziglang/zig/issues/3340
 if [[ "${ARCH}" == "riscv64" ]]; then
   cd /tmp
-  wget -O glibc.patch https://github.com/zatrazz/glibc/commit/588566c11723bce5dc2169f897f55bc5e0cfb6fc.patch
-  cd $(dirname $(which zig))/lib/libc/glibc
-  patch -p1 -t < /tmp/glibc.patch || true
+  wget -O glibc.patch https://github.com/ExpidusOS/zig/commit/75a8de38f6b729d600c2f4f9042aa309bfb2f8a0.patch
+  cd $(dirname $(which zig))
+  patch -p1 < /tmp/glibc.patch || true
   cd ${WORKDIR}
 fi
 
