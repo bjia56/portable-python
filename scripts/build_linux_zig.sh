@@ -71,7 +71,7 @@ else
   export CC="${ARCH}-linux-gnu-gcc"
   export CXX="${ARCH}-linux-gnu-g++"
   if [[ "${ARCH}" == "riscv64" ]]; then
-    export ZIG_FLAGS="-target riscv64-linux-gnu.2.34 -mabi=lp64 -mcpu=generic_rv64"
+    export ZIG_FLAGS="-target riscv64-linux-gnu.2.34"
     export CFLAGS="-Wl,--undefined-version ${CFLAGS}"
   else
     export ZIG_FLAGS="-target ${ARCH}-linux-gnu.2.17"
@@ -83,7 +83,7 @@ fi
 # https://github.com/ziglang/zig/issues/3340
 if [[ "${ARCH}" == "riscv64" ]]; then
   cd /tmp
-  wget -O glibc.patch https://github.com/ExpidusOS/zig/commit/75a8de38f6b729d600c2f4f9042aa309bfb2f8a0.patch
+  wget -O glibc.patch https://patch-diff.githubusercontent.com/raw/ziglang/zig/pull/18803.patch
   cd $(dirname $(which zig))
   patch -p1 < /tmp/glibc.patch || true
   cd ${WORKDIR}
