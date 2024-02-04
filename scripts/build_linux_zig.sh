@@ -34,6 +34,8 @@ case "$ARCH" in
   riscv64)
     sudo apt -y install libc6-riscv64-cross
     sudo ln -s /usr/riscv64-linux-gnu/lib/ld-linux-riscv64-lp64d.so.1 /lib/ld-linux-riscv64-lp64d.so.1
+    # workaround since the Zig compiler always targets ld-linux-riscv64-lp64.so.1
+    sudo ln -s /usr/riscv64-linux-gnu/lib/ld-linux-riscv64-lp64d.so.1 /lib/ld-linux-riscv64-lp64.so.1
     ;;
 esac
 sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja patchelf==0.15.0.0
@@ -555,6 +557,9 @@ echo "::group::Patch python"
 cd ${BUILDDIR}
 
 cd python-install
+if [[ "${ARCH}" == "riscv64" ]]; then
+  patchelf --set-interpreter /lib/ld-linux-riscv64-lp64d.so.1 ./bin/python
+fi
 ${WORKDIR}/scripts/patch_libpython.sh ./lib/libpython${PYTHON_VER}.so ./bin/python
 patchelf --replace-needed libpython${PYTHON_VER}.so "\$ORIGIN/../lib/libpython${PYTHON_VER}.so" ./bin/python
 
