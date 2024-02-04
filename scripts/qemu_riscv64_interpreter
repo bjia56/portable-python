@@ -1,4 +1,5 @@
 #!/bin/bash
 # this interpreter shim is used by cmake to run platform
 # detection programs
+patchelf --set-interpreter /lib/ld-linux-riscv64-lp64d.so.1 $1
 LD_LIBRARY_PATH=/usr/riscv64-linux-gnu/lib qemu-riscv64-static "$@"
