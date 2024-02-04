@@ -477,7 +477,6 @@ LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
   -DINSTALL_MANUAL=OFF \
   "${additionalparams[@]}" \
   -DUSE_LIBEDIT=ON \
-  -DUSE_SYSTEM_READLINE=ON \
   -DOPENSSL_INCLUDE_DIR:PATH=${DEPSDIR}/include \
   -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/libssl.a;${DEPSDIR}/lib/libcrypto.a" \
   -DSQLite3_INCLUDE_DIR:PATH=${DEPSDIR}/include \
