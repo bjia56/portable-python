@@ -475,7 +475,7 @@ if [[ "${ARCH}" == "arm" ]]; then
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${DEPSDIR}/lib
 fi
 
-wget --no-verbose -O python-cmake-buildsystem.tar.gz https://github.com/bjia56/python-cmake-buildsystem/tarball/portable-python
+wget --no-verbose -O python-cmake-buildsystem.tar.gz https://github.com/bjia56/python-cmake-buildsystem/tarball/portable-python-riscv
 tar -xf python-cmake-buildsystem.tar.gz
 rm *.tar.gz
 mv *python-cmake-buildsystem* python-cmake-buildsystem
