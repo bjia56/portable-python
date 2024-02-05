@@ -31,8 +31,8 @@ on:
         type: boolean
 
 env:
-  image_map: '{"x86_64": "centos:7", "aarch64": "centos:7", "arm": "debian:bullseye"}'
-  platform_map: '{"x86_64": "linux/amd64", "aarch64": "linux/arm64/v8", "arm": "linux/arm/v7"}'
+  image_map: '{"x86_64": "centos:7", "aarch64": "centos:7", "arm": "debian:bullseye", "riscv64": "riscv64/debian:sid"}'
+  platform_map: '{"x86_64": "linux/amd64", "aarch64": "linux/arm64/v8", "arm": "linux/arm/v7", "riscv64": "linux/riscv64"}'
   RUN_TESTS: ${{ inputs.run_tests }}
   DEBUG_CI: ${{ inputs.debug }}
   VERBOSE_CI: ${{ inputs.verbose }}
@@ -44,7 +44,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [ x86_64, aarch64, arm ]
+        arch: [ x86_64, aarch64, arm, riscv64 ]
 
     steps:
       - name: Parse platform
@@ -93,7 +93,7 @@ jobs:
           run: |
             set -e
 
-            if [[ "${{ matrix.arch }}" == "arm" ]]; then
+            if [ "${{ matrix.arch }}" == "arm" ] || [ "${{ matrix.arch }}" == "riscv64" ]; then
               apt update
               apt -y install unzip
             else

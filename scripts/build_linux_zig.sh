@@ -4,6 +4,7 @@ PLATFORM=linux
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 source ${SCRIPT_DIR}/utils.sh
 
+which zig
 zig version
 
 ########################
@@ -30,6 +31,12 @@ case "$ARCH" in
     sudo apt -y install libc6-armhf-cross
     sudo ln -s /usr/arm-linux-gnueabihf/lib/ld-linux-armhf.so.3 /lib/ld-linux-armhf.so.3
     ;;
+  riscv64)
+    sudo apt -y install libc6-riscv64-cross
+    sudo ln -s /usr/riscv64-linux-gnu/lib/ld-linux-riscv64-lp64d.so.1 /lib/ld-linux-riscv64-lp64d.so.1
+    # workaround since the Zig compiler always targets ld-linux-riscv64-lp64.so.1
+    sudo ln -s /usr/riscv64-linux-gnu/lib/ld-linux-riscv64-lp64d.so.1 /lib/ld-linux-riscv64-lp64.so.1
+    ;;
 esac
 sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja patchelf==0.15.0.0
 
@@ -37,6 +44,7 @@ mkdir ${BUILDDIR}
 mkdir ${DEPSDIR}
 mkdir ${LICENSEDIR}
 
+export ZIG_FLAGS=""
 export CFLAGS="-I${DEPSDIR}/include"
 export CPPFLAGS="-I${DEPSDIR}/include"
 export CXXFLAGS="${CPPFLAGS}"
@@ -54,9 +62,8 @@ if [[ "${ARCH}" == "arm" ]]; then
   export AR="${ARCH}-linux-gnueabihf-gcc-ar"
   export CC="${ARCH}-linux-gnueabihf-gcc"
   export CXX="${ARCH}-linux-gnueabihf-g++"
-  export ZIG_TARGET=${ARCH}-linux-gnueabihf.2.17
   export CHOST=${ARCH}-linux-gnueabihf
-  export CFLAGS="-mfpu=vfp -mfloat-abi=hard -mcpu=arm1176jzf_s ${CFLAGS}"
+  export ZIG_FLAGS="-target ${ARCH}-linux-gnueabihf.2.17 -mfpu=vfp -mfloat-abi=hard -mcpu=arm1176jzf_s"
 else
   # See above comment
   sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/${ARCH}-linux-gnu-gcc-ar
@@ -65,8 +72,23 @@ else
   export AR="${ARCH}-linux-gnu-gcc-ar"
   export CC="${ARCH}-linux-gnu-gcc"
   export CXX="${ARCH}-linux-gnu-g++"
-  export ZIG_TARGET=${ARCH}-linux-gnu.2.17
+  if [[ "${ARCH}" == "riscv64" ]]; then
+    export ZIG_FLAGS="-target riscv64-linux-gnu.2.27"
+    export CFLAGS="-Wl,--undefined-version ${CFLAGS}"
+  else
+    export ZIG_FLAGS="-target ${ARCH}-linux-gnu.2.17"
+  fi
   export CHOST=${ARCH}-linux-gnu
+fi
+
+# RISC-V hack for zig's glibc
+# https://github.com/ziglang/zig/issues/3340
+if [[ "${ARCH}" == "riscv64" ]]; then
+  cd /tmp
+  wget -O glibc.patch https://patch-diff.githubusercontent.com/raw/ziglang/zig/pull/18803.patch
+  cd $(dirname $(which zig))
+  patch -p1 < /tmp/glibc.patch || true
+  cd ${WORKDIR}
 fi
 
 echo "::endgroup::"
@@ -94,6 +116,8 @@ download_verify_extract openssl-1.1.1w.tar.gz
 cd openssl*
 if [[ "${ARCH}" == "arm" ]]; then
   ./Configure linux-generic32 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+elif [[ "${ARCH}" == "riscv64" ]]; then
+  CFLAGS="${CFLAGS} -fgnuc-version=0 -D__STDC_NO_ATOMICS__" ./Configure linux-generic64 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 else
   ./Configure linux-${ARCH} no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 fi
@@ -534,6 +558,10 @@ echo "::group::Patch python"
 cd ${BUILDDIR}
 
 cd python-install
+if [[ "${ARCH}" == "riscv64" ]]; then
+  patchelf --set-interpreter /lib/ld-linux-riscv64-lp64d.so.1 ./bin/python
+  patchelf --replace-needed ld-linux-riscv64-lp64.so.1 ld-linux-riscv64-lp64d.so.1 ./lib/libpython${PYTHON_VER}.so
+fi
 ${WORKDIR}/scripts/patch_libpython.sh ./lib/libpython${PYTHON_VER}.so ./bin/python
 patchelf --replace-needed libpython${PYTHON_VER}.so "\$ORIGIN/../lib/libpython${PYTHON_VER}.so" ./bin/python
 
