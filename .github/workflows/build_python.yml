@@ -203,9 +203,18 @@ jobs:
           path: ./*python*.tar.gz
 
   test_macos:
-    name: MacOS ${{ inputs.python_version }} universal2 (test)
+    name: MacOS ${{ inputs.python_version }} ${{ matrix.arch }} (test)
     needs: build_macos
-    runs-on: macos-11
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ macos-11, macos-14 ]
+        include:
+          - os: macos-11
+            arch: x86_64
+          - os: macos-14
+            arch: arm64
 
     steps:
       - name: Download artifact
