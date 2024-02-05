@@ -37,6 +37,7 @@ Currently, Python 3.8, 3.9, and 3.10 are built for the following targets:
 - Linux x86_64
 - Linux aarch64
 - Linux arm <sup id="a1">[1](#f1)</sup>
+- Linux riscv64
 - Windows x86_64
 - MacOS x86_64 <sup id="a2">[2](#f2)</sup>
 - MacOS arm64 <sup>[2](#f2)</sup>
