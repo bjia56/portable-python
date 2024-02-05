@@ -37,7 +37,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [ riscv64 ]
+        arch: [ x86_64, aarch64, arm, riscv64 ]
 
     steps:
       - name: Parse platform
@@ -107,7 +107,6 @@ jobs:
             fi
 
   build_windows:
-    if: false
     name: Windows ${{ inputs.python_version }} x86_64 (build)
     runs-on: windows-latest
 
@@ -173,7 +172,6 @@ jobs:
           fi
 
   build_macos:
-    if: false
     name: MacOS ${{ inputs.python_version }} universal2 (build)
     runs-on: macos-latest
 
