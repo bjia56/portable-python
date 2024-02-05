@@ -73,7 +73,7 @@ else
   export CC="${ARCH}-linux-gnu-gcc"
   export CXX="${ARCH}-linux-gnu-g++"
   if [[ "${ARCH}" == "riscv64" ]]; then
-    export ZIG_FLAGS="-target riscv64-linux-gnu.2.34 -mabi=lp64d -mcpu=sifive_s54"
+    export ZIG_FLAGS="-target riscv64-linux-gnu.2.34"
     export CFLAGS="-Wl,--undefined-version ${CFLAGS}"
   else
     export ZIG_FLAGS="-target ${ARCH}-linux-gnu.2.17"
