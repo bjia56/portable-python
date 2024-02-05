@@ -559,6 +559,7 @@ cd ${BUILDDIR}
 cd python-install
 if [[ "${ARCH}" == "riscv64" ]]; then
   patchelf --set-interpreter /lib/ld-linux-riscv64-lp64d.so.1 ./bin/python
+  patchelf --replace-needed ld-linux-riscv64-lp64.so.1 ld-linux-riscv64-lp64d.so.1 ./lib/libpython${PYTHON_VER}.so
 fi
 ${WORKDIR}/scripts/patch_libpython.sh ./lib/libpython${PYTHON_VER}.so ./bin/python
 patchelf --replace-needed libpython${PYTHON_VER}.so "\$ORIGIN/../lib/libpython${PYTHON_VER}.so" ./bin/python
@@ -594,8 +595,10 @@ echo "::endgroup::"
 echo "::group::Preload pip"
 cd ${BUILDDIR}
 
-cd python-install
-${WORKDIR}/scripts/qemu_${ARCH}_interpreter ./bin/python -m ensurepip
+if [[ "${ARCH}" != "riscv64" ]]; then
+  cd python-install
+  ${WORKDIR}/scripts/qemu_${ARCH}_interpreter ./bin/python -m ensurepip
+fi
 
 echo "::endgroup::"
 ###################
