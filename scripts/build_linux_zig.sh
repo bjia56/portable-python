@@ -595,10 +595,8 @@ echo "::endgroup::"
 echo "::group::Preload pip"
 cd ${BUILDDIR}
 
-if [[ "${ARCH}" != "riscv64" ]]; then
-  cd python-install
-  ${WORKDIR}/scripts/qemu_${ARCH}_interpreter ./bin/python -m ensurepip
-fi
+cd python-install
+${WORKDIR}/scripts/qemu_${ARCH}_interpreter ./bin/python -m ensurepip
 
 echo "::endgroup::"
 ###################
