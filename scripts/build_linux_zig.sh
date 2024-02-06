@@ -25,7 +25,7 @@ case "$ARCH" in
     ;;
   i386)
     sudo apt -y install libc6-i386-cross
-    #sudo ln -s /usr/i686-linux-gnu/lib/ld-linux.so.2 /lib/ld-linux.so.2
+    sudo ln -sf /usr/i686-linux-gnu/lib/ld-linux.so.2 /lib/ld-linux.so.2
     ;;
   aarch64)
     sudo apt -y install libc6-arm64-cross
