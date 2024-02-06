@@ -78,7 +78,7 @@ elif [[ "${ARCH}" == "i386" ]]; then
   export CXX="i686-linux-gnu-g++"
   export CHOST=i686-linux-gnu
   export ZIG_FLAGS="-target x86-linux-gnu.2.17"
-  export CFLAGS="-Wl,--undefined-version ${CFLAGS}"
+  export CFLAGS="-m32 -Wl,--undefined-version ${CFLAGS}"
 else
   # See above comment
   sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/${ARCH}-linux-gnu-gcc-ar
