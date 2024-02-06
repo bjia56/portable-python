@@ -23,6 +23,10 @@ case "$ARCH" in
     sudo apt -y install libc6-amd64-cross
     sudo ln -s /usr/x86_64-linux-gnu/lib/ld-linux-x86-64.so.2 /lib/ld-linux-x86-64.so.2
     ;;
+  i386)
+    sudo apt -y install libc6-i386-cross
+    sudo ln -s /usr/i686-linux-gnu/lib/ld-linux.so.2 /lib/ld-linux.so.2
+    ;;
   aarch64)
     sudo apt -y install libc6-arm64-cross
     sudo ln -s /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib/ld-linux-aarch64.so.1
@@ -64,6 +68,16 @@ if [[ "${ARCH}" == "arm" ]]; then
   export CXX="${ARCH}-linux-gnueabihf-g++"
   export CHOST=${ARCH}-linux-gnueabihf
   export ZIG_FLAGS="-target ${ARCH}-linux-gnueabihf.2.17 -mfpu=vfp -mfloat-abi=hard -mcpu=arm1176jzf_s"
+elif [[ "${ARCH}" == "i386" ]]; then
+  # See above comment
+  sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/i686-linux-gnueabihf-gcc-ar
+  sudo cp ${WORKDIR}/zigshim/zig_cc /usr/bin/i686-linux-gnueabihf-gcc
+  sudo cp ${WORKDIR}/zigshim/zig_cxx /usr/bin/i686-linux-gnueabihf-g++
+  export AR="i686-linux-gnueabihf-gcc-ar"
+  export CC="i686-linux-gnueabihf-gcc"
+  export CXX="i686-linux-gnueabihf-g++"
+  export CHOST=i686-linux-gnueabihf
+  export ZIG_FLAGS="-target x86-linux-gnu.2.17"
 else
   # See above comment
   sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/${ARCH}-linux-gnu-gcc-ar
