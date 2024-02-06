@@ -70,13 +70,13 @@ if [[ "${ARCH}" == "arm" ]]; then
   export ZIG_FLAGS="-target ${ARCH}-linux-gnueabihf.2.17 -mfpu=vfp -mfloat-abi=hard -mcpu=arm1176jzf_s"
 elif [[ "${ARCH}" == "i386" ]]; then
   # See above comment
-  sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/i686-linux-gnueabihf-gcc-ar
-  sudo cp ${WORKDIR}/zigshim/zig_cc /usr/bin/i686-linux-gnueabihf-gcc
-  sudo cp ${WORKDIR}/zigshim/zig_cxx /usr/bin/i686-linux-gnueabihf-g++
-  export AR="i686-linux-gnueabihf-gcc-ar"
-  export CC="i686-linux-gnueabihf-gcc"
-  export CXX="i686-linux-gnueabihf-g++"
-  export CHOST=i686-linux-gnueabihf
+  sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/i686-linux-gnu-gcc-ar
+  sudo cp ${WORKDIR}/zigshim/zig_cc /usr/bin/i686-linux-gnu-gcc
+  sudo cp ${WORKDIR}/zigshim/zig_cxx /usr/bin/i686-linux-gnu-g++
+  export AR="i686-linux-gnu-gcc-ar"
+  export CC="i686-linux-gnu-gcc"
+  export CXX="i686-linux-gnu-g++"
+  export CHOST=i686-linux-gnu
   export ZIG_FLAGS="-target x86-linux-gnu.2.17"
   export CFLAGS="-Wl,--undefined-version ${CFLAGS}"
 else
