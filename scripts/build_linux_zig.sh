@@ -614,7 +614,7 @@ echo "::group::Preload pip"
 cd ${BUILDDIR}
 
 cd python-install
-${WORKDIR}/scripts/qemu_${ARCH}_interpreter ./bin/python -m ensurepip
+#${WORKDIR}/scripts/qemu_${ARCH}_interpreter ./bin/python -m ensurepip
 
 echo "::endgroup::"
 ###################
