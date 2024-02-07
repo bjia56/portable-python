@@ -42,7 +42,7 @@ case "$ARCH" in
     sudo ln -s /usr/riscv64-linux-gnu/lib/ld-linux-riscv64-lp64d.so.1 /lib/ld-linux-riscv64-lp64.so.1
     ;;
 esac
-sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja patchelf==0.15.0.0
+sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja patchelf==0.17.2.0
 
 mkdir ${BUILDDIR}
 mkdir ${DEPSDIR}
@@ -583,7 +583,7 @@ if [[ "${ARCH}" == "riscv64" ]]; then
   patchelf --replace-needed ld-linux-riscv64-lp64.so.1 ld-linux-riscv64-lp64d.so.1 ./lib/libpython${PYTHON_VER}.so
 fi
 ${WORKDIR}/scripts/patch_libpython.sh ./lib/libpython${PYTHON_VER}.so ./bin/python
-#patchelf --replace-needed libpython${PYTHON_VER}.so "\$ORIGIN/../lib/libpython${PYTHON_VER}.so" ./bin/python
+patchelf --replace-needed libpython${PYTHON_VER}.so "\$ORIGIN/../lib/libpython${PYTHON_VER}.so" ./bin/python
 
 echo "::endgroup::"
 ##############################################
@@ -609,7 +609,7 @@ echo "::group::Test python"
 cd ${BUILDDIR}
 
 cd python-install
-#${WORKDIR}/scripts/qemu_${ARCH}_interpreter ./bin/python --version
+${WORKDIR}/scripts/qemu_${ARCH}_interpreter ./bin/python --version
 
 echo "::endgroup::"
 ###############
@@ -619,7 +619,7 @@ echo "::group::Preload pip"
 cd ${BUILDDIR}
 
 cd python-install
-#${WORKDIR}/scripts/qemu_${ARCH}_interpreter ./bin/python -m ensurepip
+${WORKDIR}/scripts/qemu_${ARCH}_interpreter ./bin/python -m ensurepip
 
 echo "::endgroup::"
 ###################
