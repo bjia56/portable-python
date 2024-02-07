@@ -44,7 +44,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [ i386 ]
+        arch: [ x86_64, i386, aarch64, arm, riscv64 ]
 
     steps:
       - name: Parse platform

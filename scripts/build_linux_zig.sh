@@ -42,7 +42,7 @@ case "$ARCH" in
     sudo ln -s /usr/riscv64-linux-gnu/lib/ld-linux-riscv64-lp64d.so.1 /lib/ld-linux-riscv64-lp64.so.1
     ;;
 esac
-sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja #patchelf==0.17.2.0
+sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja
 
 mkdir ${BUILDDIR}
 mkdir ${DEPSDIR}
@@ -557,10 +557,10 @@ cp -r ${DEPSDIR}/lib/tk8.6 ./python-install/lib
 cp -r ${LICENSEDIR} ./python-install
 
 echo "::endgroup::"
-#############################################
-# Check executable dependencies (pre-patch) #
-#############################################
-echo "::group::Check executable dependencies (pre-patch)"
+#################################
+# Check executable dependencies #
+#################################
+echo "::group::Check executable dependencies"
 cd ${BUILDDIR}
 
 cd python-install
@@ -569,37 +569,6 @@ readelf -d ./bin/python
 echo
 echo "libpython dependencies"
 readelf -d ./lib/libpython${PYTHON_VER}.so
-
-echo "::endgroup::"
-################
-# Patch python #
-################
-echo "::group::Patch python"
-cd ${BUILDDIR}
-
-cd python-install
-#if [[ "${ARCH}" == "riscv64" ]]; then
-#  patchelf --set-interpreter /lib/ld-linux-riscv64-lp64d.so.1 ./bin/python
-#  patchelf --replace-needed ld-linux-riscv64-lp64.so.1 ld-linux-riscv64-lp64d.so.1 ./lib/libpython${PYTHON_VER}.so
-#fi
-#${WORKDIR}/scripts/patch_libpython.sh ./lib/libpython${PYTHON_VER}.so ./bin/python
-#patchelf --replace-needed libpython${PYTHON_VER}.so "\$ORIGIN/../lib/libpython${PYTHON_VER}.so" ./bin/python
-
-echo "::endgroup::"
-##############################################
-# Check executable dependencies (post-patch) #
-##############################################
-echo "::group::Check executable dependencies (post-patch)"
-cd ${BUILDDIR}
-
-cd python-install
-echo "python dependencies"
-readelf -d ./bin/python
-ldd -v ./bin/python || true
-echo
-echo "libpython dependencies"
-readelf -d ./lib/libpython${PYTHON_VER}.so
-ldd -v ./lib/libpython${PYTHON_VER}.so || true
 
 echo "::endgroup::"
 ###############
