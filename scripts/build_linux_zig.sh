@@ -23,6 +23,10 @@ case "$ARCH" in
     sudo apt -y install libc6-amd64-cross
     sudo ln -s /usr/x86_64-linux-gnu/lib/ld-linux-x86-64.so.2 /lib/ld-linux-x86-64.so.2
     ;;
+  i386)
+    sudo apt -y install libc6-i386-cross
+    sudo ln -sf /usr/i686-linux-gnu/lib/ld-linux.so.2 /lib/ld-linux.so.2
+    ;;
   aarch64)
     sudo apt -y install libc6-arm64-cross
     sudo ln -s /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib/ld-linux-aarch64.so.1
@@ -38,7 +42,10 @@ case "$ARCH" in
     sudo ln -s /usr/riscv64-linux-gnu/lib/ld-linux-riscv64-lp64d.so.1 /lib/ld-linux-riscv64-lp64.so.1
     ;;
 esac
-sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja patchelf==0.15.0.0
+sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja
+if [[ "${ARCH}" == "riscv64" ]]; then
+  sudo pip install patchelf==0.15.0.0
+fi
 
 mkdir ${BUILDDIR}
 mkdir ${DEPSDIR}
@@ -64,6 +71,20 @@ if [[ "${ARCH}" == "arm" ]]; then
   export CXX="${ARCH}-linux-gnueabihf-g++"
   export CHOST=${ARCH}-linux-gnueabihf
   export ZIG_FLAGS="-target ${ARCH}-linux-gnueabihf.2.17 -mfpu=vfp -mfloat-abi=hard -mcpu=arm1176jzf_s"
+elif [[ "${ARCH}" == "i386" ]]; then
+  # See above comment
+  sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/i686-linux-gnu-gcc-ar
+  sudo cp ${WORKDIR}/zigshim/zig_cc /usr/bin/i686-linux-gnu-gcc
+  sudo cp ${WORKDIR}/zigshim/zig_cxx /usr/bin/i686-linux-gnu-g++
+  export AR="i686-linux-gnu-gcc-ar"
+  export CC="i686-linux-gnu-gcc"
+  export CXX="i686-linux-gnu-g++"
+  export CHOST=i686-linux-gnu
+  export ZIG_FLAGS="-target x86-linux-gnu.2.17"
+  export CFLAGS="-m32 -Wl,--undefined-version ${CFLAGS}"
+  export CPPFLAGS="-m32 ${CPPFLAGS}"
+  export CXXFLAGS="-m32 ${CXXFLAGS}"
+  export LDFLAGS="-m32 ${LDFLAGS}"
 else
   # See above comment
   sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/${ARCH}-linux-gnu-gcc-ar
@@ -116,6 +137,8 @@ download_verify_extract openssl-1.1.1w.tar.gz
 cd openssl*
 if [[ "${ARCH}" == "arm" ]]; then
   ./Configure linux-generic32 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+elif [[ "${ARCH}" == "i386" ]]; then
+  ./Configure linux-x86 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 elif [[ "${ARCH}" == "riscv64" ]]; then
   CFLAGS="${CFLAGS} -fgnuc-version=0 -D__STDC_NO_ATOMICS__" ./Configure linux-generic64 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 else
@@ -531,45 +554,22 @@ LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
 make -j4
 make install
 
+if [[ "${ARCH}" == "riscv64" ]]; then
+  cd ${BUILDDIR}/python-install
+  patchelf --set-interpreter /lib/ld-linux-riscv64-lp64d.so.1 ./bin/python
+  patchelf --replace-needed ld-linux-riscv64-lp64.so.1 ld-linux-riscv64-lp64d.so.1 ./lib/libpython${PYTHON_VER}.so
+fi
+
 cd ${BUILDDIR}
 cp -r ${DEPSDIR}/lib/tcl8.6 ./python-install/lib
 cp -r ${DEPSDIR}/lib/tk8.6 ./python-install/lib
 cp -r ${LICENSEDIR} ./python-install
 
 echo "::endgroup::"
-#############################################
-# Check executable dependencies (pre-patch) #
-#############################################
-echo "::group::Check executable dependencies (pre-patch)"
-cd ${BUILDDIR}
-
-cd python-install
-echo "python dependencies"
-readelf -d ./bin/python
-echo
-echo "libpython dependencies"
-readelf -d ./lib/libpython${PYTHON_VER}.so
-
-echo "::endgroup::"
-################
-# Patch python #
-################
-echo "::group::Patch python"
-cd ${BUILDDIR}
-
-cd python-install
-if [[ "${ARCH}" == "riscv64" ]]; then
-  patchelf --set-interpreter /lib/ld-linux-riscv64-lp64d.so.1 ./bin/python
-  patchelf --replace-needed ld-linux-riscv64-lp64.so.1 ld-linux-riscv64-lp64d.so.1 ./lib/libpython${PYTHON_VER}.so
-fi
-${WORKDIR}/scripts/patch_libpython.sh ./lib/libpython${PYTHON_VER}.so ./bin/python
-patchelf --replace-needed libpython${PYTHON_VER}.so "\$ORIGIN/../lib/libpython${PYTHON_VER}.so" ./bin/python
-
-echo "::endgroup::"
-##############################################
-# Check executable dependencies (post-patch) #
-##############################################
-echo "::group::Check executable dependencies (post-patch)"
+#################################
+# Check executable dependencies #
+#################################
+echo "::group::Check executable dependencies"
 cd ${BUILDDIR}
 
 cd python-install
