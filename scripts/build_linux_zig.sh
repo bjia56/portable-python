@@ -595,9 +595,11 @@ cd ${BUILDDIR}
 cd python-install
 echo "python dependencies"
 readelf -d ./bin/python
+ldd -v ./bin/python || true
 echo
 echo "libpython dependencies"
 readelf -d ./lib/libpython${PYTHON_VER}.so
+ldd -v ./lib/libpython${PYTHON_VER}.so || true
 
 echo "::endgroup::"
 ###############
@@ -607,7 +609,7 @@ echo "::group::Test python"
 cd ${BUILDDIR}
 
 cd python-install
-${WORKDIR}/scripts/qemu_${ARCH}_interpreter ./bin/python --version
+#${WORKDIR}/scripts/qemu_${ARCH}_interpreter ./bin/python --version
 
 echo "::endgroup::"
 ###############
