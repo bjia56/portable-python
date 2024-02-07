@@ -43,6 +43,9 @@ case "$ARCH" in
     ;;
 esac
 sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja
+if [[ "${ARCH}" == "riscv64" ]]; then
+  sudo pip install patchelf==0.15.0.0
+fi
 
 mkdir ${BUILDDIR}
 mkdir ${DEPSDIR}
@@ -550,6 +553,12 @@ LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
   ../python-cmake-buildsystem
 make -j4
 make install
+
+if [[ "${ARCH}" == "riscv64" ]]; then
+  cd ${BUILDDIR}/python-install
+  patchelf --set-interpreter /lib/ld-linux-riscv64-lp64d.so.1 ./bin/python
+  patchelf --replace-needed ld-linux-riscv64-lp64.so.1 ld-linux-riscv64-lp64d.so.1 ./lib/libpython${PYTHON_VER}.so
+fi
 
 cd ${BUILDDIR}
 cp -r ${DEPSDIR}/lib/tcl8.6 ./python-install/lib
