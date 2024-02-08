@@ -51,13 +51,13 @@ jobs:
         id: parse_platform
         run: |
           PLATFORM=$(echo ${{ toJSON(env.platform_map) }} | jq -r '.["${{ matrix.arch }}"]')
-          echo "::set-output name=platform::$PLATFORM"
+          echo "platform=$PLATFORM" >> "$GITHUB_OUTPUT"
 
       - name: Parse image
         id: parse_image
         run: |
           IMAGE=$(echo ${{ toJSON(env.image_map) }} | jq -r '.["${{ matrix.arch }}"]')
-          echo "::set-output name=image::$IMAGE"
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
 
       - name: Set up zig
         uses: goto-bus-stop/setup-zig@v2
