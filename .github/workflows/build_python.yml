@@ -31,8 +31,6 @@ on:
         type: boolean
 
 env:
-  image_map: '{"x86_64": "centos:7", "i386": "centos:7", "aarch64": "centos:7", "arm": "debian:bullseye", "riscv64": "riscv64/debian:sid"}'
-  platform_map: '{"x86_64": "linux/amd64", "i386": "linux/386", "aarch64": "linux/arm64/v8", "arm": "linux/arm/v7", "riscv64": "linux/riscv64"}'
   RUN_TESTS: ${{ inputs.run_tests }}
   DEBUG_CI: ${{ inputs.debug }}
   VERBOSE_CI: ${{ inputs.verbose }}
@@ -44,21 +42,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [ x86_64, i386, aarch64, arm, riscv64 ]
+        include:
+          - arch: x86_64
+            image: amd64/centos:7
+          - arch: i386
+            image: i386/centos:7
+          - arch: aarch64
+            image: arm64v8/centos:7
+          - arch: arm
+            image: arm32v7/debian:bullseye
+          - arch: riscv64
+            image: riscv64/debian:sid
 
     steps:
-      - name: Parse platform
-        id: parse_platform
-        run: |
-          PLATFORM=$(echo ${{ toJSON(env.platform_map) }} | jq -r '.["${{ matrix.arch }}"]')
-          echo "platform=$PLATFORM" >> "$GITHUB_OUTPUT"
-
-      - name: Parse image
-        id: parse_image
-        run: |
-          IMAGE=$(echo ${{ toJSON(env.image_map) }} | jq -r '.["${{ matrix.arch }}"]')
-          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
-
       - name: Set up zig
         uses: goto-bus-stop/setup-zig@v2
         with:
@@ -87,11 +83,12 @@ jobs:
       - name: Test python in clean environment
         uses: addnab/docker-run-action@v3
         with:
-          image: ${{ steps.parse_image.outputs.image }}
-          options: -v ${{ github.workspace }}:/work --workdir /tmp --platform ${{ steps.parse_platform.outputs.platform }}
+          image: ${{ matrix.image }}
+          options: -v ${{ github.workspace }}:/work --workdir /tmp
           shell: bash
           run: |
             set -e
+            uname -a
 
             if [ "${{ matrix.arch }}" == "arm" ] || [ "${{ matrix.arch }}" == "riscv64" ]; then
               apt update
