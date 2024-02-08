@@ -48,7 +48,7 @@ jobs:
           - arch: i386
             image: i386/centos:7
           - arch: aarch64
-            image: arm64v8:centos:7
+            image: arm64v8/centos:7
           - arch: arm
             image: arm32v7/debian:bullseye
           - arch: riscv64
