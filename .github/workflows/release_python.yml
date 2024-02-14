@@ -49,7 +49,7 @@ jobs:
 
       - name: Get latest
         run: |
-          echo "LATEST_TAG=$(./scripts/pick_semver.sh ${{ inputs.python_version }} ${{ inputs.beta }}) true" >> $GITHUB_ENV
+          echo "LATEST_TAG=$(./scripts/pick_semver.sh ${{ inputs.python_version }} ${{ inputs.beta }} true)" >> $GITHUB_ENV
 
       - name: Pick tag
         run: |
