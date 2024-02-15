@@ -57,7 +57,10 @@ jobs:
 
       - name: Create release
         run: |
-          gh release create ${{ env.SELECTED_TAG }} --title "Python ${{ inputs.python_version }}" ${{ env.LATEST_TAG && format('--notes-start-tag {0}', env.LATEST_TAG) || format('--notes "Python {0}"', inputs.python_version) }} 
+          gh release create ${{ env.SELECTED_TAG }} \
+            --title ${{ env.SELECTED_TAG }} \
+            --target ${{ github.sha }} \
+            ${{ env.LATEST_TAG && format('--generate-notes --notes-start-tag {0}', env.LATEST_TAG) || format('--notes "Python {0}"', inputs.python_version) }} 
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
