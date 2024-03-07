@@ -20,7 +20,7 @@ mkdir ${LICENSEDIR}
 
 export MACOSX_DEPLOYMENT_TARGET=10.5
 
-git clone https://github.com/bjia56/python-cmake-buildsystem.git --branch sysconfig-fixes --single-branch --depth 1
+git clone https://github.com/bjia56/python-cmake-buildsystem.git --branch portable-python --single-branch --depth 1
 
 echo "::endgroup::"
 ###########
