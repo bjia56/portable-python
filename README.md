@@ -42,6 +42,8 @@ Currently, Python 3.8, 3.9, and 3.10 are built for the following targets:
 
 <sub><b id="f2">2</b> MacOS distributions are provided as universal2, which will work on both x86_64 and arm64. [↩](#a2)</sub> 
 
+Download stats: <a href="https://bjia56.github.io/portable-python/">📊</a>
+
 ## Licensing
 
 The build scripts and code in this repository are available under the Apache-2.0 License. Note that compilation of Python involves linking against other libraries, some of which may include different licensing terms. Copies of the licenses from known dependencies are included under the `licenses` directory of each Python distribution.
