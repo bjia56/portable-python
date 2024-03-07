@@ -204,6 +204,7 @@ cmake \
   -DINSTALL_TEST=${INSTALL_TEST} \
   -DINSTALL_MANUAL=OFF \
   -DOPENSSL_ROOT_DIR:PATH=${WORKDIR}/deps/openssl \
+  -DUSE_SYSTEM_EXPAT=OFF \
   -DEXPAT_INCLUDE_DIRS:PATH=${WORKDIR}/deps/expat/include \
   -DEXPAT_LIBRARIES:FILEPATH=${WORKDIR}/deps/expat/lib/libexpat.a \
   -DSQLite3_INCLUDE_DIR:PATH=${WORKDIR}/deps/sqlite3/include \
