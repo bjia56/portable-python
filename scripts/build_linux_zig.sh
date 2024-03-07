@@ -513,7 +513,6 @@ LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
   -DCMAKE_CROSSCOMPILING_EMULATOR=${WORKDIR}/scripts/qemu_${ARCH}_interpreter \
   -DCMAKE_IGNORE_PATH=/usr/include \
   -DCMAKE_C_STANDARD=99 \
-  -DPATCH_COMMAND=patch \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
   -DCMAKE_BUILD_TYPE:STRING=Release \
   -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install \

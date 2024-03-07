@@ -138,6 +138,21 @@ install_license
 file ${WORKDIR}/deps/zlib/lib/libz.a
 
 echo "::endgroup::"
+#########
+# expat #
+#########
+echo "::group::expat"
+cd ${WORKDIR}
+
+download_verify_extract expat-2.5.0.tar.gz
+mkdir deps/expat
+cd expat*
+CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --disable-shared --prefix=${WORKDIR}/deps/expat
+make -j4
+make install
+install_license
+
+echo "::endgroup::"
 ##########
 # libffi #
 ##########
@@ -180,7 +195,6 @@ cmake \
   "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET} \
   -DCMAKE_C_STANDARD=99 \
-  -DPATCH_COMMAND=patch \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
   -DCMAKE_BUILD_TYPE:STRING=Release \
   -DCMAKE_INSTALL_PREFIX:PATH=${WORKDIR}/python-install \
@@ -190,6 +204,9 @@ cmake \
   -DINSTALL_TEST=${INSTALL_TEST} \
   -DINSTALL_MANUAL=OFF \
   -DOPENSSL_ROOT_DIR:PATH=${WORKDIR}/deps/openssl \
+  -DUSE_SYSTEM_EXPAT=OFF \
+  -DEXPAT_INCLUDE_DIRS:PATH=${WORKDIR}/deps/expat/include \
+  -DEXPAT_LIBRARIES:FILEPATH=${WORKDIR}/deps/expat/lib/libexpat.a \
   -DSQLite3_INCLUDE_DIR:PATH=${WORKDIR}/deps/sqlite3/include \
   -DSQLite3_LIBRARY:FILEPATH=${WORKDIR}/deps/sqlite3/lib/libsqlite3.a \
   -DZLIB_INCLUDE_DIR:PATH=${WORKDIR}/deps/zlib/include \
