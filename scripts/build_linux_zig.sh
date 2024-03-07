@@ -15,7 +15,7 @@ echo "::group::Install dependencies"
 export DEBIAN_FRONTEND=noninteractive
 sudo apt update
 sudo apt -y install \
-  wget build-essential pkg-config cmake autoconf git \
+  wget build-essential pkg-config cmake autoconf git patch \
   python2 python3 python3-pip clang qemu-user-static \
   gettext bison libtool autopoint gperf ncurses-bin xutils-dev
 case "$ARCH" in
@@ -513,6 +513,7 @@ LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
   -DCMAKE_CROSSCOMPILING_EMULATOR=${WORKDIR}/scripts/qemu_${ARCH}_interpreter \
   -DCMAKE_IGNORE_PATH=/usr/include \
   -DCMAKE_C_STANDARD=99 \
+  -DPATCH_COMMAND=patch \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
   -DCMAKE_BUILD_TYPE:STRING=Release \
   -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install \
