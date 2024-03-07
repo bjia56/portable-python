@@ -500,10 +500,10 @@ if [[ "${ARCH}" == "arm" ]]; then
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${DEPSDIR}/lib
 fi
 
-wget --no-verbose -O python-cmake-buildsystem.tar.gz https://github.com/bjia56/python-cmake-buildsystem/tarball/portable-python
-tar -xf python-cmake-buildsystem.tar.gz
+wget --no-verbose -O portable-python-cmake-buildsystem.tar.gz https://github.com/bjia56/portable-python-cmake-buildsystem/tarball/portable-python
+tar -xf portable-python-cmake-buildsystem.tar.gz
 rm *.tar.gz
-mv *python-cmake-buildsystem* python-cmake-buildsystem
+mv *portable-python-cmake-buildsystem* portable-python-cmake-buildsystem
 mkdir python-build
 mkdir python-install
 cd python-build
@@ -550,7 +550,7 @@ LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
   -DTCL_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtcl8.6.a \
   -DX11_INCLUDE_DIR:PATH=${DEPSDIR}/include/X11 \
   -DX11_LIBRARIES="${DEPSDIR}/lib/libXau.a;${DEPSDIR}/lib/libXdmcp.a;${DEPSDIR}/lib/libX11.a;${DEPSDIR}/lib/libXext.a;${DEPSDIR}/lib/libICE.a;${DEPSDIR}/lib/libSM.a;${DEPSDIR}/lib/libXrender.a;${DEPSDIR}/lib/libXft.a;${DEPSDIR}/lib/libXss.a;${DEPSDIR}/lib/libxcb.a" \
-  ../python-cmake-buildsystem
+  ../portable-python-cmake-buildsystem
 make -j4
 make install
 

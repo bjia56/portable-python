@@ -20,7 +20,7 @@ mkdir ${LICENSEDIR}
 
 export MACOSX_DEPLOYMENT_TARGET=10.5
 
-git clone https://github.com/bjia56/python-cmake-buildsystem.git --branch portable-python --single-branch --depth 1
+git clone https://github.com/bjia56/portable-python-cmake-buildsystem.git --branch portable-python --single-branch --depth 1
 
 echo "::endgroup::"
 ###########
@@ -217,7 +217,7 @@ cmake \
   -DBZIP2_LIBRARIES:FILEPATH=${WORKDIR}/deps/bzip2/lib/libbz2.a \
   -DLibFFI_INCLUDE_DIR:PATH=${WORKDIR}/deps/libffi/include \
   -DLibFFI_LIBRARY:FILEPATH=${WORKDIR}/deps/libffi/lib/libffi.a \
-  ../python-cmake-buildsystem
+  ../portable-python-cmake-buildsystem
 make -j${NPROC}
 make install
 cp -r ${LICENSEDIR} ${WORKDIR}/python-install
