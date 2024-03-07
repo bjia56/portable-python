@@ -142,7 +142,7 @@ echo "::endgroup::"
 # expat #
 #########
 echo "::group::expat"
-cd ${BUILDDIR}
+cd ${WORKDIR}
 
 download_verify_extract expat-2.5.0.tar.gz
 mkdir deps/expat
