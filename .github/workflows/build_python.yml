@@ -188,6 +188,10 @@ jobs:
       - name: Install coreutils
         run: brew install coreutils
 
+      - name: Install gpatch
+        run: |
+          brew install gpatch
+
       - name: Build
         run: |
           set -ex
