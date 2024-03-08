@@ -19,26 +19,30 @@ const DL_ARCH = (() => {
     }
 
     switch (arch()) {
+    case "ia32":
+        return "i386";
     case "x64":
         return "x86_64";
-    case "arm":
-        return "armv7l";
     case "arm64":
         return "aarch64";
     }
 
-    return "unknown";
+    return arch();
 })();
 
 const VERSIONS = [
     "3.10.13",
+    "3.9.18",
     "3.9.17",
+    "3.8.18",
     "3.8.17",
 ];
 
 const VERSION_BUILDS = new Map<string, string>([
-    ["3.10.13", "v3.10.13-build.2"],
+    ["3.10.13", "v3.10.13-build.3"],
+    ["3.9.18", "v3.9.18-beta.2"],
     ["3.9.17", "v3.9.17-build.4"],
+    ["3.8.18", "v3.8.18-build.0"],
     ["3.8.17", "v3.8.17-build.3"],
 ]);
 

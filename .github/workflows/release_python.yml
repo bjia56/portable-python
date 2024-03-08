@@ -47,14 +47,26 @@ jobs:
           path: /tmp/python/
           merge-multiple: true
 
+      - name: Get latest
+        run: |
+          echo "LATEST_TAG=$(./scripts/pick_semver.sh ${{ inputs.python_version }} ${{ inputs.beta }} true)" >> $GITHUB_ENV
+
       - name: Pick tag
         run: |
           echo "SELECTED_TAG=$(./scripts/pick_semver.sh ${{ inputs.python_version }} ${{ inputs.beta }})" >> $GITHUB_ENV
 
-      - name: Release
+      - name: Create release
+        run: |
+          gh release create ${{ env.SELECTED_TAG }} \
+            --title ${{ env.SELECTED_TAG }} \
+            --target ${{ github.sha }} \
+            ${{ env.LATEST_TAG && format('--generate-notes --notes-start-tag {0}', env.LATEST_TAG) || format('--notes "Python {0}"', inputs.python_version) }} \
+            ${{ inputs.beta && '--prerelease' || '' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload files
         uses: softprops/action-gh-release@v1
         with:
           files: /tmp/python/python*.zip
           tag_name: ${{ env.SELECTED_TAG }}
-          body: "Python ${{ inputs.python_version }}"
-          prerelease: ${{ inputs.beta }}

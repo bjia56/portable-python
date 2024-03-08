@@ -14,7 +14,7 @@ mkdir python-install
 mkdir deps
 mkdir ${LICENSEDIR}
 
-git clone https://github.com/bjia56/python-cmake-buildsystem.git --branch portable-python --single-branch --depth 1
+git clone https://github.com/bjia56/portable-python-cmake-buildsystem.git --branch portable-python --single-branch --depth 1
 
 echo "::endgroup::"
 ###########
@@ -162,7 +162,7 @@ cmake \
   -DBZIP2_LIBRARIES:FILEPATH=${WORKDIR}/deps/bzip2/lib/libbz2.lib \
   -DLibFFI_INCLUDE_DIR:PATH=${WORKDIR}/deps/libffi/include \
   -DLibFFI_LIBRARY:FILEPATH=${WORKDIR}/deps/libffi/lib/ffi_static.lib \
-  ../python-cmake-buildsystem
+  ../portable-python-cmake-buildsystem
 cmake --build . --config Release -- /property:Configuration=Release
 cmake --build . --target INSTALL -- /property:Configuration=Release
 cp -r ${LICENSEDIR} ${WORKDIR}/python-install

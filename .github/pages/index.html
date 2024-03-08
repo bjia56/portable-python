@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub Releases - Portable Python</title>
+</head>
+<body>
+  <h1>GitHub Releases - Portable Python</h1>
+  <div id="releases-list"></div>
+
+  <script>
+    const username = 'bjia56';
+    const repository = 'portable-python';
+
+    // Fetch releases from GitHub API
+    fetch(`https://api.github.com/repos/${username}/${repository}/releases`)
+      .then(response => response.json())
+      .then(data => {
+        const releasesList = document.getElementById('releases-list');
+        data.forEach(release => {
+          const releaseDiv = document.createElement('div');
+          releaseDiv.innerHTML = `<h2>${release.name}</h2>`;
+          const artifactsList = document.createElement('ul');
+          release.assets.forEach(asset => {
+            artifactsList.innerHTML += `<li>${asset.name} - Download count: ${asset.download_count}</li>`;
+          });
+          releaseDiv.appendChild(artifactsList);
+          releasesList.appendChild(releaseDiv);
+        });
+      })
+      .catch(error => console.error('Error fetching releases:', error));
+  </script>
+</body>
+</html>

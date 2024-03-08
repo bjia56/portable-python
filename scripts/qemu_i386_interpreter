@@ -1,0 +1,4 @@
+#!/bin/bash
+# this interpreter shim is used by cmake to run platform
+# detection programs
+LD_LIBRARY_PATH=/usr/i686-linux-gnu/lib qemu-i386-static "$@"

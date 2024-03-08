@@ -1,13 +1,13 @@
 {
   "name": "@bjia56/portable-python-3.10",
-  "version": "0.1.2",
+  "version": "0.1.4",
   "description": "Portable Python 3.10",
   "main": "./dist/index.js",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "cp ../../README.md . && tsup",
     "prepublishOnly": "npm run build",
     "postinstall": "node ./dist/index.js"
   },

@@ -4,6 +4,7 @@ PLATFORM=linux
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 source ${SCRIPT_DIR}/utils.sh
 
+which zig
 zig version
 
 ########################
@@ -14,13 +15,17 @@ echo "::group::Install dependencies"
 export DEBIAN_FRONTEND=noninteractive
 sudo apt update
 sudo apt -y install \
-  wget build-essential pkg-config cmake autoconf git \
+  wget build-essential pkg-config cmake autoconf git patch \
   python2 python3 python3-pip clang qemu-user-static \
   gettext bison libtool autopoint gperf ncurses-bin xutils-dev
 case "$ARCH" in
   x86_64)
     sudo apt -y install libc6-amd64-cross
     sudo ln -s /usr/x86_64-linux-gnu/lib/ld-linux-x86-64.so.2 /lib/ld-linux-x86-64.so.2
+    ;;
+  i386)
+    sudo apt -y install libc6-i386-cross
+    sudo ln -sf /usr/i686-linux-gnu/lib/ld-linux.so.2 /lib/ld-linux.so.2
     ;;
   aarch64)
     sudo apt -y install libc6-arm64-cross
@@ -30,13 +35,23 @@ case "$ARCH" in
     sudo apt -y install libc6-armhf-cross
     sudo ln -s /usr/arm-linux-gnueabihf/lib/ld-linux-armhf.so.3 /lib/ld-linux-armhf.so.3
     ;;
+  riscv64)
+    sudo apt -y install libc6-riscv64-cross
+    sudo ln -s /usr/riscv64-linux-gnu/lib/ld-linux-riscv64-lp64d.so.1 /lib/ld-linux-riscv64-lp64d.so.1
+    # workaround since the Zig compiler always targets ld-linux-riscv64-lp64.so.1
+    sudo ln -s /usr/riscv64-linux-gnu/lib/ld-linux-riscv64-lp64d.so.1 /lib/ld-linux-riscv64-lp64.so.1
+    ;;
 esac
-sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja patchelf==0.15.0.0
+sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja
+if [[ "${ARCH}" == "riscv64" ]]; then
+  sudo pip install patchelf==0.15.0.0
+fi
 
 mkdir ${BUILDDIR}
 mkdir ${DEPSDIR}
 mkdir ${LICENSEDIR}
 
+export ZIG_FLAGS=""
 export CFLAGS="-I${DEPSDIR}/include"
 export CPPFLAGS="-I${DEPSDIR}/include"
 export CXXFLAGS="${CPPFLAGS}"
@@ -54,9 +69,22 @@ if [[ "${ARCH}" == "arm" ]]; then
   export AR="${ARCH}-linux-gnueabihf-gcc-ar"
   export CC="${ARCH}-linux-gnueabihf-gcc"
   export CXX="${ARCH}-linux-gnueabihf-g++"
-  export ZIG_TARGET=${ARCH}-linux-gnueabihf.2.17
   export CHOST=${ARCH}-linux-gnueabihf
-  export CFLAGS="-mfpu=vfp -mfloat-abi=hard -mcpu=arm1176jzf_s ${CFLAGS}"
+  export ZIG_FLAGS="-target ${ARCH}-linux-gnueabihf.2.17 -mfpu=vfp -mfloat-abi=hard -mcpu=arm1176jzf_s"
+elif [[ "${ARCH}" == "i386" ]]; then
+  # See above comment
+  sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/i686-linux-gnu-gcc-ar
+  sudo cp ${WORKDIR}/zigshim/zig_cc /usr/bin/i686-linux-gnu-gcc
+  sudo cp ${WORKDIR}/zigshim/zig_cxx /usr/bin/i686-linux-gnu-g++
+  export AR="i686-linux-gnu-gcc-ar"
+  export CC="i686-linux-gnu-gcc"
+  export CXX="i686-linux-gnu-g++"
+  export CHOST=i686-linux-gnu
+  export ZIG_FLAGS="-target x86-linux-gnu.2.17"
+  export CFLAGS="-m32 -Wl,--undefined-version ${CFLAGS}"
+  export CPPFLAGS="-m32 ${CPPFLAGS}"
+  export CXXFLAGS="-m32 ${CXXFLAGS}"
+  export LDFLAGS="-m32 ${LDFLAGS}"
 else
   # See above comment
   sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/${ARCH}-linux-gnu-gcc-ar
@@ -65,8 +93,23 @@ else
   export AR="${ARCH}-linux-gnu-gcc-ar"
   export CC="${ARCH}-linux-gnu-gcc"
   export CXX="${ARCH}-linux-gnu-g++"
-  export ZIG_TARGET=${ARCH}-linux-gnu.2.17
+  if [[ "${ARCH}" == "riscv64" ]]; then
+    export ZIG_FLAGS="-target riscv64-linux-gnu.2.27"
+    export CFLAGS="-Wl,--undefined-version ${CFLAGS}"
+  else
+    export ZIG_FLAGS="-target ${ARCH}-linux-gnu.2.17"
+  fi
   export CHOST=${ARCH}-linux-gnu
+fi
+
+# RISC-V hack for zig's glibc
+# https://github.com/ziglang/zig/issues/3340
+if [[ "${ARCH}" == "riscv64" ]]; then
+  cd /tmp
+  wget -O glibc.patch https://patch-diff.githubusercontent.com/raw/ziglang/zig/pull/18803.patch
+  cd $(dirname $(which zig))
+  patch -p1 < /tmp/glibc.patch || true
+  cd ${WORKDIR}
 fi
 
 echo "::endgroup::"
@@ -94,6 +137,10 @@ download_verify_extract openssl-1.1.1w.tar.gz
 cd openssl*
 if [[ "${ARCH}" == "arm" ]]; then
   ./Configure linux-generic32 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+elif [[ "${ARCH}" == "i386" ]]; then
+  ./Configure linux-x86 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+elif [[ "${ARCH}" == "riscv64" ]]; then
+  CFLAGS="${CFLAGS} -fgnuc-version=0 -D__STDC_NO_ATOMICS__" ./Configure linux-generic64 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 else
   ./Configure linux-${ARCH} no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 fi
@@ -453,10 +500,10 @@ if [[ "${ARCH}" == "arm" ]]; then
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${DEPSDIR}/lib
 fi
 
-wget --no-verbose -O python-cmake-buildsystem.tar.gz https://github.com/bjia56/python-cmake-buildsystem/tarball/portable-python-dev
-tar -xf python-cmake-buildsystem.tar.gz
+wget --no-verbose -O portable-python-cmake-buildsystem.tar.gz https://github.com/bjia56/portable-python-cmake-buildsystem/tarball/portable-python
+tar -xf portable-python-cmake-buildsystem.tar.gz
 rm *.tar.gz
-mv *python-cmake-buildsystem* python-cmake-buildsystem
+mv *portable-python-cmake-buildsystem* portable-python-cmake-buildsystem
 mkdir python-build
 mkdir python-install
 cd python-build
@@ -505,9 +552,15 @@ LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
   -DTCL_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtcl8.6.a \
   -DX11_INCLUDE_DIR:PATH=${DEPSDIR}/include/X11 \
   -DX11_LIBRARIES="${DEPSDIR}/lib/libXau.a;${DEPSDIR}/lib/libXdmcp.a;${DEPSDIR}/lib/libX11.a;${DEPSDIR}/lib/libXext.a;${DEPSDIR}/lib/libICE.a;${DEPSDIR}/lib/libSM.a;${DEPSDIR}/lib/libXrender.a;${DEPSDIR}/lib/libXft.a;${DEPSDIR}/lib/libXss.a;${DEPSDIR}/lib/libxcb.a" \
-  ../python-cmake-buildsystem
+  ../portable-python-cmake-buildsystem
 make -j4
 make install
+
+if [[ "${ARCH}" == "riscv64" ]]; then
+  cd ${BUILDDIR}/python-install
+  patchelf --set-interpreter /lib/ld-linux-riscv64-lp64d.so.1 ./bin/python
+  patchelf --replace-needed ld-linux-riscv64-lp64.so.1 ld-linux-riscv64-lp64d.so.1 ./lib/libpython${PYTHON_VER}.so
+fi
 
 cd ${BUILDDIR}
 cp -r ${DEPSDIR}/lib/tcl8.6 ./python-install/lib
@@ -515,35 +568,10 @@ cp -r ${DEPSDIR}/lib/tk8.6 ./python-install/lib
 cp -r ${LICENSEDIR} ./python-install
 
 echo "::endgroup::"
-#############################################
-# Check executable dependencies (pre-patch) #
-#############################################
-echo "::group::Check executable dependencies (pre-patch)"
-cd ${BUILDDIR}
-
-cd python-install
-echo "python dependencies"
-readelf -d ./bin/python
-echo
-echo "libpython dependencies"
-readelf -d ./lib/libpython${PYTHON_VER}.so
-
-echo "::endgroup::"
-################
-# Patch python #
-################
-echo "::group::Patch python"
-cd ${BUILDDIR}
-
-cd python-install
-${WORKDIR}/scripts/patch_libpython.sh ./lib/libpython${PYTHON_VER}.so ./bin/python
-patchelf --replace-needed libpython${PYTHON_VER}.so "\$ORIGIN/../lib/libpython${PYTHON_VER}.so" ./bin/python
-
-echo "::endgroup::"
-##############################################
-# Check executable dependencies (post-patch) #
-##############################################
-echo "::group::Check executable dependencies (post-patch)"
+#################################
+# Check executable dependencies #
+#################################
+echo "::group::Check executable dependencies"
 cd ${BUILDDIR}
 
 cd python-install
