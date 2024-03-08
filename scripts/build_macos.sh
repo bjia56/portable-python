@@ -252,6 +252,7 @@ echo "::group::Preload pip"
 cd ${WORKDIR}
 
 ./python-install/bin/python -m ensurepip
+./python-install/bin/python -m pip install certifi==${CERTIFI_VERSION}
 
 ###################
 # Compress output #
