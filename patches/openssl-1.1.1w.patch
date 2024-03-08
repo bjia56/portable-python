@@ -11,6 +11,76 @@ index 2c619c6..1505e8e 100644
          {- $target{uplink_aux_src} -}
  EXTRA=  ../ms/uplink-x86.pl ../ms/uplink.c ../ms/applink.c \
          x86cpuid.pl x86_64cpuid.pl ia64cpuid.S \
+diff --git a/crypto/portable.c b/crypto/portable.c
+new file mode 100644
+index 0000000..fe1b43a
+--- /dev/null
++++ b/crypto/portable.c
+@@ -0,0 +1,63 @@
++#if defined(__linux__) || defined(__APPLE__)
++
++#include "crypto/cryptlib.h"
++#include <stdio.h>
++#include <string.h>
++
++#if defined(__linux__)
++#include <linux/limits.h>
++#else
++#include <limits.h>
++#endif
++
++char PORTABLE_OPENSSLDIR[PATH_MAX] = "/usr/local/ssl";
++char PORTABLE_X509_CERT_AREA[PATH_MAX] = "/usr/local/ssl";
++char PORTABLE_X509_CERT_DIR[PATH_MAX] = "/usr/local/ssl/certs";
++char PORTABLE_X509_CERT_FILE[PATH_MAX] = "/usr/local/ssl/certs/cert.pem";
++char PORTABLE_X509_PRIVATE_DIR[PATH_MAX] = "/usr/local/ssl/private";
++char PORTABLE_CTLOG_FILE[PATH_MAX] = "/usr/local/ssl/ct_log_list.cnf";
++
++void OPENSSL_portable_override_OPENSSLDIR(const char *path) {
++    strncpy(PORTABLE_OPENSSLDIR, path, PATH_MAX);
++    size_t len = strlen(PORTABLE_OPENSSLDIR);
++
++    strncpy(PORTABLE_X509_CERT_AREA, path, PATH_MAX);
++
++    strncpy(PORTABLE_X509_CERT_DIR, path, PATH_MAX);
++    strncat(PORTABLE_X509_CERT_DIR, "/certs", PATH_MAX - len);
++
++    strncpy(PORTABLE_X509_CERT_FILE, PORTABLE_X509_CERT_DIR, PATH_MAX);
++    strncat(PORTABLE_X509_CERT_FILE, "/cert.pem", PATH_MAX - len);
++
++    strncpy(PORTABLE_X509_PRIVATE_DIR, path, PATH_MAX);
++    strncat(PORTABLE_X509_PRIVATE_DIR, "/private", PATH_MAX - len);
++
++    strncpy(PORTABLE_CTLOG_FILE, path, PATH_MAX);
++    strncat(PORTABLE_CTLOG_FILE, "/ct_log_list.cnf", PATH_MAX - len);
++}
++
++const char* OPENSSL_portable_get_OPENSSLDIR(void) {
++    return PORTABLE_OPENSSLDIR;
++}
++
++const char* OPENSSL_portable_get_X509_CERT_AREA(void) {
++    return PORTABLE_X509_CERT_AREA;
++}
++
++const char* OPENSSL_portable_get_X509_CERT_DIR(void) {
++    return PORTABLE_X509_CERT_DIR;
++}
++
++const char* OPENSSL_portable_get_X509_CERT_FILE(void) {
++    return PORTABLE_X509_CERT_FILE;
++}
++
++const char* OPENSSL_portable_get_X509_PRIVATE_DIR(void) {
++    return PORTABLE_X509_PRIVATE_DIR;
++}
++
++const char* OPENSSL_portable_get_CTLOG_FILE(void) {
++    return PORTABLE_CTLOG_FILE;
++}
++
++#endif
+\ No newline at end of file
 diff --git a/include/internal/cryptlib.h b/include/internal/cryptlib.h
 index 6e7291a..95a65c3 100644
 --- a/include/internal/cryptlib.h
