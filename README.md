@@ -33,10 +33,12 @@ console.log(child_process.execSync(`${pythonExe} --version`).toString());
 
 ## Available distributions
 
-Currently, Python 3.8, 3.9, and 3.10 are built for the following targets:
+Currently, Python 3.9, and 3.10 are built for the following targets:
 - Linux x86_64, i386, aarch64, arm <sup id="a1">[1](#f1)</sup>, riscv64
 - Windows x86_64
 - MacOS x86_64, arm64 <sup id="a2">[2](#f2)</sup>
+
+Python 3.8 builds are available, but will no longer be actively updated.
 
 <sub><b id="f1">1</b> The arm builds target armv6, specifically the configuration of the Raspberry Pi 1. Current arm builds do not work properly on old glibc, but a recent version of Raspbian like Debian bullseye should provide a new enough glibc to work. [↩](#a1)</sub>
 
