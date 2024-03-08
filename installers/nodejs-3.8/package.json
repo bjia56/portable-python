@@ -7,7 +7,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "cp ../../README.md . && tsup",
+    "build": "cp ../../README.md . && cd ../nodejs && npm run build && cd - && tsup",
     "prepublishOnly": "npm run build",
     "postinstall": "node ./dist/index.js"
   },
