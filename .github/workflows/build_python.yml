@@ -34,7 +34,6 @@ env:
   RUN_TESTS: ${{ inputs.run_tests }}
   DEBUG_CI: ${{ inputs.debug }}
   VERBOSE_CI: ${{ inputs.verbose }}
-  CERTIFI_VERSION: 2024.2.2
 
 jobs:
   build_linux:
