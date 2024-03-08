@@ -266,6 +266,6 @@ python3 -m pip install pyclean
 python3 -m pyclean -v python-install
 mv python-install python-${PYTHON_FULL_VER}-darwin-${ARCH}
 tar -czf python-${PYTHON_FULL_VER}-darwin-${ARCH}.tar.gz python-${PYTHON_FULL_VER}-darwin-${ARCH}
-zip python-${PYTHON_FULL_VER}-darwin-${ARCH}.zip $(tar tf python-${PYTHON_FULL_VER}-darwin-${ARCH}.tar.gz)
+zip -y python-${PYTHON_FULL_VER}-darwin-${ARCH}.zip $(tar tf python-${PYTHON_FULL_VER}-darwin-${ARCH}.tar.gz)
 
 echo "::endgroup::"
