@@ -135,6 +135,7 @@ cd ${BUILDDIR}
 
 download_verify_extract openssl-1.1.1w.tar.gz
 cd openssl*
+patch -p1 < ${WORKDIR}/patches/openssl-1.1.1w.patch
 if [[ "${ARCH}" == "arm" ]]; then
   ./Configure linux-generic32 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 elif [[ "${ARCH}" == "i386" ]]; then

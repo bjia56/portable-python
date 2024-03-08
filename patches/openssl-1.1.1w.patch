@@ -1,0 +1,57 @@
+diff --git a/crypto/build.info b/crypto/build.info
+index 2c619c6..1505e8e 100644
+--- a/crypto/build.info
++++ b/crypto/build.info
+@@ -3,7 +3,7 @@ SOURCE[../libcrypto]=\
+         cryptlib.c mem.c mem_dbg.c cversion.c ex_data.c cpt_err.c \
+         ebcdic.c uid.c o_time.c o_str.c o_dir.c o_fopen.c ctype.c \
+         threads_pthread.c threads_win.c threads_none.c getenv.c \
+-        o_init.c o_fips.c mem_sec.c init.c {- $target{cpuid_asm_src} -} \
++        o_init.c o_fips.c mem_sec.c init.c portable.c {- $target{cpuid_asm_src} -} \
+         {- $target{uplink_aux_src} -}
+ EXTRA=  ../ms/uplink-x86.pl ../ms/uplink.c ../ms/applink.c \
+         x86cpuid.pl x86_64cpuid.pl ia64cpuid.S \
+diff --git a/include/internal/cryptlib.h b/include/internal/cryptlib.h
+index 6e7291a..95a65c3 100644
+--- a/include/internal/cryptlib.h
++++ b/include/internal/cryptlib.h
+@@ -54,11 +54,39 @@ DEFINE_LHASH_OF(MEM);
+ # define OPENSSL_CONF             "openssl.cnf"
+ 
+ # ifndef OPENSSL_SYS_VMS
++
++# if defined(__linux__) || defined(__APPLE__)
++
++// Note: Not thread safe! Ideally, set these at the start of the program and never change them.
++void OPENSSL_portable_override_OPENSSLDIR(const char *path);
++const char* OPENSSL_portable_get_OPENSSLDIR(void);
++const char* OPENSSL_portable_get_X509_CERT_AREA(void);
++const char* OPENSSL_portable_get_X509_CERT_DIR(void);
++const char* OPENSSL_portable_get_X509_CERT_FILE(void);
++const char* OPENSSL_portable_get_X509_PRIVATE_DIR(void);
++const char* OPENSSL_portable_get_CTLOG_FILE(void);
++
++# ifdef OPENSSLDIR
++#  undef OPENSSLDIR
++# endif
++
++#  define OPENSSLDIR              (OPENSSL_portable_get_OPENSSLDIR())
++#  define X509_CERT_AREA          (OPENSSL_portable_get_X509_CERT_AREA())
++#  define X509_CERT_DIR           (OPENSSL_portable_get_X509_CERT_DIR())
++#  define X509_CERT_FILE          (OPENSSL_portable_get_X509_CERT_FILE())
++#  define X509_PRIVATE_DIR        (OPENSSL_portable_get_X509_PRIVATE_DIR())
++#  define CTLOG_FILE              (OPENSSL_portable_get_CTLOG_FILE())
++
++# else
++
+ #  define X509_CERT_AREA          OPENSSLDIR
+ #  define X509_CERT_DIR           OPENSSLDIR "/certs"
+ #  define X509_CERT_FILE          OPENSSLDIR "/cert.pem"
+ #  define X509_PRIVATE_DIR        OPENSSLDIR "/private"
+ #  define CTLOG_FILE              OPENSSLDIR "/ct_log_list.cnf"
++
++# endif
++
+ # else
+ #  define X509_CERT_AREA          "OSSL$DATAROOT:[000000]"
+ #  define X509_CERT_DIR           "OSSL$DATAROOT:[CERTS]"

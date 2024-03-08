@@ -33,6 +33,7 @@ download_verify_extract openssl-1.1.1w.tar.gz
 
 mkdir deps/openssl
 cd openssl-1.1.1w
+patch -p1 < ${WORKDIR}/patches/openssl-1.1.1w.patch
 CC=${WORKDIR}/scripts/cc ./Configure enable-rc5 zlib no-asm darwin64-x86_64-cc --prefix=${WORKDIR}/deps/openssl
 make -j${NPROC}
 make install_sw
