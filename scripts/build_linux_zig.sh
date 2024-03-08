@@ -16,7 +16,7 @@ sudo apt update
 sudo apt -y install \
   wget build-essential pkg-config cmake autoconf git \
   python2 python3 python3-pip clang qemu-user-static \
-  gettext bison libtool autopoint gperf ncurses-bin xutils-dev libedit-dev
+  gettext bison libtool autopoint gperf ncurses-bin xutils-dev
 case "$ARCH" in
   x86_64)
     sudo apt -y install libc6-amd64-cross
@@ -465,7 +465,7 @@ LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
   -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
   -DCMAKE_CROSSCOMPILING_EMULATOR=${WORKDIR}/scripts/qemu_${ARCH}_interpreter \
   -DCMAKE_IGNORE_PATH=/usr/include \
-  -DCMAKE_REQUIRED_INCLUDES=${DEPSDIR}/include \
+  -DINCLUDE_DIRECTORIES=${DEPSDIR}/include \
   -DCMAKE_C_STANDARD=99 \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
   -DCMAKE_BUILD_TYPE:STRING=Release \
