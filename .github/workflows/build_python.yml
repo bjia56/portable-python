@@ -105,7 +105,7 @@ jobs:
             ldd -v -r ./bin/python
             ./bin/python --version
             ./bin/python -m sysconfig
-            ./bin/python -c "import ssl"
+            ./bin/python -c "import ssl; import urllib.request; urllib.request.urlopen('https://github.com')"
 
             if [[ "${{ inputs.run_tests }}" == "true" ]]; then
               ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata
@@ -171,7 +171,7 @@ jobs:
           cd python-${{ inputs.python_version }}-windows-x86_64
           ./bin/python --version
           ./bin/python -m sysconfig
-          ./bin/python -c "import ssl"
+          ./bin/python -c "import ssl; import urllib.request; urllib.request.urlopen('https://github.com')"
 
           if [[ "${{ inputs.run_tests }}" == "true" ]]; then
             ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata
@@ -240,7 +240,7 @@ jobs:
           chmod +x ./bin/python
           ./bin/python --version
           ./bin/python -m sysconfig
-          ./bin/python -c "import ssl"
+          ./bin/python -c "import ssl; import urllib.request; urllib.request.urlopen('https://github.com')"
 
           if [[ "${{ inputs.run_tests }}" == "true" ]]; then
             ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata

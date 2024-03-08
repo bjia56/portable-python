@@ -598,6 +598,7 @@ cd ${BUILDDIR}
 
 cd python-install
 ${WORKDIR}/scripts/qemu_${ARCH}_interpreter ./bin/python -m ensurepip
+${WORKDIR}/scripts/qemu_${ARCH}_interpreter ./bin/python -m pip install -r ${WORKDIR}/baseline/requirements.txt
 
 echo "::endgroup::"
 ###################
