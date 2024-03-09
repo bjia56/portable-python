@@ -54,7 +54,8 @@ jobs:
       - name: Pick tag
         id: pick_tag
         run: |
-          echo "SELECTED_TAG=$(./scripts/pick_semver.sh ${{ inputs.python_version }} ${{ inputs.beta }})" >> $GITHUB_ENV
+          SELECTED_TAG=$(./scripts/pick_semver.sh ${{ inputs.python_version }} ${{ inputs.beta }})
+          echo "SELECTED_TAG=$SELECTED_TAG" >> $GITHUB_ENV
           echo "::set-output name=release_tag::$SELECTED_TAG"
 
       - name: Create release
