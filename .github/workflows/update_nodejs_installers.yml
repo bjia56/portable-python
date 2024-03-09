@@ -55,13 +55,13 @@ jobs:
           cd ./installers/nodejs
           npm i
           npm run build
-          npm publish ${{ inputs.beta && '--tag beta' || '' }} --dry-run
+          npm publish ${{ inputs.beta && '--tag beta' || '' }}
           cd -
 
           cd ./installers/nodejs-$MAJOR.$MINOR
           npm i || true
           npm run build
           npm i
-          npm publish ${{ inputs.beta && '--tag beta' || '' }} --dry-run
+          npm publish ${{ inputs.beta && '--tag beta' || '' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
