@@ -52,6 +52,7 @@ jobs:
           cd -
 
           cd ./installers/nodejs-$MAJOR.$MINOR
+          npm i || true
           npm i
           npm publish ${{ inputs.beta && '--tag beta' || '' }} --dry-run
         env:
