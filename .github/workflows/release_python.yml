@@ -85,3 +85,4 @@ jobs:
       python_version: ${{ inputs.python_version }}
       release_tag: ${{ needs.publish.outputs.release_tag }}
       beta: ${{ inputs.beta }}
+    secrets: inherit
