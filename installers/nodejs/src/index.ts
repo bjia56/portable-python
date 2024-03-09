@@ -1,5 +1,5 @@
 import { createWriteStream, existsSync, rm, rmSync, mkdirSync, chmodSync } from "fs";
-import { join } from "path";
+import { join, dirname } from "path";
 import { platform, arch } from "os";
 import { Readable } from 'stream';
 import { finished } from 'stream/promises';
@@ -65,10 +65,15 @@ async function download(url: string, dest: string) {
 
 export class PortablePython {
     _version: string
+    installDir = dirname(__dirname);
 
-    constructor(version: string, public installDir: string) {
+    constructor(version: string, installDir: string | null = null) {
         if (!version) {
             throw Error("version must not be empty");
+        }
+
+        if (installDir) {
+            this.installDir = installDir;
         }
 
         this._version = pickVersion(version);
