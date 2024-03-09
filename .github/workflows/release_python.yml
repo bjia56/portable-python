@@ -80,6 +80,8 @@ jobs:
   update_installers:
     name: Update installers
     needs: publish
+    permissions:
+      contents: write
     uses: ./.github/workflows/update_nodejs_installers.yml
     with:
       python_version: ${{ inputs.python_version }}
