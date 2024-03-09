@@ -6,6 +6,8 @@ import { finished } from 'stream/promises';
 import { ReadableStream } from 'stream/web';
 import AdmZip from "adm-zip";
 
+const packageJson = require("../package.json");
+
 const DL_PLATFORM = (() => {
     if (platform() == "win32") {
         return "windows";
@@ -30,21 +32,8 @@ const DL_ARCH = (() => {
     return arch();
 })();
 
-const VERSIONS = [
-    "3.10.13",
-    "3.9.18",
-    "3.9.17",
-    "3.8.18",
-    "3.8.17",
-];
-
-const VERSION_BUILDS = new Map<string, string>([
-    ["3.10.13", "v3.10.13-build.3"],
-    ["3.9.18", "v3.9.18-beta.4"],
-    ["3.9.17", "v3.9.17-build.4"],
-    ["3.8.18", "v3.8.18-build.0"],
-    ["3.8.17", "v3.8.17-build.3"],
-]);
+const VERSIONS = packageJson.portablePython.versions;
+const VERSION_BUILDS = packageJson.portablePython.versionBuilds;
 
 function pickVersion(version: string) {
     for (let i = 0; i < VERSIONS.length; ++i) {
@@ -100,7 +89,7 @@ export class PortablePython {
      * Contains the release tag that will be downloaded.
      */
     get releaseTag() {
-        return VERSION_BUILDS.get(this.version) as string;
+        return VERSION_BUILDS[this.version] as string;
     }
 
     /**
