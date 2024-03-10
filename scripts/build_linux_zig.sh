@@ -47,10 +47,6 @@ if [[ "${ARCH}" == "riscv64" ]]; then
   sudo pip install patchelf==0.15.0.0
 fi
 
-mkdir ${BUILDDIR}
-mkdir ${DEPSDIR}
-mkdir ${LICENSEDIR}
-
 export ZIG_FLAGS=""
 export CFLAGS="-I${DEPSDIR}/include"
 export CPPFLAGS="-I${DEPSDIR}/include"
