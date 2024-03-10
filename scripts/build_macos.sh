@@ -20,7 +20,7 @@ mkdir ${LICENSEDIR}
 
 export MACOSX_DEPLOYMENT_TARGET=10.5
 
-git clone https://github.com/bjia56/python-cmake-buildsystem.git --branch python3.11 --single-branch --depth 1
+git clone https://github.com/bjia56/portable-python-cmake-buildsystem.git --branch python3.11 --single-branch --depth 1
 
 echo "::endgroup::"
 ###########
@@ -138,6 +138,21 @@ install_license
 file ${WORKDIR}/deps/zlib/lib/libz.a
 
 echo "::endgroup::"
+#########
+# expat #
+#########
+echo "::group::expat"
+cd ${WORKDIR}
+
+download_verify_extract expat-2.5.0.tar.gz
+mkdir deps/expat
+cd expat*
+CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --disable-shared --prefix=${WORKDIR}/deps/expat
+make -j4
+make install
+install_license
+
+echo "::endgroup::"
 ##########
 # libffi #
 ##########
@@ -175,7 +190,7 @@ cd ${WORKDIR}
 
 cd python-build
 cmake \
-  "${cmake_debug_flags[@]}" \
+  "${cmake_verbose_flags[@]}" \
   -G "Unix Makefiles" \
   "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET} \
@@ -189,6 +204,9 @@ cmake \
   -DINSTALL_TEST=${INSTALL_TEST} \
   -DINSTALL_MANUAL=OFF \
   -DOPENSSL_ROOT_DIR:PATH=${WORKDIR}/deps/openssl \
+  -DUSE_SYSTEM_EXPAT=OFF \
+  -DEXPAT_INCLUDE_DIRS:PATH=${WORKDIR}/deps/expat/include \
+  -DEXPAT_LIBRARIES:FILEPATH=${WORKDIR}/deps/expat/lib/libexpat.a \
   -DSQLite3_INCLUDE_DIR:PATH=${WORKDIR}/deps/sqlite3/include \
   -DSQLite3_LIBRARY:FILEPATH=${WORKDIR}/deps/sqlite3/lib/libsqlite3.a \
   -DZLIB_INCLUDE_DIR:PATH=${WORKDIR}/deps/zlib/include \
@@ -199,7 +217,7 @@ cmake \
   -DBZIP2_LIBRARIES:FILEPATH=${WORKDIR}/deps/bzip2/lib/libbz2.a \
   -DLibFFI_INCLUDE_DIR:PATH=${WORKDIR}/deps/libffi/include \
   -DLibFFI_LIBRARY:FILEPATH=${WORKDIR}/deps/libffi/lib/libffi.a \
-  ../python-cmake-buildsystem
+  ../portable-python-cmake-buildsystem
 make -j${NPROC}
 make install
 cp -r ${LICENSEDIR} ${WORKDIR}/python-install
@@ -234,6 +252,7 @@ echo "::group::Preload pip"
 cd ${WORKDIR}
 
 ./python-install/bin/python -m ensurepip
+./python-install/bin/python -m pip install -r ${WORKDIR}/baseline/requirements.txt
 
 ###################
 # Compress output #

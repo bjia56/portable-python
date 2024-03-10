@@ -14,7 +14,7 @@ mkdir python-install
 mkdir deps
 mkdir ${LICENSEDIR}
 
-git clone https://github.com/bjia56/python-cmake-buildsystem.git --branch python3.11 --single-branch --depth 1
+git clone https://github.com/bjia56/portable-python-cmake-buildsystem.git --branch python3.11 --single-branch --depth 1
 
 echo "::endgroup::"
 ###########
@@ -138,7 +138,7 @@ cd ${WORKDIR}
 
 cd python-build
 cmake \
-  "${cmake_debug_flags[@]}" \
+  "${cmake_verbose_flags[@]}" \
   -G "Visual Studio 17 2022" -A x64 \
   -DCMAKE_C_STANDARD=99 \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
@@ -162,7 +162,7 @@ cmake \
   -DBZIP2_LIBRARIES:FILEPATH=${WORKDIR}/deps/bzip2/lib/libbz2.lib \
   -DLibFFI_INCLUDE_DIR:PATH=${WORKDIR}/deps/libffi/include \
   -DLibFFI_LIBRARY:FILEPATH=${WORKDIR}/deps/libffi/lib/ffi_static.lib \
-  ../python-cmake-buildsystem
+  ../portable-python-cmake-buildsystem
 cmake --build . --config Release -- /property:Configuration=Release
 cmake --build . --target INSTALL -- /property:Configuration=Release
 cp -r ${LICENSEDIR} ${WORKDIR}/python-install
@@ -191,6 +191,7 @@ echo "::group::Preload pip"
 cd ${WORKDIR}
 
 ./python-install/bin/python -m ensurepip
+./python-install/bin/python -m pip install -r ${WORKDIR}/baseline/requirements.txt
 
 ###################
 # Compress output #

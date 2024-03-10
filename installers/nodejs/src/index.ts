@@ -1,10 +1,12 @@
 import { createWriteStream, existsSync, rm, rmSync, mkdirSync, chmodSync } from "fs";
-import { join } from "path";
+import { join, dirname } from "path";
 import { platform, arch } from "os";
 import { Readable } from 'stream';
 import { finished } from 'stream/promises';
 import { ReadableStream } from 'stream/web';
 import AdmZip from "adm-zip";
+
+const packageJson = require("../package.json");
 
 const DL_PLATFORM = (() => {
     if (platform() == "win32") {
@@ -19,28 +21,19 @@ const DL_ARCH = (() => {
     }
 
     switch (arch()) {
+    case "ia32":
+        return "i386";
     case "x64":
         return "x86_64";
-    case "arm":
-        return "armv7l";
     case "arm64":
         return "aarch64";
     }
 
-    return "unknown";
+    return arch();
 })();
 
-const VERSIONS = [
-    "3.10.13",
-    "3.9.17",
-    "3.8.17",
-];
-
-const VERSION_BUILDS = new Map<string, string>([
-    ["3.10.13", "v3.10.13-build.2"],
-    ["3.9.17", "v3.9.17-build.4"],
-    ["3.8.17", "v3.8.17-build.3"],
-]);
+const VERSIONS = packageJson.portablePython.versions;
+const VERSION_BUILDS = packageJson.portablePython.versionBuilds;
 
 function pickVersion(version: string) {
     for (let i = 0; i < VERSIONS.length; ++i) {
@@ -61,10 +54,15 @@ async function download(url: string, dest: string) {
 
 export class PortablePython {
     _version: string
+    installDir = dirname(__dirname);
 
-    constructor(version: string, public installDir: string) {
+    constructor(version: string, installDir: string | null = null) {
         if (!version) {
             throw Error("version must not be empty");
+        }
+
+        if (installDir) {
+            this.installDir = installDir;
         }
 
         this._version = pickVersion(version);
@@ -91,7 +89,7 @@ export class PortablePython {
      * Contains the release tag that will be downloaded.
      */
     get releaseTag() {
-        return VERSION_BUILDS.get(this.version) as string;
+        return VERSION_BUILDS[this.version] as string;
     }
 
     /**

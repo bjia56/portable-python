@@ -1,0 +1,82 @@
+name: Update NodeJS Installers
+
+on:
+  workflow_dispatch:
+    inputs:
+      python_version:
+        required: true
+        type: string
+      release_tag:
+        required: true
+        type: string
+      beta:
+        required: false
+        type: boolean
+        default: false
+  workflow_call:
+    inputs:
+      python_version:
+        required: true
+        type: string
+      release_tag:
+        required: true
+        type: string
+      beta:
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  update_base:
+    name: Update NodeJS installers
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Pull latest
+        run: |
+          git pull
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+          
+      - name: Setup NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Update and publish installers
+        run: |
+          python ./scripts/update_installer.py ${{ inputs.python_version }} ${{ inputs.release_tag }}
+
+          MAJOR=$(echo ${{ inputs.python_version }} | cut -d. -f1)
+          MINOR=$(echo ${{ inputs.python_version }} | cut -d. -f2)
+
+          cd ./installers/nodejs
+          npm i
+          npm run build
+          npm publish ${{ inputs.beta && '--tag beta' || '' }}
+          cd -
+
+          cd ./installers/nodejs-$MAJOR.$MINOR
+          npm i || true
+          npm run build
+          npm i
+          npm publish ${{ inputs.beta && '--tag beta' || '' }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Commit and push
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "github-actions[bot]@users.noreply.github.com"
+          commit_author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
+          commit_message: Releasing ${{ inputs.release_tag }}

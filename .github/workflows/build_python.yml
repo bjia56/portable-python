@@ -12,6 +12,9 @@ on:
       debug:
         required: false
         type: boolean
+      verbose:
+        required: false
+        type: boolean
   workflow_call:
     inputs:
       python_version:
@@ -23,12 +26,14 @@ on:
       debug:
         required: false
         type: boolean
+      verbose:
+        required: false
+        type: boolean
 
 env:
-  image_map: '{"x86_64": "centos:7", "aarch64": "centos:7", "arm": "debian:bullseye"}'
-  platform_map: '{"x86_64": "linux/amd64", "aarch64": "linux/arm64/v8", "arm": "linux/arm/v7"}'
   RUN_TESTS: ${{ inputs.run_tests }}
   DEBUG_CI: ${{ inputs.debug }}
+  VERBOSE_CI: ${{ inputs.verbose }}
 
 jobs:
   build_linux:
@@ -37,28 +42,26 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [ x86_64, aarch64, arm ]
+        include:
+          - arch: x86_64
+            image: amd64/centos:7
+          - arch: i386
+            image: i386/centos:7
+          - arch: aarch64
+            image: arm64v8/centos:7
+          - arch: arm
+            image: arm32v7/debian:bullseye
+          - arch: riscv64
+            image: riscv64/debian:sid
 
     steps:
-      - name: Parse platform
-        id: parse_platform
-        run: |
-          PLATFORM=$(echo ${{ toJSON(env.platform_map) }} | jq -r '.["${{ matrix.arch }}"]')
-          echo "::set-output name=platform::$PLATFORM"
-          
-      - name: Parse image
-        id: parse_image
-        run: |
-          IMAGE=$(echo ${{ toJSON(env.image_map) }} | jq -r '.["${{ matrix.arch }}"]')
-          echo "::set-output name=image::$IMAGE"
-
       - name: Set up zig
         uses: goto-bus-stop/setup-zig@v2
         with:
-          version: 0.12.0-dev.2341+92211135f
+          version: 0.12.0-dev.3097+5c0766b6c
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Build
         run: |
@@ -80,13 +83,14 @@ jobs:
       - name: Test python in clean environment
         uses: addnab/docker-run-action@v3
         with:
-          image: ${{ steps.parse_image.outputs.image }}
-          options: -v ${{ github.workspace }}:/work --workdir /tmp --platform ${{ steps.parse_platform.outputs.platform }}
+          image: ${{ matrix.image }}
+          options: -v ${{ github.workspace }}:/work --workdir /tmp
           shell: bash
           run: |
             set -e
+            uname -a
 
-            if [[ "${{ matrix.arch }}" == "arm" ]]; then
+            if [ "${{ matrix.arch }}" == "arm" ] || [ "${{ matrix.arch }}" == "riscv64" ]; then
               apt update
               apt -y install unzip
             else
@@ -100,7 +104,8 @@ jobs:
             chmod +x ./bin/python
             ldd -v -r ./bin/python
             ./bin/python --version
-            ./bin/python -c "import ssl"
+            ./bin/python -m sysconfig
+            ./bin/python -c "import ssl; import urllib.request; urllib.request.urlopen('https://github.com')"
 
             if [[ "${{ inputs.run_tests }}" == "true" ]]; then
               ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata
@@ -164,8 +169,9 @@ jobs:
           7z.exe x python/python-${{ inputs.python_version }}-windows-x86_64.zip
 
           cd python-${{ inputs.python_version }}-windows-x86_64
-          bin/python --version
-          ./bin/python -c "import ssl"
+          ./bin/python --version
+          ./bin/python -m sysconfig
+          ./bin/python -c "import ssl; import urllib.request; urllib.request.urlopen('https://github.com')"
 
           if [[ "${{ inputs.run_tests }}" == "true" ]]; then
             ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata
@@ -181,6 +187,10 @@ jobs:
 
       - name: Install coreutils
         run: brew install coreutils
+
+      - name: Install gpatch
+        run: |
+          brew install gpatch
 
       - name: Build
         run: |
@@ -201,9 +211,18 @@ jobs:
           path: ./*python*.tar.gz
 
   test_macos:
-    name: MacOS ${{ inputs.python_version }} universal2 (test)
+    name: MacOS ${{ inputs.python_version }} ${{ matrix.arch }} (test)
     needs: build_macos
-    runs-on: macos-11
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ macos-11, macos-14 ]
+        include:
+          - os: macos-11
+            arch: x86_64
+          - os: macos-14
+            arch: arm64
 
     steps:
       - name: Download artifact
@@ -220,7 +239,8 @@ jobs:
           cd python-${{ inputs.python_version }}-darwin-universal2
           chmod +x ./bin/python
           ./bin/python --version
-          ./bin/python -c "import ssl"
+          ./bin/python -m sysconfig
+          ./bin/python -c "import ssl; import urllib.request; urllib.request.urlopen('https://github.com')"
 
           if [[ "${{ inputs.run_tests }}" == "true" ]]; then
             ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata
