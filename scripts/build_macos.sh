@@ -186,6 +186,8 @@ echo "::endgroup::"
 echo "::group::Build"
 cd ${BUILDDIR}
 
+# TODO: build TCL
+
 mkdir python-build
 mkdir python-install
 cd python-build
@@ -204,6 +206,7 @@ cmake \
   -DINSTALL_MANUAL=OFF \
   -DOPENSSL_ROOT_DIR:PATH=${DEPSDIR}/openssl \
   -DUSE_SYSTEM_EXPAT=OFF \
+  -DUSE_SYSTEM_TCL=OFF \
   -DEXPAT_INCLUDE_DIRS:PATH=${DEPSDIR}/expat/include \
   -DEXPAT_LIBRARIES:FILEPATH=${DEPSDIR}/expat/lib/libexpat.a \
   -DSQLite3_INCLUDE_DIR:PATH=${DEPSDIR}/sqlite3/include \
