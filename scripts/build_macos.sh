@@ -12,6 +12,7 @@ set -ex
 # Initialize #
 ##############
 echo "::group::Initialize"
+cd ${BUILDDIR}
 
 export MACOSX_DEPLOYMENT_TARGET=10.5
 
@@ -146,6 +147,8 @@ CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --disable-shared --prefix
 make -j4
 make install
 install_license
+
+file ${DEPSDIR}/expat/lib/libexpat.a
 
 echo "::endgroup::"
 ##########
