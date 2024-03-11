@@ -204,7 +204,7 @@ jobs:
           ./scripts/build_macos.sh universal2 ${{ inputs.python_version }}
 
       - name: Interactive debugging
-        uses: fawazahmed0/action-debug@main
+        uses: fawazahmed0/action-debug@v2
         if: ${{ always() && inputs.debug_interactive }}
 
       - name: Upload artifacts
