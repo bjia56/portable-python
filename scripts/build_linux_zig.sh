@@ -201,14 +201,14 @@ install_license
 
 echo "::endgroup::"
 ############
-# readline #
+# editline #
 ############
-echo "::group::readline"
+echo "::group::editline"
 cd ${BUILDDIR}
 
-download_verify_extract readline-8.2.tar.gz
-cd readline*
-./configure --with-curses --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
+download_verify_extract libedit-20230828-3.1.tar.gz
+cd libedit*
+./configure --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
 install_license
@@ -449,7 +449,7 @@ cd tcl*/unix
 LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
-cd .. 
+cd ..
 install_license ./license.terms
 
 echo "::endgroup::"
@@ -464,7 +464,7 @@ cd tk*/unix
 LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
-cd .. 
+cd ..
 install_license ./license.terms
 
 echo "::endgroup::"
@@ -519,6 +519,7 @@ LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
   -DINSTALL_TEST=${INSTALL_TEST} \
   -DINSTALL_MANUAL=OFF \
   "${additionalparams[@]}" \
+  -DUSE_LIBEDIT=ON \
   -DOPENSSL_INCLUDE_DIR:PATH=${DEPSDIR}/include \
   -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/libssl.a;${DEPSDIR}/lib/libcrypto.a" \
   -DSQLite3_INCLUDE_DIR:PATH=${DEPSDIR}/include \
@@ -531,18 +532,18 @@ LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
   -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libbz2.a \
   -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/include \
   -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.a \
-  -DREADLINE_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/readline/readline.h \
-  -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.a \
+  -DREADLINE_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include \
+  -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libedit.a \
   -DUUID_LIBRARY:FILEPATH=${DEPSDIR}/lib/libuuid.a \
   -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.a \
   -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.a \
-  -DGDBM_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/gdbm.h \
+  -DGDBM_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include \
   -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.a \
   -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.a \
   -DNDBM_TAG=NDBM \
-  -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tk.h \
+  -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include \
   -DTK_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtk8.6.a \
-  -DTCL_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tcl.h \
+  -DTCL_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include \
   -DTCL_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtcl8.6.a \
   -DX11_INCLUDE_DIR:PATH=${DEPSDIR}/include/X11 \
   -DX11_LIBRARIES="${DEPSDIR}/lib/libXau.a;${DEPSDIR}/lib/libXdmcp.a;${DEPSDIR}/lib/libX11.a;${DEPSDIR}/lib/libXext.a;${DEPSDIR}/lib/libICE.a;${DEPSDIR}/lib/libSM.a;${DEPSDIR}/lib/libXrender.a;${DEPSDIR}/lib/libXft.a;${DEPSDIR}/lib/libXss.a;${DEPSDIR}/lib/libxcb.a" \
