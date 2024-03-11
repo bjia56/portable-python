@@ -14,9 +14,6 @@ on:
       debug:
         required: false
         type: boolean
-      debug_interactive:
-        required: false
-        type: boolean
       verbose:
         required: false
         type: boolean
@@ -33,5 +30,4 @@ jobs:
       python_version: ${{ matrix.python_version }}
       run_tests: ${{ inputs.run_tests || false }}
       debug: ${{ inputs.debug || false }}
-      debug_interactive: ${{ inputs.debug_interactive || false }}
       verbose: ${{ inputs.verbose || false }}
