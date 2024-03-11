@@ -7,7 +7,7 @@ on:
         required: true
         type: string
       matrix:
-        required: false
+        required: true
         type: string
         default: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,macos,windows"
       run_tests:
@@ -28,7 +28,7 @@ on:
         required: true
         type: string
       matrix:
-        required: false
+        required: true
         type: string
         default: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,macos,windows"
       run_tests:
