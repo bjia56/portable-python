@@ -52,6 +52,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        arch: [x86_64, i386, aarch64, arm, riscv64]
         include:
           - arch: x86_64
             image: amd64/centos:7
