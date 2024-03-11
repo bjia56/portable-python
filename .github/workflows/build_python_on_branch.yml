@@ -31,4 +31,4 @@ jobs:
       run_tests: ${{ inputs.run_tests || false }}
       debug: ${{ inputs.debug || false }}
       verbose: ${{ inputs.verbose || false }}
-      matrix: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,macos,windows"
+      platforms: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,macos,windows"

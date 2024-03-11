@@ -6,7 +6,7 @@ on:
       python_version:
         required: true
         type: string
-      matrix:
+      platforms:
         required: true
         type: string
         default: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,macos,windows"
@@ -27,7 +27,7 @@ on:
       python_version:
         required: true
         type: string
-      matrix:
+      platforms:
         required: true
         type: string
       run_tests:
@@ -48,7 +48,7 @@ env:
 jobs:
   build_linux:
     name: Linux ${{ inputs.python_version }} ${{ matrix.arch }}
-    if: ${{ contains(inputs.matrix, format('linux-{0}', matrix.arch)) }}
+    if: ${{ contains(inputs.platforms, format('linux-{0}', matrix.arch)) }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -124,7 +124,7 @@ jobs:
 
   build_windows:
     name: Windows ${{ inputs.python_version }} x86_64 (build)
-    if: ${{ contains(inputs.matrix, 'windows') }}
+    if: ${{ contains(inputs.platforms, 'windows') }}
     runs-on: windows-latest
 
     steps:
@@ -191,7 +191,7 @@ jobs:
 
   build_macos:
     name: MacOS ${{ inputs.python_version }} universal2 (build)
-    if: ${{ contains(inputs.matrix, 'macos') }}
+    if: ${{ contains(inputs.platforms, 'macos') }}
     runs-on: macos-latest
 
     steps:
