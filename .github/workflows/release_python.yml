@@ -26,6 +26,7 @@ jobs:
     uses: ./.github/workflows/build_python.yml
     with:
       python_version: ${{ inputs.python_version }}
+      matrix: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,macos,windows"
 
   publish:
     name: Publish ${{ inputs.python_version }}
