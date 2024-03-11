@@ -48,7 +48,6 @@ env:
 jobs:
   build_linux:
     name: Linux ${{ inputs.python_version }} ${{ matrix.arch }}
-    if: ${{ contains(inputs.platforms, format('linux-{0}', matrix.arch)) }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -64,6 +63,12 @@ jobs:
             image: arm32v7/debian:bullseye
           - arch: riscv64
             image: riscv64/debian:sid
+        exclude:
+          - arch: ${{ !contains(inputs.platforms, 'linux-x86_64') && 'x86_64' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'linux-i386') && 'i386' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'linux-aarch64') && 'aarch64' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'linux-arm') && 'arm' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'linux-riscv64') && 'riscv64' || '' }}
 
     steps:
       - name: Set up zig
