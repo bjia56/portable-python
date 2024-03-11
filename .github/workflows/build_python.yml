@@ -53,7 +53,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [x86_64, i386, aarch64, arm, riscv64]]
+        arch: [x86_64, i386, aarch64, arm, riscv64]
         exclude:
           - arch: ${{ !contains(inputs.platforms, 'linux-x86_64') && 'x86_64' || '' }}
           - arch: ${{ !contains(inputs.platforms, 'linux-i386') && 'i386' || '' }}
