@@ -44,6 +44,7 @@ env:
   RUN_TESTS: ${{ inputs.run_tests }}
   DEBUG_CI: ${{ inputs.debug }}
   VERBOSE_CI: ${{ inputs.verbose }}
+  image_map: '{"x86_64": "amd64/centos:7", "i386": "i386/centos:7", "aarch64": "arm64v8/centos:7", "arm": "arm32v7/debian:bullseye", "riscv64": "riscv64/debian:sid"}'
 
 jobs:
   build_linux:
@@ -52,26 +53,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [x86_64, i386, aarch64, arm, riscv64]
-        include:
-          - arch: x86_64
-            image: amd64/centos:7
-          - arch: i386
-            image: i386/centos:7
-          - arch: aarch64
-            image: arm64v8/centos:7
-          - arch: arm
-            image: arm32v7/debian:bullseye
-          - arch: riscv64
-            image: riscv64/debian:sid
+        arch: [x86_64, i386, aarch64, arm, riscv64]]
         exclude:
-          - arch: ${{ contains(inputs.platforms, 'linux-x86_64') && 'x86_64' || 'no-skip' }}
-          - arch: ${{ contains(inputs.platforms, 'linux-i386') && 'i386' || 'no-skip' }}
-          - arch: ${{ contains(inputs.platforms, 'linux-aarch64') && 'aarch64' || 'no-skip' }}
-          - arch: ${{ contains(inputs.platforms, 'linux-arm') && 'arm' || 'no-skip' }}
-          - arch: ${{ contains(inputs.platforms, 'linux-riscv64') && 'riscv64' || 'no-skip' }}
+          - arch: ${{ !contains(inputs.platforms, 'linux-x86_64') && 'x86_64' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'linux-i386') && 'i386' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'linux-aarch64') && 'aarch64' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'linux-arm') && 'arm' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'linux-riscv64') && 'riscv64' || '' }}
 
     steps:
+      - name: Parse image
+        id: parse_image
+        run: |
+          IMAGE=$(echo ${{ toJSON(env.image_map) }} | jq -r '.["${{ matrix.arch }}"]')
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+
       - name: Set up zig
         uses: goto-bus-stop/setup-zig@v2
         with:
@@ -100,7 +96,7 @@ jobs:
       - name: Test python in clean environment
         uses: addnab/docker-run-action@v3
         with:
-          image: ${{ matrix.image }}
+          image: ${{ steps.parse_image.outputs.image }}
           options: -v ${{ github.workspace }}:/work --workdir /tmp
           shell: bash
           run: |
