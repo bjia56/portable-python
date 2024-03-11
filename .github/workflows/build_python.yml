@@ -65,6 +65,10 @@ jobs:
       - name: Parse image
         id: parse_image
         run: |
+          if [ "${{ matrix.arch}}x" == "x" ]; then
+            echo "invalid arch"
+            exit 1
+          fi
           IMAGE=$(echo ${{ toJSON(env.image_map) }} | jq -r '.["${{ matrix.arch }}"]')
           echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
 
