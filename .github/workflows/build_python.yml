@@ -6,6 +6,10 @@ on:
       python_version:
         required: true
         type: string
+      matrix:
+        required: false
+        type: string
+        default: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,macos,windows"
       run_tests:
         required: false
         type: boolean
@@ -23,6 +27,10 @@ on:
       python_version:
         required: true
         type: string
+      matrix:
+        required: false
+        type: string
+        default: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,macos,windows"
       run_tests:
         required: false
         type: boolean
@@ -41,6 +49,7 @@ env:
 jobs:
   build_linux:
     name: Linux ${{ inputs.python_version }} ${{ matrix.arch }}
+    if: ${{ contains(inputs.matrix, format('linux-{0}', matrix.arch)) }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -116,6 +125,7 @@ jobs:
 
   build_windows:
     name: Windows ${{ inputs.python_version }} x86_64 (build)
+    if: ${{ contains(inputs.matrix, 'windows') }}
     runs-on: windows-latest
 
     steps:
@@ -182,6 +192,7 @@ jobs:
 
   build_macos:
     name: MacOS ${{ inputs.python_version }} universal2 (build)
+    if: ${{ contains(inputs.matrix, 'macos') }}
     runs-on: macos-latest
 
     steps:
