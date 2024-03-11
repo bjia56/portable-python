@@ -12,6 +12,9 @@ on:
       debug:
         required: false
         type: boolean
+      debug_interactive:
+        required: false
+        type: boolean
       verbose:
         required: false
         type: boolean
@@ -24,6 +27,9 @@ on:
         required: false
         type: boolean
       debug:
+        required: false
+        type: boolean
+      debug_interactive:
         required: false
         type: boolean
       verbose:
@@ -196,6 +202,10 @@ jobs:
         run: |
           set -ex
           ./scripts/build_macos.sh universal2 ${{ inputs.python_version }}
+
+      - name: Interactive debugging
+        uses: fawazahmed0/action-debug@main
+        if: ${{ always() && inputs.debug_interactive }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
