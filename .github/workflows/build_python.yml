@@ -30,7 +30,6 @@ on:
       matrix:
         required: true
         type: string
-        default: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,macos,windows"
       run_tests:
         required: false
         type: boolean
