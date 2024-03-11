@@ -80,6 +80,10 @@ jobs:
         run: |
           ./scripts/build_linux_zig.sh ${{ matrix.arch }} ${{ inputs.python_version }}
 
+      - name: Interactive debugging
+        uses: fawazahmed0/action-debug@v2
+        if: ${{ always() && inputs.debug_interactive }}
+  
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -151,6 +155,10 @@ jobs:
         run: |
           set -ex
           ./scripts/build_windows.sh x86_64 ${{ inputs.python_version }}
+
+      - name: Interactive debugging
+        uses: fawazahmed0/action-debug@v2
+        if: ${{ always() && inputs.debug_interactive }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
