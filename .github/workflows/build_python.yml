@@ -29,9 +29,6 @@ on:
       debug:
         required: false
         type: boolean
-      debug_interactive:
-        required: false
-        type: boolean
       verbose:
         required: false
         type: boolean
