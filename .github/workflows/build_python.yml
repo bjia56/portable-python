@@ -64,11 +64,11 @@ jobs:
           - arch: riscv64
             image: riscv64/debian:sid
         exclude:
-          - arch: ${{ !contains(inputs.platforms, 'linux-x86_64') && 'x86_64' || 'no-skip' }}
-          - arch: ${{ !contains(inputs.platforms, 'linux-i386') && 'i386' || 'no-skip' }}
-          - arch: ${{ !contains(inputs.platforms, 'linux-aarch64') && 'aarch64' || 'no-skip' }}
-          - arch: ${{ !contains(inputs.platforms, 'linux-arm') && 'arm' || 'no-skip' }}
-          - arch: ${{ !contains(inputs.platforms, 'linux-riscv64') && 'riscv64' || 'no-skip' }}
+          - arch: ${{ contains(inputs.platforms, 'linux-x86_64') && 'x86_64' || 'no-skip' }}
+          - arch: ${{ contains(inputs.platforms, 'linux-i386') && 'i386' || 'no-skip' }}
+          - arch: ${{ contains(inputs.platforms, 'linux-aarch64') && 'aarch64' || 'no-skip' }}
+          - arch: ${{ contains(inputs.platforms, 'linux-arm') && 'arm' || 'no-skip' }}
+          - arch: ${{ contains(inputs.platforms, 'linux-riscv64') && 'riscv64' || 'no-skip' }}
 
     steps:
       - name: Set up zig
