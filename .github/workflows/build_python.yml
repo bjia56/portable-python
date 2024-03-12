@@ -208,7 +208,7 @@ jobs:
   build_macos:
     name: MacOS ${{ inputs.python_version }} universal2 (build)
     if: ${{ contains(inputs.platforms, 'macos') }}
-    runs-on: macos-13
+    runs-on: macos-latest
 
     steps:
       - name: Checkout
