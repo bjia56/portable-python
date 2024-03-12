@@ -144,11 +144,26 @@ download_verify_extract expat-2.5.0.tar.gz
 mkdir ${DEPSDIR}/expat
 cd expat*
 CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --disable-shared --prefix=${DEPSDIR}/expat
-make -j4
+make -j${NPROC}
 make install
 install_license
 
 file ${DEPSDIR}/expat/lib/libexpat.a
+
+echo "::endgroup::"
+########
+# gdbm #
+########
+echo "::group::gdbm"
+cd ${BUILDDIR}
+
+download_verify_extract gdbm-1.23.tar.gz
+mkdir ${DEPSDIR}/gdbm
+cd gdbm*
+CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --enable-libgdbm-compat --prefix=${DEPSDIR}/gdbm
+make -j${NPROC}
+make install
+install_license
 
 echo "::endgroup::"
 ##########
@@ -219,6 +234,11 @@ cmake \
   -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/bzip2/lib/libbz2.a \
   -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/libffi/include \
   -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/libffi/lib/libffi.a \
+  -DGDBM_INCLUDE_PATH:FILEPATH=${DEPSDIR}/gdbm/include/gdbm.h \
+  -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/gdbm/lib/libgdbm.a \
+  -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/gdbm/lib/libgdbm_compat.a \
+  -DNDBM_TAG=NDBM \
+  -DNDBM_USE=NDBM \
   ../portable-python-cmake-buildsystem
 make -j${NPROC}
 make install
