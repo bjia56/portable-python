@@ -160,7 +160,7 @@ cd ${BUILDDIR}
 download_verify_extract gdbm-1.23.tar.gz
 mkdir ${DEPSDIR}/gdbm
 cd gdbm*
-CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --enable-libgdbm-compat --prefix=${DEPSDIR}/gdbm
+CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --enable-libgdbm-compat --without-readline --prefix=${DEPSDIR}/gdbm
 make -j${NPROC}
 make install
 install_license
