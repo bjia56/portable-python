@@ -539,6 +539,7 @@ LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
   -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.a \
   -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.a \
   -DNDBM_TAG=NDBM \
+  -DNDBM_USE=NDBM \
   -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tk.h \
   -DTK_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtk8.6.a \
   -DTCL_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tcl.h \
