@@ -14,7 +14,7 @@ set -ex
 echo "::group::Initialize"
 cd ${BUILDDIR}
 
-export MACOSX_DEPLOYMENT_TARGET=10.5
+export MACOSX_DEPLOYMENT_TARGET=10.6
 
 git clone https://github.com/bjia56/portable-python-cmake-buildsystem.git --branch ${CMAKE_BUILDSYSTEM_BRANCH} --single-branch --depth 1
 
