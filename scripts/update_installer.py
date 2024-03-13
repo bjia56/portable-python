@@ -3,7 +3,6 @@
 from distutils.version import StrictVersion, LooseVersion
 import json
 import os
-import subprocess
 import sys
 
 if len(sys.argv) != 3:
@@ -50,8 +49,8 @@ with open(base_installer_package_json, 'w') as f:
 with open(version_installer_package_json, 'r') as f:
     package_json = json.load(f)
 
-package_version = StrictVersion(package_json["version"])
-package_json["version"] = f"{package_version.version[0]}.{package_version.version[1]}.{package_version.version[2] + 1}"
+package_version = LooseVersion(package_json["version"])
+package_json["version"] = f"{package_version.version[0]}.{package_version.version[1]}.{int(''.join([str(i) for i in package_version.version[2:]])) + 1}"
 
 with open(version_installer_package_json, 'w') as f:
     json.dump(package_json, f, indent=2)
