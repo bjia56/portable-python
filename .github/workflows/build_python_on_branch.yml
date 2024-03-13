@@ -24,10 +24,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python_version: [ 3.9.18, 3.10.13 ]
+        python_version: [ 3.9.18, 3.10.13, 3.11.7 ]
     uses: ./.github/workflows/build_python.yml
     with:
       python_version: ${{ matrix.python_version }}
       run_tests: ${{ inputs.run_tests || false }}
       debug: ${{ inputs.debug || false }}
       verbose: ${{ inputs.verbose || false }}
+      platforms: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,macos,windows"

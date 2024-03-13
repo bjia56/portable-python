@@ -449,7 +449,7 @@ cd tcl*/unix
 LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
-cd .. 
+cd ..
 install_license ./license.terms
 
 echo "::endgroup::"
@@ -464,7 +464,7 @@ cd tk*/unix
 LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
-cd .. 
+cd ..
 install_license ./license.terms
 
 echo "::endgroup::"
@@ -501,7 +501,7 @@ if [[ "${ARCH}" == "arm" || "${ARCH}" == "aarch64" || "${ARCH}" == "riscv64" ]];
   CFLAGS="-static-libgcc"
 fi
 
-wget --no-verbose -O portable-python-cmake-buildsystem.tar.gz https://github.com/bjia56/portable-python-cmake-buildsystem/tarball/portable-python
+wget --no-verbose -O portable-python-cmake-buildsystem.tar.gz https://github.com/bjia56/portable-python-cmake-buildsystem/tarball/${CMAKE_BUILDSYSTEM_BRANCH}
 tar -xf portable-python-cmake-buildsystem.tar.gz
 rm *.tar.gz
 mv *portable-python-cmake-buildsystem* portable-python-cmake-buildsystem
@@ -513,7 +513,6 @@ LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" CFLAGS="${CFLAGS}" cmake \
   -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
   -DCMAKE_CROSSCOMPILING_EMULATOR=${WORKDIR}/scripts/qemu_${ARCH}_interpreter \
   -DCMAKE_IGNORE_PATH=/usr/include \
-  -DCMAKE_C_STANDARD=99 \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
   -DCMAKE_BUILD_TYPE:STRING=Release \
   -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install \
@@ -545,6 +544,7 @@ LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" CFLAGS="${CFLAGS}" cmake \
   -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.a \
   -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.a \
   -DNDBM_TAG=NDBM \
+  -DNDBM_USE=NDBM \
   -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tk.h \
   -DTK_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtk8.6.a \
   -DTCL_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tcl.h \
