@@ -45,7 +45,7 @@ download_verify_extract tk8.6.13-src.tar.gz
 mkdir ${DEPSDIR}/tk
 cd tk*/unix
 CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --disable-shared --enable-aqua --prefix=${DEPSDIR}/tk
-make -j{NPROC}
+make -j${NPROC}
 make install
 cd ..
 install_license ./license.terms
