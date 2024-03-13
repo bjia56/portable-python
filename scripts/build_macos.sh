@@ -254,7 +254,7 @@ cmake \
   -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/tk/include/tk.h \
   -DTK_LIBRARY:FILEPATH=${DEPSDIR}/tk/lib/libtk8.6.a \
   -DTCL_INCLUDE_PATH:FILEPATH=${DEPSDIR}/tcl/include/tcl.h \
-  -DTCL_LIBRARY:FILEPATH=${DEPSDIR}/tcl/lib/libtcl8.6.a \ 
+  -DTCL_LIBRARY:FILEPATH=${DEPSDIR}/tcl/lib/libtcl8.6.a \
   ../portable-python-cmake-buildsystem
 make -j${NPROC}
 make install
