@@ -10,7 +10,7 @@ source ${SCRIPT_DIR}/utils.sh
 echo "::group::Initialize"
 cd ${BUILDDIR}
 
-git clone https://github.com/bjia56/portable-python-cmake-buildsystem.git --branch portable-python --single-branch --depth 1
+git clone https://github.com/bjia56/portable-python-cmake-buildsystem.git --branch ${CMAKE_BUILDSYSTEM_BRANCH} --single-branch --depth 1
 
 echo "::endgroup::"
 ###########
@@ -138,7 +138,6 @@ cd python-build
 cmake \
   "${cmake_verbose_flags[@]}" \
   -G "Visual Studio 17 2022" -A x64 \
-  -DCMAKE_C_STANDARD=99 \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
   -DCMAKE_BUILD_TYPE:STRING=Release \
   -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install \

@@ -16,7 +16,7 @@ cd ${BUILDDIR}
 
 export MACOSX_DEPLOYMENT_TARGET=10.5
 
-git clone https://github.com/bjia56/portable-python-cmake-buildsystem.git --branch portable-python --single-branch --depth 1
+git clone https://github.com/bjia56/portable-python-cmake-buildsystem.git --branch ${CMAKE_BUILDSYSTEM_BRANCH} --single-branch --depth 1
 
 echo "::endgroup::"
 ###########
@@ -144,7 +144,7 @@ download_verify_extract expat-2.5.0.tar.gz
 mkdir ${DEPSDIR}/expat
 cd expat*
 CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --disable-shared --prefix=${DEPSDIR}/expat
-make -j4
+make -j${NPROC}
 make install
 install_license
 
@@ -186,6 +186,8 @@ echo "::endgroup::"
 echo "::group::Build"
 cd ${BUILDDIR}
 
+# TODO: build TCL
+
 mkdir python-build
 mkdir python-install
 cd python-build
@@ -194,7 +196,6 @@ cmake \
   -G "Unix Makefiles" \
   "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET} \
-  -DCMAKE_C_STANDARD=99 \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
   -DCMAKE_BUILD_TYPE:STRING=Release \
   -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install \
@@ -205,6 +206,7 @@ cmake \
   -DINSTALL_MANUAL=OFF \
   -DOPENSSL_ROOT_DIR:PATH=${DEPSDIR}/openssl \
   -DUSE_SYSTEM_EXPAT=OFF \
+  -DUSE_SYSTEM_TCL=OFF \
   -DEXPAT_INCLUDE_DIRS:PATH=${DEPSDIR}/expat/include \
   -DEXPAT_LIBRARIES:FILEPATH=${DEPSDIR}/expat/lib/libexpat.a \
   -DSQLite3_INCLUDE_DIR:PATH=${DEPSDIR}/sqlite3/include \
