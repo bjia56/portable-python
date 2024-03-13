@@ -496,6 +496,11 @@ if [[ "${ARCH}" == "arm" ]]; then
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${DEPSDIR}/lib
 fi
 
+CFLAGS=""
+if [[ "${ARCH}" == "arm" || "${ARCH}" == "aarch64" || "${ARCH}" == "riscv64" ]]; then
+  CFLAGS="-static-libgcc"
+fi
+
 wget --no-verbose -O portable-python-cmake-buildsystem.tar.gz https://github.com/bjia56/portable-python-cmake-buildsystem/tarball/portable-python
 tar -xf portable-python-cmake-buildsystem.tar.gz
 rm *.tar.gz
@@ -503,7 +508,7 @@ mv *portable-python-cmake-buildsystem* portable-python-cmake-buildsystem
 mkdir python-build
 mkdir python-install
 cd python-build
-LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
+LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" CFLAGS="${CFLAGS}" cmake \
   "${cmake_verbose_flags[@]}" \
   -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
   -DCMAKE_CROSSCOMPILING_EMULATOR=${WORKDIR}/scripts/qemu_${ARCH}_interpreter \
