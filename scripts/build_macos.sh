@@ -16,7 +16,7 @@ cd ${BUILDDIR}
 
 export MACOSX_DEPLOYMENT_TARGET=10.5
 
-git clone https://github.com/bjia56/portable-python-cmake-buildsystem.git --branch python3.11 --single-branch --depth 1
+git clone https://github.com/bjia56/portable-python-cmake-buildsystem.git --branch ${CMAKE_BUILDSYSTEM_BRANCH} --single-branch --depth 1
 
 echo "::endgroup::"
 ###########
