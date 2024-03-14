@@ -45,7 +45,6 @@ function pickVersion(version: string) {
     return VERSIONS[0]
 }
 
-// https://stackoverflow.com/a/32134846
 async function download(url: string, dest: string) {
     const res = await fetch(url);
     const file = createWriteStream(dest);
