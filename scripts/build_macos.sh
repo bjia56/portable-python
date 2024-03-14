@@ -14,7 +14,7 @@ set -ex
 echo "::group::Initialize"
 cd ${BUILDDIR}
 
-export MACOSX_DEPLOYMENT_TARGET=10.6
+export MACOSX_DEPLOYMENT_TARGET=10.9
 export CFLAGS="-I${DEPSDIR}/include"
 export CPPFLAGS="-I${DEPSDIR}/include"
 export CXXFLAGS="${CPPFLAGS}"
