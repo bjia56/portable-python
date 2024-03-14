@@ -34,7 +34,7 @@ download_verify_extract ncurses-6.4.tar.gz
 cd ncurses*
 CC=clang CXX=clang++ CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" CXXFLAGS="${CXXFLAGS} -arch x86_64 -arch arm64" ./configure --with-normal --without-progs --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
 make -j4
-make install
+make install.libs
 install_license
 
 echo "::endgroup::"
