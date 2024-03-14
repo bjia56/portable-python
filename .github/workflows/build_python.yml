@@ -87,7 +87,7 @@ jobs:
       - name: Interactive debugging
         if: ${{ always() && matrix.arch && inputs.debug_interactive }}
         uses: fawazahmed0/action-debug@v2
-  
+
       - name: Upload artifacts
         if: ${{ matrix.arch }}
         uses: actions/upload-artifact@v4
@@ -214,12 +214,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install coreutils
-        run: brew install coreutils
-
-      - name: Install gpatch
-        run: |
-          brew install gpatch
+      - name: Install tools
+        run: brew install coreutils gpatch autoconf automake libtool
 
       - name: Build
         run: |
