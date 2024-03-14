@@ -26,9 +26,8 @@ echo "::group::tcl"
 cd ${BUILDDIR}
 
 download_verify_extract tcl8.6.13-src.tar.gz
-mkdir ${DEPSDIR}/tcl
 cd tcl*/unix
-CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --disable-shared --enable-aqua --prefix=${DEPSDIR}/tcl
+CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --disable-shared --enable-aqua --prefix=${DEPSDIR}
 make -j${NPROC}
 make install
 cd ..
@@ -42,9 +41,8 @@ echo "::group::tk"
 cd ${BUILDDIR}
 
 download_verify_extract tk8.6.13-src.tar.gz
-mkdir ${DEPSDIR}/tk
 cd tk*/unix
-CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --disable-shared --enable-aqua --prefix=${DEPSDIR}/tk
+CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --disable-shared --enable-aqua --prefix=${DEPSDIR}
 make -j${NPROC}
 make install
 cd ..
@@ -58,21 +56,19 @@ echo "::group::OpenSSL"
 cd ${BUILDDIR}
 
 download_verify_extract openssl-1.1.1w.tar.gz
-
-mkdir ${DEPSDIR}/openssl
 cd openssl-1.1.1w
-CC=${WORKDIR}/scripts/cc ./Configure enable-rc5 zlib no-asm darwin64-x86_64-cc --prefix=${DEPSDIR}/openssl
+CC=${WORKDIR}/scripts/cc ./Configure enable-rc5 zlib no-asm darwin64-x86_64-cc --prefix=${DEPSDIR}
 make -j${NPROC}
 make install_sw
 install_license
 
-file ${DEPSDIR}/openssl/lib/libcrypto.a
-file ${DEPSDIR}/openssl/lib/libssl.a
+file ${DEPSDIR}/lib/libcrypto.a
+file ${DEPSDIR}/lib/libssl.a
 
-install_name_tool -change ${DEPSDIR}/openssl/lib/libcrypto.1.1.dylib @loader_path/libcrypto.1.1.dylib ${DEPSDIR}/openssl/lib/libssl.1.1.dylib
+install_name_tool -change ${DEPSDIR}/lib/libcrypto.1.1.dylib @loader_path/libcrypto.1.1.dylib ${DEPSDIR}/lib/libssl.1.1.dylib
 
-otool -l ${DEPSDIR}/openssl/lib/libssl.1.1.dylib
-otool -l ${DEPSDIR}/openssl/lib/libcrypto.1.1.dylib
+otool -l ${DEPSDIR}/lib/libssl.1.1.dylib
+otool -l ${DEPSDIR}/lib/libcrypto.1.1.dylib
 
 echo "::endgroup::"
 #########
@@ -82,7 +78,6 @@ echo "::group::bzip2"
 cd ${BUILDDIR}
 
 git clone https://github.com/commontk/bzip2.git --branch master --single-branch --depth 1
-mkdir ${DEPSDIR}/bzip2
 cd bzip2
 mkdir build
 cd build
@@ -90,14 +85,14 @@ cmake \
   -G "Unix Makefiles" \
   "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET} \
-  -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR}/bzip2 \
+  -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} \
   ..
 make -j${NPROC}
 make install
 cd ..
 install_license
 
-file ${DEPSDIR}/bzip2/lib/libbz2.a
+file ${DEPSDIR}/lib/libbz2.a
 
 echo "::endgroup::"
 ########
@@ -107,7 +102,6 @@ echo "::group::lzma"
 cd ${BUILDDIR}
 
 git clone https://github.com/tukaani-project/xz.git --branch v5.4.4 --single-branch --depth 1
-mkdir ${DEPSDIR}/xz
 cd xz
 mkdir build
 cd build
@@ -115,14 +109,14 @@ cmake \
   -G "Unix Makefiles" \
   "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET} \
-  -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR}/xz \
+  -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} \
   ..
 make -j${NPROC}
 make install
 cd ..
 install_license
 
-file ${DEPSDIR}/xz/lib/liblzma.a
+file ${DEPSDIR}/lib/liblzma.a
 
 echo "::endgroup::"
 ###########
@@ -132,13 +126,12 @@ echo "::group::sqlite3"
 cd ${WORKDIR}
 
 download_verify_extract sqlite-autoconf-3450000.tar.gz
-mkdir ${DEPSDIR}/sqlite3
 cd sqlite-autoconf-3450000
-CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --prefix ${DEPSDIR}/sqlite3
+CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --prefix ${DEPSDIR}
 make -j${NPROC}
 make install
 
-file ${DEPSDIR}/sqlite3/lib/libsqlite3.a
+file ${DEPSDIR}/lib/libsqlite3.a
 
 echo "::endgroup::"
 ########
@@ -148,7 +141,6 @@ echo "::group::zlib"
 cd ${BUILDDIR}
 
 download_verify_extract zlib-1.3.1.tar.gz
-mkdir ${DEPSDIR}/zlib
 cd zlib-1.3.1
 mkdir build
 cd build
@@ -156,14 +148,14 @@ cmake \
   -G "Unix Makefiles" \
   "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET} \
-  -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR}/zlib \
+  -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} \
   ..
 make -j${NPROC}
 make install
 cd ..
 install_license
 
-file ${DEPSDIR}/zlib/lib/libz.a
+file ${DEPSDIR}/lib/libz.a
 
 echo "::endgroup::"
 #########
@@ -173,14 +165,13 @@ echo "::group::expat"
 cd ${BUILDDIR}
 
 download_verify_extract expat-2.5.0.tar.gz
-mkdir ${DEPSDIR}/expat
 cd expat*
-CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --disable-shared --prefix=${DEPSDIR}/expat
+CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --disable-shared --prefix=${DEPSDIR}
 make -j${NPROC}
 make install
 install_license
 
-file ${DEPSDIR}/expat/lib/libexpat.a
+file ${DEPSDIR}/lib/libexpat.a
 
 echo "::endgroup::"
 ##########
@@ -191,10 +182,9 @@ cd ${BUILDDIR}
 
 wget -q https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.tar.gz
 tar -xf libffi-3.4.2.tar.gz
-mkdir ${DEPSDIR}/libffi
 cp -r libffi-3.4.2 libffi-3.4.2-arm64
 cd libffi-3.4.2
-CC="/usr/bin/cc" ./configure --prefix ${DEPSDIR}/libffi
+CC="/usr/bin/cc" ./configure --prefix ${DEPSDIR}
 make -j${NPROC}
 make install
 cd ${BUILDDIR}
@@ -206,10 +196,10 @@ make install
 install_license
 
 cd ${BUILDDIR}
-lipo -create -output libffi.a ${DEPSDIR}/libffi/lib/libffi.a ${BUILDDIR}/libffi-arm64-out/lib/libffi.a
-mv libffi.a ${DEPSDIR}/libffi/lib/libffi.a
+lipo -create -output libffi.a ${DEPSDIR}/lib/libffi.a ${BUILDDIR}/libffi-arm64-out/lib/libffi.a
+mv libffi.a ${DEPSDIR}/lib/libffi.a
 
-file ${DEPSDIR}/libffi/lib/libffi.a
+file ${DEPSDIR}/lib/libffi.a
 
 echo "::endgroup::"
 #########
@@ -218,43 +208,41 @@ echo "::endgroup::"
 echo "::group::Build"
 cd ${BUILDDIR}
 
-# TODO: build TCL
-
 mkdir python-build
 mkdir python-install
 cd python-build
-cmake \
+CFLAGS="-I${DEPSDIR}/include" cmake \
   "${cmake_verbose_flags[@]}" \
   -G "Unix Makefiles" \
   "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET} \
+  -DCMAKE_IGNORE_PREFIX_PATH=/Applications \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
   -DCMAKE_BUILD_TYPE:STRING=Release \
   -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install \
   -DBUILD_EXTENSIONS_AS_BUILTIN=OFF \
   -DBUILD_LIBPYTHON_SHARED=ON \
+  -DUSE_SYSTEM_LIBRARIES=OFF \
   -DBUILD_TESTING=${INSTALL_TEST} \
   -DINSTALL_TEST=${INSTALL_TEST} \
   -DINSTALL_MANUAL=OFF \
-  -DOPENSSL_ROOT_DIR:PATH=${DEPSDIR}/openssl \
-  -DUSE_SYSTEM_EXPAT=OFF \
-  -DUSE_SYSTEM_TCL=OFF \
-  -DEXPAT_INCLUDE_DIRS:PATH=${DEPSDIR}/expat/include \
-  -DEXPAT_LIBRARIES:FILEPATH=${DEPSDIR}/expat/lib/libexpat.a \
-  -DSQLite3_INCLUDE_DIR:PATH=${DEPSDIR}/sqlite3/include \
-  -DSQLite3_LIBRARY:FILEPATH=${DEPSDIR}/sqlite3/lib/libsqlite3.a \
-  -DZLIB_INCLUDE_DIR:PATH=${DEPSDIR}/zlib/include \
-  -DZLIB_LIBRARY:FILEPATH=${DEPSDIR}/zlib/lib/libz.a \
-  -DLZMA_INCLUDE_PATH:PATH=${DEPSDIR}/xz/include \
-  -DLZMA_LIBRARY:FILEPATH=${DEPSDIR}/xz/lib/liblzma.a \
-  -DBZIP2_INCLUDE_DIR:PATH=${DEPSDIR}/bzip2/include \
-  -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/bzip2/lib/libbz2.a \
-  -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/libffi/include \
-  -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/libffi/lib/libffi.a \
-  -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/tk/include/tk.h \
-  -DTK_LIBRARY:FILEPATH=${DEPSDIR}/tk/lib/libtk8.6.a \
-  -DTCL_INCLUDE_PATH:FILEPATH=${DEPSDIR}/tcl/include/tcl.h \
-  -DTCL_LIBRARY:FILEPATH=${DEPSDIR}/tcl/lib/libtcl8.6.a \
+  -DOPENSSL_ROOT_DIR:PATH=${DEPSDIR} \
+  -DEXPAT_INCLUDE_DIRS:PATH=${DEPSDIR}/include \
+  -DEXPAT_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libexpat.a \
+  -DSQLite3_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+  -DSQLite3_LIBRARY:FILEPATH=${DEPSDIR}/lib/libsqlite3.a \
+  -DZLIB_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+  -DZLIB_LIBRARY:FILEPATH=${DEPSDIR}/lib/libz.a \
+  -DLZMA_INCLUDE_PATH:PATH=${DEPSDIR}/include \
+  -DLZMA_LIBRARY:FILEPATH=${DEPSDIR}/lib/liblzma.a \
+  -DBZIP2_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+  -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libbz2.a \
+  -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+  -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.a \
+  -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tk.h \
+  -DTK_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtk8.6.a \
+  -DTCL_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tcl.h \
+  -DTCL_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtcl8.6.a \
   ../portable-python-cmake-buildsystem
 make -j${NPROC}
 make install
