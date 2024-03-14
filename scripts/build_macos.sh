@@ -19,6 +19,20 @@ export MACOSX_DEPLOYMENT_TARGET=10.6
 git clone https://github.com/bjia56/portable-python-cmake-buildsystem.git --branch ${CMAKE_BUILDSYSTEM_BRANCH} --single-branch --depth 1
 
 echo "::endgroup::"
+############
+# readline #
+############
+echo "::group::readline"
+cd ${BUILDDIR}
+
+download_verify_extract readline-8.2.tar.gz
+cd readline*
+./configure --with-curses --disable-shared --prefix=${DEPSDIR}
+make -j4
+make install
+install_license
+
+echo "::endgroup::"
 #######
 # tcl #
 #######
