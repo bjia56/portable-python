@@ -174,6 +174,20 @@ install_license
 file ${DEPSDIR}/lib/libexpat.a
 
 echo "::endgroup::"
+########
+# gdbm #
+########
+echo "::group::gdbm"
+cd ${BUILDDIR}
+
+download_verify_extract gdbm-1.23.tar.gz
+cd gdbm*
+CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --enable-libgdbm-compat --prefix=${DEPSDIR}
+make -j${NPROC}
+make install
+install_license
+
+echo "::endgroup::"
 ##########
 # libffi #
 ##########
