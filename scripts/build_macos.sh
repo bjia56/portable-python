@@ -244,6 +244,21 @@ mv libffi.a ${DEPSDIR}/lib/libffi.a
 file ${DEPSDIR}/lib/libffi.a
 
 echo "::endgroup::"
+########
+# uuid #
+########
+echo "::group::uuid"
+cd ${BUILDDIR}
+
+download_verify_extract util-linux-2.39.3.tar.gz
+cd util-linux*
+./autogen.sh
+CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --disable-all-programs --enable-libuuid --prefix=${DEPSDIR}
+make -j${NPROC}
+make install
+install_license ./Documentation/licenses/COPYING.BSD-3-Clause libuuid-2.39.3
+
+echo "::endgroup::"
 #########
 # Build #
 #########
@@ -284,6 +299,7 @@ cmake \
   -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.a \
   -DREADLINE_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/readline/readline.h \
   -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.a \
+  -DUUID_LIBRARY:FILEPATH=${DEPSDIR}/lib/libuuid.a \
   -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.a \
   -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.a \
   -DGDBM_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/gdbm.h \
