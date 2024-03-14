@@ -24,21 +24,6 @@ export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig:${DEPSDIR}/share/pkgconfig"
 git clone https://github.com/bjia56/portable-python-cmake-buildsystem.git --branch ${CMAKE_BUILDSYSTEM_BRANCH} --single-branch --depth 1
 
 echo "::endgroup::"
-########
-# uuid #
-########
-echo "::group::uuid"
-cd ${BUILDDIR}
-
-download_verify_extract util-linux-2.39.3.tar.gz
-cd util-linux*
-./autogen.sh
-CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --disable-all-programs --enable-libuuid --prefix=${DEPSDIR}
-make -j${NPROC}
-make install
-install_license ./Documentation/licenses/COPYING.BSD-3-Clause libuuid-2.39.3
-
-echo "::endgroup::"
 ###########
 # ncurses #
 ###########
@@ -48,7 +33,7 @@ cd ${BUILDDIR}
 download_verify_extract ncurses-6.4.tar.gz
 cd ncurses*
 CC=clang CXX=clang++ CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" CXXFLAGS="${CXXFLAGS} -arch x86_64 -arch arm64" ./configure --with-normal --without-progs --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
-make -j${NPROC}
+make -j4
 make install.libs
 install_license
 
@@ -62,7 +47,7 @@ cd ${BUILDDIR}
 download_verify_extract readline-8.2.tar.gz
 cd readline*
 CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --with-curses --disable-shared --prefix=${DEPSDIR}
-make -j${NPROC}
+make -j4
 make install
 install_license
 
@@ -112,6 +97,11 @@ install_license
 
 file ${DEPSDIR}/lib/libcrypto.a
 file ${DEPSDIR}/lib/libssl.a
+
+#install_name_tool -change ${DEPSDIR}/lib/libcrypto.1.1.dylib @loader_path/libcrypto.1.1.dylib ${DEPSDIR}/lib/libssl.1.1.dylib
+
+#otool -l ${DEPSDIR}/lib/libssl.1.1.dylib
+#otool -l ${DEPSDIR}/lib/libcrypto.1.1.dylib
 
 echo "::endgroup::"
 #########
@@ -299,7 +289,6 @@ cmake \
   -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.a \
   -DREADLINE_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/readline/readline.h \
   -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.a \
-  -DUUID_LIBRARY:FILEPATH=${DEPSDIR}/lib/libuuid.a \
   -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.a \
   -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.a \
   -DGDBM_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/gdbm.h \
@@ -325,11 +314,16 @@ echo "::group::Test and patch python"
 cd ${BUILDDIR}
 
 ./python-install/bin/python --version
+#cp ${DEPSDIR}/openssl/lib/libssl.1.1.dylib ${BUILDDIR}/python-install/lib/python${PYTHON_VER}/lib-dynload/
+#cp ${DEPSDIR}/openssl/lib/libcrypto.1.1.dylib ${BUILDDIR}/python-install/lib/python${PYTHON_VER}/lib-dynload/
 
 otool -l ./python-install/bin/python
 install_name_tool -add_rpath @executable_path/../lib ./python-install/bin/python
 install_name_tool -change ${BUILDDIR}/python-install/lib/libpython${PYTHON_VER}.dylib @rpath/libpython${PYTHON_VER}.dylib ./python-install/bin/python
+#install_name_tool -change ${DEPSDIR}/openssl/lib/libssl.1.1.dylib @loader_path/libssl.1.1.dylib ${BUILDDIR}/python-install/lib/python${PYTHON_VER}/lib-dynload/_ssl.so
+#install_name_tool -change ${DEPSDIR}/openssl/lib/libcrypto.1.1.dylib @loader_path/libcrypto.1.1.dylib ${BUILDDIR}/python-install/lib/python${PYTHON_VER}/lib-dynload/_ssl.so
 otool -l ./python-install/bin/python
+#otool -l ./python-install/lib/python${PYTHON_VER}/lib-dynload/_ssl.so
 
 ./python-install/bin/python --version
 
