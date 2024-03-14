@@ -15,8 +15,27 @@ echo "::group::Initialize"
 cd ${BUILDDIR}
 
 export MACOSX_DEPLOYMENT_TARGET=10.6
+export CFLAGS="-I${DEPSDIR}/include"
+export CPPFLAGS="-I${DEPSDIR}/include"
+export CXXFLAGS="${CPPFLAGS}"
+export LDFLAGS="-L${DEPSDIR}/lib"
+export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig:${DEPSDIR}/share/pkgconfig"
 
 git clone https://github.com/bjia56/portable-python-cmake-buildsystem.git --branch ${CMAKE_BUILDSYSTEM_BRANCH} --single-branch --depth 1
+
+echo "::endgroup::"
+###########
+# ncurses #
+###########
+echo "::group::ncurses"
+cd ${BUILDDIR}
+
+download_verify_extract ncurses-6.4.tar.gz
+cd ncurses*
+CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --with-normal --without-progs --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
+make -j4
+make install
+install_license
 
 echo "::endgroup::"
 ############
@@ -27,7 +46,7 @@ cd ${BUILDDIR}
 
 download_verify_extract readline-8.2.tar.gz
 cd readline*
-./configure --with-curses --disable-shared --prefix=${DEPSDIR}
+CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --with-curses --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
 install_license
@@ -41,7 +60,7 @@ cd ${BUILDDIR}
 
 download_verify_extract tcl8.6.13-src.tar.gz
 cd tcl*/unix
-CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --disable-shared --enable-aqua --prefix=${DEPSDIR}
+CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --disable-shared --enable-aqua --prefix=${DEPSDIR}
 make -j${NPROC}
 make install
 cd ..
@@ -56,7 +75,7 @@ cd ${BUILDDIR}
 
 download_verify_extract tk8.6.13-src.tar.gz
 cd tk*/unix
-CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --disable-shared --enable-aqua --prefix=${DEPSDIR}
+CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --disable-shared --enable-aqua --prefix=${DEPSDIR}
 make -j${NPROC}
 make install
 cd ..
@@ -141,7 +160,7 @@ cd ${WORKDIR}
 
 download_verify_extract sqlite-autoconf-3450000.tar.gz
 cd sqlite-autoconf-3450000
-CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --prefix ${DEPSDIR}
+CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64"  ./configure --prefix ${DEPSDIR}
 make -j${NPROC}
 make install
 
@@ -180,7 +199,7 @@ cd ${BUILDDIR}
 
 download_verify_extract expat-2.5.0.tar.gz
 cd expat*
-CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --disable-shared --prefix=${DEPSDIR}
+CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64"  ./configure --disable-shared --prefix=${DEPSDIR}
 make -j${NPROC}
 make install
 install_license
@@ -196,7 +215,7 @@ cd ${BUILDDIR}
 
 download_verify_extract gdbm-1.23.tar.gz
 cd gdbm*
-CC=clang CFLAGS="-arch x86_64 -arch arm64" ./configure --enable-libgdbm-compat --without-readline --prefix=${DEPSDIR}
+CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --enable-libgdbm-compat --without-readline --prefix=${DEPSDIR}
 make -j${NPROC}
 make install
 install_license
@@ -218,7 +237,7 @@ make install
 cd ${BUILDDIR}
 mkdir libffi-arm64-out
 cd libffi-3.4.2-arm64
-CC="/usr/bin/cc" CFLAGS="-target arm64-apple-macos11" ./configure --prefix ${BUILDDIR}/libffi-arm64-out --build=aarch64-apple-darwin --host=aarch64
+CC="/usr/bin/cc" CFLAGS="${CFLAGS} -target arm64-apple-macos11" ./configure --prefix ${BUILDDIR}/libffi-arm64-out --build=aarch64-apple-darwin --host=aarch64
 make -j${NPROC}
 make install
 install_license
@@ -239,7 +258,7 @@ cd ${BUILDDIR}
 mkdir python-build
 mkdir python-install
 cd python-build
-CFLAGS="-I${DEPSDIR}/include" cmake \
+cmake \
   "${cmake_verbose_flags[@]}" \
   -G "Unix Makefiles" \
   "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
