@@ -98,11 +98,6 @@ install_license
 file ${DEPSDIR}/lib/libcrypto.a
 file ${DEPSDIR}/lib/libssl.a
 
-#install_name_tool -change ${DEPSDIR}/lib/libcrypto.1.1.dylib @loader_path/libcrypto.1.1.dylib ${DEPSDIR}/lib/libssl.1.1.dylib
-
-#otool -l ${DEPSDIR}/lib/libssl.1.1.dylib
-#otool -l ${DEPSDIR}/lib/libcrypto.1.1.dylib
-
 echo "::endgroup::"
 #########
 # bzip2 #
@@ -314,16 +309,11 @@ echo "::group::Test and patch python"
 cd ${BUILDDIR}
 
 ./python-install/bin/python --version
-#cp ${DEPSDIR}/openssl/lib/libssl.1.1.dylib ${BUILDDIR}/python-install/lib/python${PYTHON_VER}/lib-dynload/
-#cp ${DEPSDIR}/openssl/lib/libcrypto.1.1.dylib ${BUILDDIR}/python-install/lib/python${PYTHON_VER}/lib-dynload/
 
 otool -l ./python-install/bin/python
 install_name_tool -add_rpath @executable_path/../lib ./python-install/bin/python
 install_name_tool -change ${BUILDDIR}/python-install/lib/libpython${PYTHON_VER}.dylib @rpath/libpython${PYTHON_VER}.dylib ./python-install/bin/python
-#install_name_tool -change ${DEPSDIR}/openssl/lib/libssl.1.1.dylib @loader_path/libssl.1.1.dylib ${BUILDDIR}/python-install/lib/python${PYTHON_VER}/lib-dynload/_ssl.so
-#install_name_tool -change ${DEPSDIR}/openssl/lib/libcrypto.1.1.dylib @loader_path/libcrypto.1.1.dylib ${BUILDDIR}/python-install/lib/python${PYTHON_VER}/lib-dynload/_ssl.so
 otool -l ./python-install/bin/python
-#otool -l ./python-install/lib/python${PYTHON_VER}/lib-dynload/_ssl.so
 
 ./python-install/bin/python --version
 
