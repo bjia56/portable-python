@@ -552,7 +552,10 @@ make install
 
 if [[ "${ARCH}" == "riscv64" ]]; then
   cd ${BUILDDIR}/python-install
-  patchelf --set-interpreter /lib/ld-linux-riscv64-lp64d.so.1 ./bin/python
+  # Zig incorrectly links the binary with and sets the interpreter to ld-linux-riscv64-lp64.so.1,
+  # so we have to correct it.
+  # Since we will run the compiled Python through the qemu shim, we rely on the shim to fix the
+  # main interpreter executable. However, we still have to fix libpython here.
   patchelf --replace-needed ld-linux-riscv64-lp64.so.1 ld-linux-riscv64-lp64d.so.1 ./lib/libpython${PYTHON_VER}.so
 fi
 
