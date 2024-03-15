@@ -9,7 +9,7 @@ fi
 
 has_lp64=$(readelf -d $1 | grep ld-linux-riscv64-lp64.so.1)
 if [[ "${has_lp64}" != "" ]]; then
-    patchelf --replace-needed ld-linux-riscv64-lp64.so.1 $1
+    patchelf --replace-needed ld-linux-riscv64-lp64.so.1 ld-linux-riscv64-lp64d.so.1 $1
 fi
 
 LD_LIBRARY_PATH=/usr/riscv64-linux-gnu/lib qemu-riscv64-static "$@"
