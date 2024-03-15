@@ -550,12 +550,6 @@ LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
 make -j4
 make install
 
-if [[ "${ARCH}" == "riscv64" ]]; then
-  cd ${BUILDDIR}/python-install
-  patchelf --set-interpreter /lib/ld-linux-riscv64-lp64d.so.1 ./bin/python
-  patchelf --replace-needed ld-linux-riscv64-lp64.so.1 ld-linux-riscv64-lp64d.so.1 ./lib/libpython${PYTHON_VER}.so
-fi
-
 cd ${BUILDDIR}
 cp -r ${DEPSDIR}/lib/tcl8.6 ./python-install/lib
 cp -r ${DEPSDIR}/lib/tk8.6 ./python-install/lib
