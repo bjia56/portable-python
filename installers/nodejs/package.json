@@ -1,6 +1,6 @@
 {
   "name": "@bjia56/portable-python",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "description": "Portable Python",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -38,6 +38,7 @@
   },
   "portablePython": {
     "versions": [
+      "3.12.2",
       "3.11.8",
       "3.10.13",
       "3.9.18",
@@ -51,7 +52,8 @@
       "3.9.17": "v3.9.17-build.4",
       "3.8.18": "v3.8.18-build.0",
       "3.8.17": "v3.8.17-build.3",
-      "3.11.8": "v3.11.8-build.0"
+      "3.11.8": "v3.11.8-build.0",
+      "3.12.2": "v3.12.2-build.0"
     }
   }
 }
