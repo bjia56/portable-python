@@ -222,16 +222,16 @@ echo "::endgroup::"
 echo "::group::libffi"
 cd ${BUILDDIR}
 
-wget -q https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.tar.gz
-tar -xf libffi-3.4.2.tar.gz
-cp -r libffi-3.4.2 libffi-3.4.2-arm64
-cd libffi-3.4.2
+wget -q https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.6.tar.gz
+tar -xf libffi-3.4.6.tar.gz
+cp -r libffi-3.4.6 libffi-3.4.6-arm64
+cd libffi-3.4.6
 CC="/usr/bin/cc" ./configure --prefix ${DEPSDIR}
 make -j${NPROC}
 make install
 cd ${BUILDDIR}
 mkdir libffi-arm64-out
-cd libffi-3.4.2-arm64
+cd libffi-3.4.6-arm64
 CC="/usr/bin/cc" CFLAGS="${CFLAGS} -target arm64-apple-macos11" ./configure --prefix ${BUILDDIR}/libffi-arm64-out --build=aarch64-apple-darwin --host=aarch64
 make -j${NPROC}
 make install
