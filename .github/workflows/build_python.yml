@@ -128,7 +128,7 @@ jobs:
             ldd -v -r ./bin/python
             ./bin/python --version
             ./bin/python -m sysconfig
-            ./bin/python -c "import ssl; import urllib.request; urllib.request.urlopen('https://github.com')"
+            ./bin/python /work/scripts/test.py
 
             if [[ "${{ inputs.run_tests }}" == "true" ]]; then
               ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata
@@ -185,6 +185,14 @@ jobs:
     runs-on: windows-latest
 
     steps:
+      - name: Set git to use LF
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
@@ -199,7 +207,7 @@ jobs:
           cd python-${{ inputs.python_version }}-windows-x86_64
           ./bin/python --version
           ./bin/python -m sysconfig
-          ./bin/python -c "import ssl; import urllib.request; urllib.request.urlopen('https://github.com')"
+          ./bin/python ${{ github.workspace }}/scripts/test.py
 
           if [[ "${{ inputs.run_tests }}" == "true" ]]; then
             ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata
@@ -254,6 +262,9 @@ jobs:
             arch: arm64
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
@@ -269,7 +280,7 @@ jobs:
           chmod +x ./bin/python
           ./bin/python --version
           ./bin/python -m sysconfig
-          ./bin/python -c "import ssl; import urllib.request; urllib.request.urlopen('https://github.com')"
+          ./bin/python ${{ github.workspace }}/scripts/test.py
 
           if [[ "${{ inputs.run_tests }}" == "true" ]]; then
             ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata
