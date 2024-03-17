@@ -18,12 +18,12 @@ function download_and_verify () {
 }
 
 function download_verify_extract () {
-  set -x
+  #set -x
   file="$1"
   download_and_verify $file
   tar -xf $file
   rm $file
-  set +x
+  #set +x
 }
 
 ARCH=$1

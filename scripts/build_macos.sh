@@ -222,8 +222,7 @@ echo "::endgroup::"
 echo "::group::libffi"
 cd ${BUILDDIR}
 
-wget -q https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.6.tar.gz
-tar -xf libffi-3.4.6.tar.gz
+download_verify_extract libffi-3.4.6.tar.gz
 cp -r libffi-3.4.6 libffi-3.4.6-arm64
 cd libffi-3.4.6
 CC="/usr/bin/cc" ./configure --prefix ${DEPSDIR}
