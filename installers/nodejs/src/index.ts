@@ -42,7 +42,7 @@ function pickVersion(version: string) {
             return VERSIONS[i];
         }
     }
-    return VERSIONS[0]
+    return null;
 }
 
 async function download(url: string, dest: string) {
@@ -65,6 +65,9 @@ export class PortablePython {
         }
 
         this._version = pickVersion(version);
+        if (!this._version) {
+            throw Error(`unknown version: ${version}`);
+        }
         if (!this.releaseTag) {
             throw Error("no releases available for this version");
         }
