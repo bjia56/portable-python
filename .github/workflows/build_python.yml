@@ -87,7 +87,7 @@ jobs:
       - name: Interactive debugging
         if: ${{ always() && matrix.arch && inputs.debug_interactive }}
         uses: fawazahmed0/action-debug@v2
-  
+
       - name: Upload artifacts
         if: ${{ matrix.arch }}
         uses: actions/upload-artifact@v4
@@ -207,7 +207,7 @@ jobs:
           cd python-${{ inputs.python_version }}-windows-x86_64
           ./bin/python --version
           ./bin/python -m sysconfig
-          ./bin/python ${{ github.workspace }}/scripts/test.py
+          ./bin/python ../scripts/test.py
 
           if [[ "${{ inputs.run_tests }}" == "true" ]]; then
             ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata
