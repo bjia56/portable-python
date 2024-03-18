@@ -4,6 +4,19 @@ import pkgutil
 import test_deps
 
 
+RED = '\u001b[31m'
+GREEN = '\u001b[32m'
+RESET = '\u001b[0m'
+
+
+def failed(msg):
+    print(f"{RED}{msg}{RESET}")
+
+
+def succeeded(msg):
+    print(f"{GREEN}{msg}{RESET}")
+
+
 def import_with_timeout(mod_name):
     q = multiprocessing.Queue()
     p = multiprocessing.Process(target=test_deps.import_module, args=(mod_name, q))
@@ -13,13 +26,13 @@ def import_with_timeout(mod_name):
     if p.is_alive():
         p.terminate()
         p.join()
-        print(f"Importing {mod_name} timed out after 10 seconds")
+        failed(f"Importing {mod_name} timed out after 10 seconds")
     else:
         result = q.get()
         if result:
-            print(f"Importing {mod_name} failed with exception:\n{result}")
+            failed(f"Importing {mod_name} failed with exception:\n{result}")
         else:
-            print(f"Importing {mod_name} succeeded")
+            succeeded(f"Importing {mod_name} succeeded")
 
 
 if __name__ == "__main__":
