@@ -18,10 +18,12 @@ function download_and_verify () {
 }
 
 function download_verify_extract () {
+  #set -x
   file="$1"
   download_and_verify $file
   tar -xf $file
   rm $file
+  #set +x
 }
 
 ARCH=$1
@@ -40,7 +42,7 @@ COPYING
 END
 )
 function install_license () {
-  set -x
+  #set -x
   project=$(basename $(pwd))
   file=$1
   if [[ "$2" != "" ]]; then
@@ -49,20 +51,20 @@ function install_license () {
   if [[ "$file" != "" ]]; then
     if test -f $file; then
       cp $1 ${LICENSEDIR}/$project.txt
-      set +x
+      #set +x
       return 0
     fi
   else
     while read license_file; do
       if test -f $license_file; then
         cp $license_file ${LICENSEDIR}/$project.txt
-        set +x
+        #set +x
         return 0
       fi
     done <<< "$license_files"
   fi
   >&2 echo "could not find a license file"
-  set +x
+  #set +x
   return 1
 }
 

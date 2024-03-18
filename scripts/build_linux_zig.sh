@@ -151,7 +151,7 @@ echo "::endgroup::"
 echo "::group::libffi"
 cd ${BUILDDIR}
 
-download_verify_extract libffi-3.4.2.tar.gz
+download_verify_extract libffi-3.4.6.tar.gz
 cd libffi*
 CFLAGS="${CFLAGS} -Wl,--undefined-version" ./configure --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
