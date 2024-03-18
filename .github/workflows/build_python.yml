@@ -131,7 +131,7 @@ jobs:
             ./bin/python /work/scripts/test.py
 
             if [[ "${{ inputs.run_tests }}" == "true" ]]; then
-              ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata
+              ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
             fi
 
   build_windows:
@@ -210,7 +210,7 @@ jobs:
           ./bin/python ../scripts/test.py
 
           if [[ "${{ inputs.run_tests }}" == "true" ]]; then
-            ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata
+            ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
           fi
 
   build_macos:
@@ -283,5 +283,5 @@ jobs:
           ./bin/python ${{ github.workspace }}/scripts/test.py
 
           if [[ "${{ inputs.run_tests }}" == "true" ]]; then
-            ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata
+            ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
           fi
