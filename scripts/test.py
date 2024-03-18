@@ -38,10 +38,12 @@ def import_with_timeout(mod_name):
 if __name__ == "__main__":
     # Get a list of all available modules
     available_modules = list(pkgutil.iter_modules())
-    print("Available modules:", [m.name for m in available_modules])
+    available_modules = [m.name for m in available_modules]
+    available_modules.sort()
+    print("Available modules:", [m for m in available_modules])
 
     for mod in available_modules:
-        import_with_timeout(mod.name)
+        import_with_timeout(mod)
 
     # test urllib can use the bundled certifi CAs
     import urllib.request
