@@ -1,5 +1,6 @@
 import multiprocessing
 import pkgutil
+import sys
 
 import test_deps
 
@@ -37,8 +38,12 @@ def import_with_timeout(mod_name):
 
 if __name__ == "__main__":
     # Get a list of all available modules
-    available_modules = list(pkgutil.iter_modules())
-    available_modules = [m.name for m in available_modules]
+    available_modules = set()
+    for m in pkgutil.iter_modules():
+        available_modules.add(m.name)
+    for m in sys.builtin_module_names:
+        available_modules.add(m)
+    available_modules = list(available_modules)
     available_modules.sort()
     print("Available modules:", [m for m in available_modules])
 
