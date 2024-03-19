@@ -32,10 +32,3 @@ jobs:
       debug: ${{ inputs.debug || false }}
       verbose: ${{ inputs.verbose || false }}
       platforms: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,macos,windows"
-
-  all_builds_passed:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - run: |
-        echo "All builds passed!"
