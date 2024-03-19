@@ -192,7 +192,7 @@ echo "::endgroup::"
 echo "::group::expat"
 cd ${BUILDDIR}
 
-download_verify_extract expat-2.5.0.tar.gz
+download_verify_extract expat-2.6.2.tar.gz
 cd expat*
 CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64"  ./configure --disable-shared --prefix=${DEPSDIR}
 make -j${NPROC}

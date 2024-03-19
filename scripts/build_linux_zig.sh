@@ -178,7 +178,7 @@ echo "::endgroup::"
 echo "::group::expat"
 cd ${BUILDDIR}
 
-download_verify_extract expat-2.5.0.tar.gz
+download_verify_extract expat-2.6.2.tar.gz
 cd expat*
 ./configure --host=${CHOST} --disable-shared --prefix=${DEPSDIR}
 make -j4
