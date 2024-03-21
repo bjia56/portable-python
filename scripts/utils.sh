@@ -2,7 +2,7 @@
 
 set -e
 
-CMAKE_BUILDSYSTEM_BRANCH="portable-python"
+CMAKE_BUILDSYSTEM_BRANCH="sysconfig-pkgconfig-patch"
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 
 function verify_checksum () {
