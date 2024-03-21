@@ -139,6 +139,7 @@ cmake \
   "${cmake_verbose_flags[@]}" \
   -G "Visual Studio 17 2022" -A x64 \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
+  -DPORTABLE_PYTHON_BUILD=ON \
   -DCMAKE_BUILD_TYPE:STRING=Release \
   -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install \
   -DBUILD_EXTENSIONS_AS_BUILTIN=OFF \
