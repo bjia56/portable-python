@@ -2,7 +2,7 @@
 
 set -e
 
-CMAKE_BUILDSYSTEM_BRANCH="main"
+CMAKE_BUILDSYSTEM_BRANCH="split-portable-patches"
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 
 function verify_checksum () {
