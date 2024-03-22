@@ -17,6 +17,9 @@ on:
       verbose:
         required: false
         type: boolean
+      buildsystem_branch:
+        required: false
+        type: string
 
 jobs:
   build:
@@ -32,3 +35,4 @@ jobs:
       debug: ${{ inputs.debug || false }}
       verbose: ${{ inputs.verbose || false }}
       platforms: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,macos,windows"
+      buildsystem_branch: ${{ inputs.buildsystem_branch || 'portable-python' }}

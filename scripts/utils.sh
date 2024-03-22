@@ -2,7 +2,9 @@
 
 set -e
 
-CMAKE_BUILDSYSTEM_BRANCH="portable-python"
+CMAKE_BUILDSYSTEM_BRANCH=${PORTABLE_PYTHON_BUILDSYSTEM_BRANCH}
+echo "Selected portable-python-cmake-buildsystem branch: ${CMAKE_BUILDSYSTEM_BRANCH}"
+
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 
 function verify_checksum () {
