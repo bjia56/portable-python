@@ -20,6 +20,7 @@ on:
       buildsystem_branch:
         required: false
         type: string
+        default: "portable-python"
 
 jobs:
   build:
