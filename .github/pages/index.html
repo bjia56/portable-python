@@ -7,29 +7,98 @@
 </head>
 <body>
   <h1>GitHub Releases - Portable Python</h1>
-  <div id="releases-list"></div>
+  <label for="release-dropdown">Select a release:</label>
+  <select id="release-dropdown"></select>
+  <div id="release-assets"></div>
 
   <script>
     const username = 'bjia56';
     const repository = 'portable-python';
 
+    const releaseDropdown = document.getElementById('release-dropdown');
+    const releaseAssets = document.getElementById('release-assets');
+
     // Fetch releases from GitHub API
     fetch(`https://api.github.com/repos/${username}/${repository}/releases`)
       .then(response => response.json())
       .then(data => {
-        const releasesList = document.getElementById('releases-list');
-        data.forEach(release => {
-          const releaseDiv = document.createElement('div');
-          releaseDiv.innerHTML = `<h2>${release.name}</h2>`;
-          const artifactsList = document.createElement('ul');
-          release.assets.forEach(asset => {
-            artifactsList.innerHTML += `<li>${asset.name} - Download count: ${asset.download_count}</li>`;
-          });
-          releaseDiv.appendChild(artifactsList);
-          releasesList.appendChild(releaseDiv);
-        });
+        // Group releases by major.minor version
+        const groupedReleases = groupReleases(data);
+        
+        // Sort grouped releases by patch and build number
+        sortGroupedReleases(groupedReleases);
+        
+        // Populate the dropdown with grouped releases
+        populateDropdown(groupedReleases);
+
+        releaseDropdown.addEventListener('change', () => renderListOnChange(data));
+		renderListOnChange(data);
       })
       .catch(error => console.error('Error fetching releases:', error));
+
+	function renderListOnChange(data) {
+	  const selectedReleaseName = releaseDropdown.value;
+      const selectedRelease = data.find(release => release.name === selectedReleaseName);
+      renderReleaseAssets(selectedRelease);
+	}
+
+    function groupReleases(releases) {
+      const groupedReleases = {};
+      releases.forEach(release => {
+        const version = release.name.match(/v(\d+\.\d+)/)[1];
+        if (!groupedReleases[version]) {
+          groupedReleases[version] = [];
+        }
+        groupedReleases[version].push(release);
+      });
+      return groupedReleases;
+    }
+
+    function sortGroupedReleases(groupedReleases) {
+      for (const version in groupedReleases) {
+        groupedReleases[version].sort((a, b) => {
+		  console.log(a.name, b.name)
+          const aPatch = parseInt(a.name.match(/(\d+)-(build|beta)\.(\d+)/)[1]);
+          const bPatch = parseInt(b.name.match(/(\d+)-(build|beta)\.(\d+)/)[1]);
+          const aBuild = parseInt(a.name.match(/(\d+)-(build|beta)\.(\d+)/)[3]);
+          const bBuild = parseInt(b.name.match(/(\d+)-(build|beta)\.(\d+)/)[3]);
+          const aType = a.name.includes('beta') ? 'beta' : 'build';
+          const bType = b.name.includes('beta') ? 'beta' : 'build';
+
+          if (aPatch !== bPatch) {
+            return bPatch - aPatch;
+          } else if (aType != bType) {
+            return aType === 'beta' ? 1 : -1; // Place beta releases behind build releases
+          } else {
+			return bBuild - aBuild;
+		  }
+        });
+      }
+    }
+
+    function populateDropdown(groupedReleases) {
+      for (const version in groupedReleases) {
+        const optionGroup = document.createElement('optgroup');
+        optionGroup.label = version;
+        groupedReleases[version].forEach(release => {
+          const option = document.createElement('option');
+          option.text = release.name;
+          optionGroup.appendChild(option);
+        });
+        releaseDropdown.add(optionGroup);
+      }
+    }
+
+    function renderReleaseAssets(release) {
+      releaseAssets.innerHTML = '';
+      const assetsList = document.createElement('ul');
+      release.assets.forEach(asset => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${asset.name} - Download count: ${asset.download_count}`;
+        assetsList.appendChild(listItem);
+      });
+      releaseAssets.appendChild(assetsList);
+    }
   </script>
 </body>
 </html>
