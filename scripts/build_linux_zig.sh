@@ -11,6 +11,7 @@ zig version
 # Install dependencies #
 ########################
 echo "::group::Install dependencies"
+cd ${BUILDDIR}
 
 export DEBIAN_FRONTEND=noninteractive
 sudo apt update
@@ -112,7 +113,7 @@ if [[ "${ARCH}" == "riscv64" ]]; then
   wget -O glibc.patch https://patch-diff.githubusercontent.com/raw/ziglang/zig/pull/18803.patch
   cd $(dirname $(which zig))
   patch -p1 < /tmp/glibc.patch || true
-  cd ${WORKDIR}
+  cd ${BUILDDIR}
 fi
 
 echo "::endgroup::"
