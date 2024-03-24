@@ -47,12 +47,19 @@ if [[ "${ARCH}" == "riscv64" ]]; then
   sudo pip install patchelf==0.15.0.0
 fi
 
+wget --no-verbose -O portable-python-cmake-buildsystem.tar.gz https://github.com/bjia56/portable-python-cmake-buildsystem/tarball/${CMAKE_BUILDSYSTEM_BRANCH}
+tar -xf portable-python-cmake-buildsystem.tar.gz
+rm *.tar.gz
+mv *portable-python-cmake-buildsystem* portable-python-cmake-buildsystem
+
 export ZIG_FLAGS=""
 export CFLAGS="-I${DEPSDIR}/include"
 export CPPFLAGS="-I${DEPSDIR}/include"
 export CXXFLAGS="${CPPFLAGS}"
 export LDFLAGS="-L${DEPSDIR}/lib"
 export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig:${DEPSDIR}/share/pkgconfig"
+export PGO_PROFILE_FLAGS="-fprofile-dir=${PGODIR} -fprofile-generate=${PGODIR}"
+export PGO_COMPILE_FLAGS="-fprofile-dir=${PGODIR} -fprofile-use=${PGODIR} -fprofile-correction"
 
 if [[ "${ARCH}" == "arm" ]]; then
   # Python's sysconfig module will retain references to these compiler values, which cause
@@ -484,10 +491,10 @@ if [[ "${ARCH}" == "arm" ]]; then
 
   echo "::endgroup::"
 fi
-##########
-# Python #
-##########
-echo "::group::Python"
+##############
+# Python PGO #
+##############
+echo "::group::Python PGO"
 cd ${BUILDDIR}
 
 additionalparams=()
@@ -496,14 +503,81 @@ if [[ "${ARCH}" == "arm" ]]; then
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${DEPSDIR}/lib
 fi
 
-wget --no-verbose -O portable-python-cmake-buildsystem.tar.gz https://github.com/bjia56/portable-python-cmake-buildsystem/tarball/${CMAKE_BUILDSYSTEM_BRANCH}
-tar -xf portable-python-cmake-buildsystem.tar.gz
-rm *.tar.gz
-mv *portable-python-cmake-buildsystem* portable-python-cmake-buildsystem
+mkdir python-build-profile
+mkdir python-install-profile
+cd python-build-profile
+LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" CFLAGS="${CFLAGS} ${PGO_PROFILE_FLAGS}" cmake \
+  "${cmake_verbose_flags[@]}" \
+  -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
+  -DCMAKE_CROSSCOMPILING_EMULATOR=${WORKDIR}/scripts/qemu_${ARCH}_interpreter \
+  -DCMAKE_IGNORE_PATH=/usr/include \
+  -DPYTHON_VERSION=${PYTHON_FULL_VER} \
+  -DPORTABLE_PYTHON_BUILD=ON \
+  -DCMAKE_BUILD_TYPE:STRING=Release \
+  -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install-profile \
+  -DBUILD_EXTENSIONS_AS_BUILTIN=ON \
+  -DBUILD_LIBPYTHON_SHARED=ON \
+  -DUSE_SYSTEM_LIBRARIES=OFF \
+  -DBUILD_TESTING=${INSTALL_TEST} \
+  -DINSTALL_TEST=${INSTALL_TEST} \
+  -DINSTALL_MANUAL=OFF \
+  "${additionalparams[@]}" \
+  -DOPENSSL_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+  -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/libssl.a;${DEPSDIR}/lib/libcrypto.a" \
+  -DSQLite3_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+  -DSQLite3_LIBRARY:FILEPATH=${DEPSDIR}/lib/libsqlite3.a \
+  -DZLIB_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+  -DZLIB_LIBRARY:FILEPATH=${DEPSDIR}/lib/libz.a \
+  -DLZMA_INCLUDE_PATH:PATH=${DEPSDIR}/include \
+  -DLZMA_LIBRARY:FILEPATH=${DEPSDIR}/lib/liblzma.a \
+  -DBZIP2_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+  -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libbz2.a \
+  -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+  -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.a \
+  -DREADLINE_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/readline/readline.h \
+  -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.a \
+  -DUUID_LIBRARY:FILEPATH=${DEPSDIR}/lib/libuuid.a \
+  -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.a \
+  -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.a \
+  -DGDBM_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/gdbm.h \
+  -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.a \
+  -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.a \
+  -DNDBM_TAG=NDBM \
+  -DNDBM_USE=NDBM \
+  -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tk.h \
+  -DTK_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtk8.6.a \
+  -DTCL_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tcl.h \
+  -DTCL_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtcl8.6.a \
+  -DX11_INCLUDE_DIR:PATH=${DEPSDIR}/include/X11 \
+  -DX11_LIBRARIES="${DEPSDIR}/lib/libXau.a;${DEPSDIR}/lib/libXdmcp.a;${DEPSDIR}/lib/libX11.a;${DEPSDIR}/lib/libXext.a;${DEPSDIR}/lib/libICE.a;${DEPSDIR}/lib/libSM.a;${DEPSDIR}/lib/libXrender.a;${DEPSDIR}/lib/libXft.a;${DEPSDIR}/lib/libXss.a;${DEPSDIR}/lib/libxcb.a" \
+  ../portable-python-cmake-buildsystem
+make -j1
+make install
+
+cd ${BUILDDIR}
+cp -r ${DEPSDIR}/lib/tcl8.6 ./python-install-profile/lib
+cp -r ${DEPSDIR}/lib/tk8.6 ./python-install-profile/lib
+cp -r ${LICENSEDIR} ./python-install
+
+#######
+# PGO #
+#######
+echo "::group::PGO"
+cd ${BUILDDIR}
+
+cd python-install-profile
+${WORKDIR}/scripts/qemu_${ARCH}_interpreter ./bin/python -m test --pgo-extended
+
+##########
+# Python #
+##########
+echo "::group::Python"
+cd ${BUILDDIR}
+
 mkdir python-build
 mkdir python-install
 cd python-build
-LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
+LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" CFLAGS="${CFLAGS} ${PGO_COMPILE_FLAGS}" cmake \
   "${cmake_verbose_flags[@]}" \
   -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
   -DCMAKE_CROSSCOMPILING_EMULATOR=${WORKDIR}/scripts/qemu_${ARCH}_interpreter \
@@ -548,7 +622,7 @@ LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
   -DX11_INCLUDE_DIR:PATH=${DEPSDIR}/include/X11 \
   -DX11_LIBRARIES="${DEPSDIR}/lib/libXau.a;${DEPSDIR}/lib/libXdmcp.a;${DEPSDIR}/lib/libX11.a;${DEPSDIR}/lib/libXext.a;${DEPSDIR}/lib/libICE.a;${DEPSDIR}/lib/libSM.a;${DEPSDIR}/lib/libXrender.a;${DEPSDIR}/lib/libXft.a;${DEPSDIR}/lib/libXss.a;${DEPSDIR}/lib/libxcb.a" \
   ../portable-python-cmake-buildsystem
-make -j4
+make -j1
 make install
 
 cd ${BUILDDIR}
