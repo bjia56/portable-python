@@ -36,6 +36,7 @@ export PORTABLE_PYTHON_PY_VER=${PYTHON_VER}
 WORKDIR=$(pwd)
 BUILDDIR=${WORKDIR}/build
 DEPSDIR=${WORKDIR}/deps
+PGODIR=${WORKDIR}/pgo
 LICENSEDIR=${WORKDIR}/licenses
 
 license_files=$(cat <<-END
@@ -87,4 +88,5 @@ fi
 
 mkdir ${BUILDDIR}
 mkdir ${DEPSDIR}
+mkdir ${PGODIR}
 mkdir ${LICENSEDIR}
