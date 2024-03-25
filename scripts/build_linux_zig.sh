@@ -59,7 +59,8 @@ export CPPFLAGS="-I${DEPSDIR}/include"
 export CXXFLAGS="${CPPFLAGS}"
 export LDFLAGS="-L${DEPSDIR}/lib"
 export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig:${DEPSDIR}/share/pkgconfig"
-export PGO_PROFILE_FLAGS="-fprofile-dir=${PGODIR} -fprofile-generate=${PGODIR} -Wl,-fprofile-instr-generate"
+export PGO_PROFILE_FLAGS="-fprofile-dir=${PGODIR} -fprofile-generate=${PGODIR}"
+export PGO_PROFILE_LINK="-fprofile-generate=${PGODIR}"
 export PGO_COMPILE_FLAGS="-fprofile-dir=${PGODIR} -fprofile-use=${PGODIR} -fprofile-correction"
 
 if [[ "${ARCH}" == "arm" ]]; then
@@ -507,7 +508,7 @@ fi
 mkdir python-build-profile
 mkdir python-install-profile
 cd python-build-profile
-LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" CFLAGS="${CFLAGS} ${PGO_PROFILE_FLAGS}" cmake \
+LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype ${PGO_PROFILE_LINK}" CFLAGS="${CFLAGS} ${PGO_PROFILE_FLAGS}" cmake \
   "${cmake_verbose_flags[@]}" \
   -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
   -DCMAKE_CROSSCOMPILING_EMULATOR=${WORKDIR}/scripts/qemu_${ARCH}_interpreter \
