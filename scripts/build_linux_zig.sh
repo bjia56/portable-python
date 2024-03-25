@@ -59,7 +59,7 @@ export CPPFLAGS="-I${DEPSDIR}/include"
 export CXXFLAGS="${CPPFLAGS}"
 export LDFLAGS="-L${DEPSDIR}/lib"
 export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig:${DEPSDIR}/share/pkgconfig"
-export PGO_PROFILE_FLAGS="-fprofile-dir=${PGODIR} -fprofile-generate=${PGODIR} -Wl,-fprofile-instr-generate"
+export PGO_PROFILE_FLAGS="-fprofile-dir=${PGODIR} -fprofile-generate=${PGODIR}"
 export PGO_COMPILE_FLAGS="-fprofile-dir=${PGODIR} -fprofile-use=${PGODIR} -fprofile-correction"
 
 if [[ "${ARCH}" == "arm" ]]; then
