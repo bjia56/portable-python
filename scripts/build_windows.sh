@@ -140,7 +140,7 @@ cmake \
   -G "Visual Studio 17 2022" -A x64 \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
   -DPORTABLE_PYTHON_BUILD=ON \
-  -DCMAKE_BUILD_TYPE:STRING=Release \
+  -DCMAKE_BUILD_TYPE:STRING=Debug \
   -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install \
   -DBUILD_EXTENSIONS_AS_BUILTIN=OFF \
   -DBUILD_LIBPYTHON_SHARED=ON \
@@ -161,8 +161,8 @@ cmake \
   -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/libffi/include \
   -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/libffi/lib/ffi_static.lib \
   ../portable-python-cmake-buildsystem
-cmake --build . --config Release -- /property:Configuration=Release
-cmake --build . --target INSTALL -- /property:Configuration=Release
+cmake --build . --config Debug -- /property:Configuration=Debug
+cmake --build . --target INSTALL -- /property:Configuration=Debug
 cp -r ${LICENSEDIR} ${BUILDDIR}/python-install
 cd ${BUILDDIR}
 
