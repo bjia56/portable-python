@@ -15,7 +15,7 @@ echo "::group::Install dependencies"
 export DEBIAN_FRONTEND=noninteractive
 sudo apt update
 sudo apt -y install \
-  wget build-essential pkg-config cmake autoconf git patch \
+  wget build-essential pkg-config autoconf git patch \
   python2 python3 python3-pip clang qemu-user-static \
   gettext bison libtool autopoint gperf ncurses-bin xutils-dev
 case "$ARCH" in
@@ -42,7 +42,7 @@ case "$ARCH" in
     sudo ln -s /usr/riscv64-linux-gnu/lib/ld-linux-riscv64-lp64d.so.1 /lib/ld-linux-riscv64-lp64.so.1
     ;;
 esac
-sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja
+sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja cmake==3.28.4
 if [[ "${ARCH}" == "riscv64" ]]; then
   sudo pip install patchelf==0.15.0.0
 fi
