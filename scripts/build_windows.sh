@@ -55,9 +55,9 @@ echo "::endgroup::"
 echo "::group::lzma"
 cd ${BUILDDIR}
 
-git clone https://github.com/tukaani-project/xz.git --branch v5.4.4 --single-branch --depth 1
+download_verify_extract xz-5.4.5.tar.gz
 mkdir ${DEPSDIR}/xz
-cd xz
+cd xz-5.4.5
 mkdir build
 cd build
 cmake \
