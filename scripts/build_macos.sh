@@ -129,8 +129,8 @@ echo "::endgroup::"
 echo "::group::lzma"
 cd ${BUILDDIR}
 
-git clone https://github.com/tukaani-project/xz.git --branch v5.4.4 --single-branch --depth 1
-cd xz
+download_verify_extract xz-5.4.5.tar.gz
+cd xz*
 mkdir build
 cd build
 cmake \
