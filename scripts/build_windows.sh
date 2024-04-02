@@ -111,17 +111,9 @@ echo "::endgroup::"
 echo "::group::libffi"
 cd ${BUILDDIR}
 
-if [[ "${PYTHON_VER}" == "3.10" ]]; then
-  LIBFFI_VER="3.4.2"
-elif [[ "${PYTHON_VER}" == "3.9" ]]; then
-  LIBFFI_VER="3.4.2"
-else
-  LIBFFI_VER="3.4.4"
-fi
-
-curl -L https://github.com/python/cpython-bin-deps/archive/refs/tags/libffi-${LIBFFI_VER}.tar.gz --output cpython-bin-deps-libffi.tar.gz
-tar -xf cpython-bin-deps-libffi.tar.gz
-cd cpython-bin-deps-libffi-${LIBFFI_VER}
+curl -L https://github.com/python/cpython-bin-deps/archive/refs/tags/libffi-3.4.4.tar.gz --output cpython-bin-deps-libffi-3.4.4.tar.gz
+tar -xf cpython-bin-deps-libffi-3.4.4.tar.gz
+cd cpython-bin-deps-libffi-3.4.4
 mkdir ${DEPSDIR}/libffi
 cp -r amd64/include ${DEPSDIR}/libffi/include
 mkdir ${DEPSDIR}/libffi/lib
