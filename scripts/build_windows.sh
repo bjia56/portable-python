@@ -135,14 +135,6 @@ echo "::endgroup::"
 echo "::group::Build"
 cd ${BUILDDIR}
 
-if [[ "${PYTHON_VER}" == "3.10" ]]; then
-  C_STANDARD=99
-elif [[ "${PYTHON_VER}" == "3.9" ]]; then
-  C_STANDARD=99
-else
-  C_STANDARD=11
-fi
-
 mkdir python-build
 mkdir python-install
 cd python-build
@@ -151,7 +143,6 @@ cmake \
   -G "Visual Studio 17 2022" -A x64 \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
   -DPORTABLE_PYTHON_BUILD=ON \
-  -DCMAKE_C_STANDARD=${C_STANDARD} \
   -DCMAKE_BUILD_TYPE:STRING=Release \
   -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install \
   -DBUILD_EXTENSIONS_AS_BUILTIN=OFF \
