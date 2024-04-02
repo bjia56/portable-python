@@ -113,23 +113,11 @@ cd ${BUILDDIR}
 
 curl -L https://github.com/python/cpython-bin-deps/archive/refs/tags/libffi-3.4.4.tar.gz --output cpython-bin-deps-libffi-3.4.4.tar.gz
 tar -xf cpython-bin-deps-libffi-3.4.4.tar.gz
+cd cpython-bin-deps-libffi-3.4.4
 mkdir ${DEPSDIR}/libffi
-cp -r cpython-bin-deps-libffi-3.4.4/amd64/include ${DEPSDIR}/libffi/include
+cp -r amd64/include ${DEPSDIR}/libffi/include
 mkdir ${DEPSDIR}/libffi/lib
-cp cpython-bin-deps-libffi-3.4.4/amd64/libffi* ${DEPSDIR}/libffi/lib/
-
-git clone https://github.com/python-cmake-buildsystem/libffi.git --branch libffi-cmake-buildsystem-v3.4.2-2021-06-28-f9ea416 --single-branch --depth 1
-mkdir ${DEPSDIR}/libffi
-cd libffi
-mkdir build
-cd build
-cmake \
-  -G "Visual Studio 17 2022" -A x64 \
-  -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR}/libffi \
-  ..
-cmake --build . --config Release -- /property:Configuration=Release
-cmake --build . --target INSTALL -- /property:Configuration=Release
-cd ..
+cp amd64/libffi* ${DEPSDIR}/libffi/lib/
 install_license
 
 echo "::endgroup::"
