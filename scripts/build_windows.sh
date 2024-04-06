@@ -111,18 +111,13 @@ echo "::endgroup::"
 echo "::group::libffi"
 cd ${BUILDDIR}
 
-git clone https://github.com/python-cmake-buildsystem/libffi.git --branch libffi-cmake-buildsystem-v3.4.2-2021-06-28-f9ea416 --single-branch --depth 1
+curl -L https://github.com/python/cpython-bin-deps/archive/refs/tags/libffi-3.4.4.tar.gz --output cpython-bin-deps-libffi-3.4.4.tar.gz
+tar -xf cpython-bin-deps-libffi-3.4.4.tar.gz
+cd cpython-bin-deps-libffi-3.4.4
 mkdir ${DEPSDIR}/libffi
-cd libffi
-mkdir build
-cd build
-cmake \
-  -G "Visual Studio 17 2022" -A x64 \
-  -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR}/libffi \
-  ..
-cmake --build . --config Release -- /property:Configuration=Release
-cmake --build . --target INSTALL -- /property:Configuration=Release
-cd ..
+cp -r amd64/include ${DEPSDIR}/libffi/include
+mkdir ${DEPSDIR}/libffi/lib
+cp amd64/libffi* ${DEPSDIR}/libffi/lib/
 install_license
 
 echo "::endgroup::"
@@ -159,7 +154,7 @@ cmake \
   -DBZIP2_INCLUDE_DIR:PATH=${DEPSDIR}/bzip2/include \
   -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/bzip2/lib/libbz2.lib \
   -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/libffi/include \
-  -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/libffi/lib/ffi_static.lib \
+  -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/libffi/lib/libffi-8.lib \
   ../portable-python-cmake-buildsystem
 cmake --build . --config Release -- /property:Configuration=Release
 cmake --build . --target INSTALL -- /property:Configuration=Release
@@ -168,6 +163,9 @@ cd ${BUILDDIR}
 
 # Need to bundle openssl with the executable
 cp ${DEPSDIR}/openssl/bin/*.dll python-install/bin
+
+# Need to bundle libffi with the executable
+cp ${DEPSDIR}/libffi/lib/*.dll python-install/bin
 
 # Need to bundle vcredist
 #cp /c/WINDOWS/SYSTEM32/VCRUNTIME140.dll python-install/bin
