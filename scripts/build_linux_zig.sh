@@ -85,10 +85,6 @@ elif [[ "${ARCH}" == "i386" ]]; then
   export CPPFLAGS="-m32 ${CPPFLAGS}"
   export CXXFLAGS="-m32 ${CXXFLAGS}"
   export LDFLAGS="-m32 ${LDFLAGS}"
-elif [[ "${ARCH}" == "s390x" ]]; then
-  export AR="s390x-linux-gnu-gcc-ar"
-  export CC="s390x-linux-gnu-gcc"
-  export CXX="s390x-linux-gnu-g++"
 else
   # See above comment
   sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/${ARCH}-linux-gnu-gcc-ar
@@ -100,6 +96,9 @@ else
   if [[ "${ARCH}" == "riscv64" ]]; then
     export ZIG_FLAGS="-target riscv64-linux-gnu.2.27"
     export CFLAGS="-Wl,--undefined-version ${CFLAGS}"
+  elif [[ "${ARCH}" == "s390x" ]]; then
+    export ZIG_FLAGS="-target s390x-linux-gnu.2.19 -mcpu=z196"
+    export LD=s390x-linux-gnu-ld
   else
     export ZIG_FLAGS="-target ${ARCH}-linux-gnu.2.17"
   fi
