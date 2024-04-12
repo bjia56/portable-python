@@ -85,7 +85,7 @@ elif [[ "${ARCH}" == "i386" ]]; then
   export CPPFLAGS="-m32 ${CPPFLAGS}"
   export CXXFLAGS="-m32 ${CXXFLAGS}"
   export LDFLAGS="-m32 ${LDFLAGS}"
-elif [[ "${ARCH}" == "s390x" ]]
+elif [[ "${ARCH}" == "s390x" ]]; then
   export AR="s390x-linux-gnu-gcc-ar"
   export CC="s390x-linux-gnu-gcc"
   export CXX="s390x-linux-gnu-g++"
