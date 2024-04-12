@@ -68,7 +68,7 @@ jobs:
           - arch: ${{ !contains(inputs.platforms, 'linux-aarch64') && 'aarch64' || '' }}
           - arch: ${{ !contains(inputs.platforms, 'linux-arm') && 'arm' || '' }}
           - arch: ${{ !contains(inputs.platforms, 'linux-riscv64') && 'riscv64' || '' }}
-          - arch: ${{ !contains(inputs.platforms, 'linux-x390x') && 's390x' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'linux-s390x') && 's390x' || '' }}
 
     steps:
       - name: Parse image
