@@ -89,6 +89,7 @@ elif [[ "${ARCH}" == "s390x" ]]; then
   export AR="s390x-linux-gnu-gcc-ar"
   export CC="s390x-linux-gnu-gcc"
   export CXX="s390x-linux-gnu-g++"
+  export CHOST=s390x-linux-gnu
 else
   # See above comment
   sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/${ARCH}-linux-gnu-gcc-ar
