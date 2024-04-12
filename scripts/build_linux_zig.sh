@@ -41,6 +41,10 @@ case "$ARCH" in
     # workaround since the Zig compiler always targets ld-linux-riscv64-lp64.so.1
     sudo ln -s /usr/riscv64-linux-gnu/lib/ld-linux-riscv64-lp64d.so.1 /lib/ld-linux-riscv64-lp64.so.1
     ;;
+  s390x)
+    sudo apt -y install libc6-s390x-cross
+    sudo ln -s /usr/s390x-linux-gnu/lib/ld64.so.1 /lib/ld64.so.1
+    ;;
 esac
 sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja cmake==3.28.4
 if [[ "${ARCH}" == "riscv64" ]]; then
@@ -92,6 +96,8 @@ else
   if [[ "${ARCH}" == "riscv64" ]]; then
     export ZIG_FLAGS="-target riscv64-linux-gnu.2.27"
     export CFLAGS="-Wl,--undefined-version ${CFLAGS}"
+  elif [[ "${ARCH}" == "s390x" ]]; then
+    export ZIG_FLAGS="-target s390x-linux-gnu.2.19"
   else
     export ZIG_FLAGS="-target ${ARCH}-linux-gnu.2.17"
   fi
