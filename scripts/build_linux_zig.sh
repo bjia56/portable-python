@@ -42,7 +42,7 @@ case "$ARCH" in
     sudo ln -s /usr/riscv64-linux-gnu/lib/ld-linux-riscv64-lp64d.so.1 /lib/ld-linux-riscv64-lp64.so.1
     ;;
   s390x)
-    sudo apt -y install libc6-s390x-cross
+    sudo apt -y install libc6-s390x-cross crossbuild-essential-s390x
     sudo ln -s /usr/s390x-linux-gnu/lib/ld64.so.1 /lib/ld64.so.1
     ;;
 esac
