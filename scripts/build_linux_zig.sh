@@ -355,7 +355,11 @@ cd ${BUILDDIR}
 
 download_verify_extract libgcrypt-1.10.3.tar.bz2
 cd libgcrypt*
-LDFLAGS="${LDFLAGS} -Wl,--undefined-version" ./configure --disable-asm --host=${CHOST} --prefix=${DEPSDIR}
+if [[ "${ARCH}" == "s390x" ]]; then
+  ./configure --disable-asm --host=${CHOST} --prefix=${DEPSDIR}
+else
+  LDFLAGS="${LDFLAGS} -Wl,--undefined-version" ./configure --disable-asm --host=${CHOST} --prefix=${DEPSDIR}
+fi
 make -j4
 make install
 install_license ./COPYING.LIB
