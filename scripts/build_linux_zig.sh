@@ -513,6 +513,8 @@ additionalparams=()
 if [[ "${ARCH}" == "arm" ]]; then
   additionalparams+=(-DUSE_SYSTEM_LIBMPDEC=ON)
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${DEPSDIR}/lib
+elif [[ "${ARCH}" == "s390x" ]]; then
+  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/s390x-linux-gnu/lib
 fi
 
 wget --no-verbose -O portable-python-cmake-buildsystem.tar.gz https://github.com/bjia56/portable-python-cmake-buildsystem/tarball/${CMAKE_BUILDSYSTEM_BRANCH}
