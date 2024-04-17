@@ -164,7 +164,11 @@ cd ${BUILDDIR}
 
 download_verify_extract libffi-3.4.6.tar.gz
 cd libffi*
-CFLAGS="${CFLAGS} -Wl,--undefined-version" ./configure --host=${CHOST} --prefix=${DEPSDIR}
+if [[ "${ARCH}" == "s390x" ]]; then
+  ./configure --host=${CHOST} --prefix=${DEPSDIR}
+else
+  CFLAGS="${CFLAGS} -Wl,--undefined-version" ./configure --host=${CHOST} --prefix=${DEPSDIR}
+fi
 make -j4
 make install
 install_license
