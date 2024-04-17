@@ -77,7 +77,10 @@ else
 fi
 
 if [[ "${DEBUG_CI}" == "true" ]]; then
+  BUILD_TYPE=Debug
   trap "cd ${BUILDDIR} && tar -czf ${WORKDIR}/build-python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz ." EXIT
+else
+  BUILD_TYPE=Release
 fi
 
 cmake_verbose_flags=()
