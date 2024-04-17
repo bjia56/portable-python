@@ -97,8 +97,8 @@ else
     export ZIG_FLAGS="-target riscv64-linux-gnu.2.27"
     export CFLAGS="-Wl,--undefined-version ${CFLAGS}"
   elif [[ "${ARCH}" == "s390x" ]]; then
+    export ZIG_FLAGS="-target s390x-linux-gnu.2.19 -mcpu=z196"
     export LD=s390x-linux-gnu-ld
-    export ZIG_FLAGS="-target s390x-linux-gnu.2.19 -mcpu=z196 -fuse-ld=${LD}"
   else
     export ZIG_FLAGS="-target ${ARCH}-linux-gnu.2.17"
   fi
