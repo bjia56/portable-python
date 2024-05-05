@@ -309,5 +309,7 @@ jobs:
           prepare: |
             pkg install -y cmake
           run: |
+            pwd
+            find .
             cd /root/work/portable-python
             ./scripts/build_freebsd.sh x86_64 ${{ inputs.python_version }}
