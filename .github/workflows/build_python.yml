@@ -296,7 +296,7 @@ jobs:
 
   build_freebsd:
     runs-on: ubuntu-latest
-    name: FreeBSD ${{ inputs.python_version }} ${{ matrix.arch }}
+    name: FreeBSD ${{ inputs.python_version }} x86_64
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -310,3 +310,20 @@ jobs:
             pkg install -y cmake bash wget patch git
           run: |
             bash ./scripts/build_freebsd.sh x86_64 ${{ inputs.python_version }}
+
+      - name: Interactive debugging
+        if: ${{ always() && inputs.debug_interactive }}
+        uses: fawazahmed0/action-debug@v2
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-freebsd-x86_64-${{ inputs.python_version }}
+          path: ./python*.zip
+
+      - name: Upload artifacts
+        if: ${{ always() && inputs.debug }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-python-freebsd-x86_64-${{ inputs.python_version }}
+          path: ./*python*.tar.gz
