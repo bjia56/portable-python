@@ -307,6 +307,6 @@ jobs:
           envs: 'RUN_TESTS DEBUG_CI VERBOSE_CI PORTABLE_PYTHON_BUILDSYSTEM_BRANCH'
           usesh: true
           prepare: |
-            pkg install -y cmake bash wget
+            pkg install -y cmake bash wget patch git
           run: |
             bash ./scripts/build_freebsd.sh x86_64 ${{ inputs.python_version }}
