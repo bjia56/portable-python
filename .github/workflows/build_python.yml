@@ -309,6 +309,4 @@ jobs:
           prepare: |
             pkg install -y cmake bash clang
           run: |
-            pwd
-            find .
-            bash ./scripts/build_freebsd.sh x86_64 ${{ inputs.python_version }}
+            ./scripts/build_freebsd.sh x86_64 ${{ inputs.python_version }}
