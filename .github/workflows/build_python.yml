@@ -309,4 +309,4 @@ jobs:
           prepare: |
             pkg install -y cmake bash
           run: |
-            ./scripts/build_freebsd.sh x86_64 ${{ inputs.python_version }}
+            bash ./scripts/build_freebsd.sh x86_64 ${{ inputs.python_version }}
