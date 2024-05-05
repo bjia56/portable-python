@@ -298,13 +298,15 @@ jobs:
     runs-on: ubuntu-latest
     name: FreeBSD ${{ inputs.python_version }} ${{ matrix.arch }}
     steps:
-    - uses: actions/checkout@v4
-    - name: Build in FreeBSD
-      uses: vmactions/freebsd-vm@v1
-      with:
-        usesh: true
-        prepare: |
-          pkg install -y cmake
+      - name: Checkout
+        uses: actions/checkout@v4
 
-        run: |
-          ./scripts/build_freebsd.sh x86_64 ${{ inputs.python_version }}
+      - name: Build in VM
+        uses: vmactions/freebsd-vm@v1
+        with:
+          envs: 'RUN_TESTS DEBUG_CI VERBOSE_CI PORTABLE_PYTHON_BUILDSYSTEM_BRANCH'
+          usesh: true
+          prepare: |
+            pkg install -y cmake
+          run: |
+            ./scripts/build_freebsd.sh x86_64 ${{ inputs.python_version }}
