@@ -296,20 +296,15 @@ jobs:
 
   build_freebsd:
     runs-on: ubuntu-latest
-    name: A job to run test in FreeBSD
+    name: FreeBSD ${{ inputs.python_version }} ${{ matrix.arch }}
     steps:
     - uses: actions/checkout@v4
-    - name: Test in FreeBSD
-      id: test
+    - name: Build in FreeBSD
       uses: vmactions/freebsd-vm@v1
       with:
         usesh: true
         prepare: |
-          pkg install -y curl
+          pkg install -y cmake
 
         run: |
-          pwd
-          ls -lah
-          whoami
-          env
-          freebsd-version
+          ./scripts/build_freebsd.sh x86_64 ${{ inputs.python_version }}
