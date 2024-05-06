@@ -295,7 +295,6 @@ jobs:
           fi
 
   build_freebsd:
-    runs-on: ubuntu-latest
     name: FreeBSD ${{ matrix.release }} ${{ inputs.python_version }} x86_64
     runs-on: ubuntu-latest
     strategy:
