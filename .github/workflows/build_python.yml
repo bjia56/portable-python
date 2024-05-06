@@ -9,7 +9,7 @@ on:
       platforms:
         required: true
         type: string
-        default: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,macos,windows,freebsd-x86_64"
+        default: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,macos,windows,freebsd14-x86_64"
       buildsystem_branch:
         required: false
         type: string
@@ -296,7 +296,15 @@ jobs:
 
   build_freebsd:
     runs-on: ubuntu-latest
-    name: FreeBSD ${{ inputs.python_version }} x86_64
+    name: FreeBSD ${{ matrix.release }} ${{ inputs.python_version }} x86_64
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        release: [14]
+        exclude:
+          - release: ${{ !contains(inputs.platforms, 'freebsd14-x86_64') && '14' || '' }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -309,6 +317,7 @@ jobs:
           prepare: |
             pkg install -y cmake bash wget patch git
           run: |
+            export PLATFORM=freebsd${{ matrix.release }}
             bash ./scripts/build_freebsd.sh x86_64 ${{ inputs.python_version }}
 
       - name: Interactive debugging

@@ -1,8 +1,55 @@
 #!/bin/bash
 
-PLATFORM=freebsd
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 source ${SCRIPT_DIR}/utils.sh
+
+########
+# zlib #
+########
+echo "::group::zlib"
+cd ${BUILDDIR}
+
+download_verify_extract zlib-1.3.1.tar.gz
+cd zlib*
+./configure --prefix=${DEPSDIR}
+make -j4
+make install
+install_license
+
+echo "::endgroup::"
+###########
+# OpenSSL #
+###########
+echo "::group::OpenSSL"
+cd ${BUILDDIR}
+
+download_verify_extract openssl-1.1.1w.tar.gz
+cd openssl*
+./Configure no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+make -j4
+make install_sw
+install_license
+
+echo "::endgroup::"
+##########
+# libffi #
+##########
+echo "::group::libffi"
+cd ${BUILDDIR}
+
+download_verify_extract libffi-3.4.6.tar.gz
+cd libffi*
+./configure --prefix=${DEPSDIR}
+make -j4
+make install
+install_license
+
+echo "::endgroup::"
+##########
+# Python #
+##########
+echo "::group::Python"
+cd ${BUILDDIR}
 
 wget --no-verbose -O portable-python-cmake-buildsystem.tar.gz https://github.com/bjia56/portable-python-cmake-buildsystem/tarball/${CMAKE_BUILDSYSTEM_BRANCH}
 tar -xf portable-python-cmake-buildsystem.tar.gz
@@ -24,6 +71,12 @@ cmake \
   -DBUILD_TESTING=${INSTALL_TEST} \
   -DINSTALL_TEST=${INSTALL_TEST} \
   -DINSTALL_MANUAL=OFF \
+  -DOPENSSL_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+  -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/libssl.a;${DEPSDIR}/lib/libcrypto.a" \
+  -DZLIB_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+  -DZLIB_LIBRARY:FILEPATH=${DEPSDIR}/lib/libz.a \
+  -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+  -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.a \
   ../portable-python-cmake-buildsystem
 make -j4
 make install
@@ -75,8 +128,8 @@ cd ${BUILDDIR}
 
 python3 -m pip install pyclean
 python3 -m pyclean -v python-install
-mv python-install python-${PYTHON_FULL_VER}-freebsd-${ARCH}
-tar -czf ${WORKDIR}/python-${PYTHON_FULL_VER}-freebsd-${ARCH}.tar.gz python-${PYTHON_FULL_VER}-freebsd-${ARCH}
-zip ${WORKDIR}/python-${PYTHON_FULL_VER}-freebsd-${ARCH}.zip $(tar tf ${WORKDIR}/python-${PYTHON_FULL_VER}-freebsd-${ARCH}.tar.gz)
+mv python-install python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
+tar -czf ${WORKDIR}/python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
+zip ${WORKDIR}/python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.zip $(tar tf ${WORKDIR}/python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz)
 
 echo "::endgroup::"
