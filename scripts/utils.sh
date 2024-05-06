@@ -12,7 +12,7 @@ if [[ "${PLATFORM}" == "freebsd"* ]]; then
     file="$1"
     filename=$(basename $file)
     sum=$(cat ${SCRIPT_DIR}/../checksums/$file.sha256 | awk '{print $1}')
-    sha256sum -c $sum $file
+    sha256 -c $sum $file
   }
 else
   function verify_checksum () {
