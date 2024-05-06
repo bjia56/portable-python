@@ -331,12 +331,12 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: python-freebsd-x86_64-${{ inputs.python_version }}
+          name: python-freebsd${{ matrix.release }}-x86_64-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
         if: ${{ always() && inputs.debug }}
         uses: actions/upload-artifact@v4
         with:
-          name: build-python-freebsd-x86_64-${{ inputs.python_version }}
+          name: build-python-freebsd${{ matrix.release }}-x86_64-${{ inputs.python_version }}
           path: ./*python*.tar.gz
