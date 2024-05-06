@@ -168,7 +168,7 @@ cd ${BUILDDIR}
 download_verify_extract util-linux-2.39.3.tar.gz
 cd util-linux*
 ./autogen.sh
-./configure --disable-all-programs --enable-libuuid --prefix=${DEPSDIR}
+AL_OPTS="-I/usr/local/share/aclocal" ./configure --disable-all-programs --enable-libuuid --prefix=${DEPSDIR}
 make -j4
 make install
 install_license ./Documentation/licenses/COPYING.BSD-3-Clause libuuid-2.39.3

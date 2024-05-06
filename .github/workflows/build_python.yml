@@ -319,7 +319,7 @@ jobs:
           usesh: true
           release: ${{ steps.parse_release.outputs.release }}
           prepare: |
-            pkg install -y cmake bash wget patch git zip python3 autoconf automake libtool gettext bison
+            pkg install -y cmake bash wget patch git zip python3 autoconf automake libtool gettext bison pkgconf
           run: |
             export PLATFORM=freebsd${{ matrix.release }}
             bash ./scripts/build_freebsd.sh x86_64 ${{ inputs.python_version }}
