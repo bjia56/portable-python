@@ -76,13 +76,14 @@ cmake \
   -DZLIB_INCLUDE_DIR:PATH=${DEPSDIR}/include \
   -DZLIB_LIBRARY:FILEPATH=${DEPSDIR}/lib/libz.so \
   -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-  -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.a \
+  -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.so \
   ../portable-python-cmake-buildsystem
 make -j4
 make install
 
 cd ${BUILDDIR}
 cp ${DEPSDIR}/lib/libz.so ./python-install/lib
+cp ${DEPSDIR}/lib/libffi.so ./python-install/lib
 cp -r ${LICENSEDIR} ./python-install
 
 echo "::endgroup::"
