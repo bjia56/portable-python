@@ -25,7 +25,7 @@ cd ${BUILDDIR}
 
 download_verify_extract openssl-1.1.1w.tar.gz
 cd openssl*
-./Configure no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+./Configure BSD-${ARCH} no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 make -j4
 make install_sw
 install_license
