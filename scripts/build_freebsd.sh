@@ -74,7 +74,7 @@ cmake \
   -DOPENSSL_INCLUDE_DIR:PATH=${DEPSDIR}/include \
   -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/libssl.a;${DEPSDIR}/lib/libcrypto.a" \
   -DZLIB_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-  -DZLIB_LIBRARY:FILEPATH=${DEPSDIR}/lib/libz.a \
+  -DZLIB_LIBRARY:FILEPATH=${DEPSDIR}/lib/libz.so \
   -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/include \
   -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.a \
   ../portable-python-cmake-buildsystem
@@ -82,6 +82,7 @@ make -j4
 make install
 
 cd ${BUILDDIR}
+cp ${DEPSDIR}/lib/libz.so ./python-install/lib
 cp -r ${LICENSEDIR} ./python-install
 
 echo "::endgroup::"
