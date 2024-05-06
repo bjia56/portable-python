@@ -10,7 +10,7 @@ SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 function verify_checksum () {
   file="$1"
   filename=$(basename $file)
-  sha256sum -c ${SCRIPT_DIR}/../checksums/$file.sha256
+  echo "$(cat ${SCRIPT_DIR}/../checksums/$file.sha256)" | sha256sum -c
 }
 
 function download_and_verify () {
