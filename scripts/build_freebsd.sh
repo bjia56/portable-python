@@ -382,10 +382,32 @@ cmake \
   -DINSTALL_MANUAL=OFF \
   -DOPENSSL_INCLUDE_DIR:PATH=${DEPSDIR}/include \
   -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/libssl.a;${DEPSDIR}/lib/libcrypto.a" \
+  -DSQLite3_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+  -DSQLite3_LIBRARY:FILEPATH=${DEPSDIR}/lib/libsqlite3.a \
   -DZLIB_INCLUDE_DIR:PATH=${DEPSDIR}/include \
   -DZLIB_LIBRARY:FILEPATH=${DEPSDIR}/lib/libz.so \
+  -DLZMA_INCLUDE_PATH:PATH=${DEPSDIR}/include \
+  -DLZMA_LIBRARY:FILEPATH=${DEPSDIR}/lib/liblzma.a \
+  -DBZIP2_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+  -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libbz2.a \
   -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/include \
   -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.so \
+  -DREADLINE_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/readline/readline.h \
+  -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.a \
+  -DUUID_LIBRARY:FILEPATH=${DEPSDIR}/lib/libuuid.a \
+  -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.a \
+  -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.a \
+  -DGDBM_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/gdbm.h \
+  -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.a \
+  -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.a \
+  -DNDBM_TAG=NDBM \
+  -DNDBM_USE=NDBM \
+  -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tk.h \
+  -DTK_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtk8.6.a \
+  -DTCL_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tcl.h \
+  -DTCL_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtcl8.6.a \
+  -DX11_INCLUDE_DIR:PATH=${DEPSDIR}/include/X11 \
+  -DX11_LIBRARIES="${DEPSDIR}/lib/libXau.a;${DEPSDIR}/lib/libXdmcp.a;${DEPSDIR}/lib/libX11.a;${DEPSDIR}/lib/libXext.a;${DEPSDIR}/lib/libICE.a;${DEPSDIR}/lib/libSM.a;${DEPSDIR}/lib/libXrender.a;${DEPSDIR}/lib/libXft.a;${DEPSDIR}/lib/libXss.a;${DEPSDIR}/lib/libxcb.a" \
   ../portable-python-cmake-buildsystem
 make -j4
 make install
