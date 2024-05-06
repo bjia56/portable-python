@@ -82,8 +82,8 @@ make -j4
 make install
 
 cd ${BUILDDIR}
-cp ${DEPSDIR}/lib/libz.so ./python-install/lib
-cp ${DEPSDIR}/lib/libffi.so ./python-install/lib
+cp ${DEPSDIR}/lib/libz.so.* ./python-install/lib
+cp ${DEPSDIR}/lib/libffi.so.* ./python-install/lib
 cp -r ${LICENSEDIR} ./python-install
 
 echo "::endgroup::"
