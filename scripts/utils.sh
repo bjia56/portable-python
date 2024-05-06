@@ -7,11 +7,20 @@ echo "Selected portable-python-cmake-buildsystem branch: ${CMAKE_BUILDSYSTEM_BRA
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 
-function verify_checksum () {
-  file="$1"
-  filename=$(basename $file)
-  echo "$(cat ${SCRIPT_DIR}/../checksums/$file.sha256)" | sha256sum -c
-}
+if [[ "${PLATFORM}" == "freebsd"* ]]; then
+  function verify_checksum () {
+    file="$1"
+    filename=$(basename $file)
+    sum=$(cat ${SCRIPT_DIR}/../checksums/$file.sha256 | awk '{print $1}')
+    sha256sum -c $sum $file
+  }
+else
+  function verify_checksum () {
+    file="$1"
+    filename=$(basename $file)
+    echo "$(cat ${SCRIPT_DIR}/../checksums/$file.sha256)" | sha256sum -c
+  }
+fi
 
 function download_and_verify () {
   file="$1"
