@@ -128,6 +128,7 @@ echo "::endgroup::"
 echo "::group::Compress output"
 cd ${BUILDDIR}
 
+python3 -m ensurepip
 python3 -m pip install pyclean
 python3 -m pyclean -v python-install
 mv python-install python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
