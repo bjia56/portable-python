@@ -88,7 +88,7 @@ download_verify_extract ncurses-6.4.tar.gz
 cd ncurses*
 ./configure --with-normal --without-progs --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
 make
-make install
+make install.libs
 install_license
 
 echo "::endgroup::"
