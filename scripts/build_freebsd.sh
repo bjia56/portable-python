@@ -9,6 +9,7 @@ export CXXFLAGS="${CPPFLAGS}"
 export LDFLAGS="-L${DEPSDIR}/lib"
 export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig:${DEPSDIR}/share/pkgconfig"
 export AL_OPTS="-I/usr/local/share/aclocal -I${DEPSDIR}/share/aclocal"
+mkdir -p ${DEPSDIR}/share/aclocal
 
 ########
 # zlib #
