@@ -33,7 +33,7 @@ cd ${BUILDDIR}
 
 download_verify_extract openssl-1.1.1w.tar.gz
 cd openssl*
-./Configure BSD-${ARCH} no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+./Configure BSD-${ARCH} --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 gmake -j4
 gmake install_sw
 install_license
@@ -74,7 +74,7 @@ cd ${BUILDDIR}
 
 download_verify_extract expat-2.6.2.tar.gz
 cd expat*
-./configure --disable-shared --prefix=${DEPSDIR}
+./configure --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license
@@ -102,7 +102,7 @@ cd ${BUILDDIR}
 
 download_verify_extract readline-8.2.tar.gz
 cd readline*
-./configure --with-curses --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
+./configure --with-curses --host=${CHOST} --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license
@@ -276,7 +276,7 @@ cd ${BUILDDIR}
 
 download_verify_extract fontconfig-2.15.0.tar.gz
 cd fontconfig*
-./configure --enable-static --disable-shared --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
+./configure --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license
@@ -341,7 +341,7 @@ cd ${BUILDDIR}
 
 download_verify_extract tcl8.6.13-src.tar.gz
 cd tcl*/unix
-LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --prefix=${DEPSDIR}
+LDFLAGS="${LDFLAGS} -lxml2" ./configure --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 cd ..
@@ -356,7 +356,7 @@ cd ${BUILDDIR}
 
 download_verify_extract tk8.6.13-src.tar.gz
 cd tk*/unix
-LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --prefix=${DEPSDIR}
+LDFLAGS="${LDFLAGS} -lxml2" ./configure --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 cd ..
@@ -390,41 +390,39 @@ LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
   -DINSTALL_TEST=${INSTALL_TEST} \
   -DINSTALL_MANUAL=OFF \
   -DOPENSSL_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-  -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/libssl.a;${DEPSDIR}/lib/libcrypto.a" \
+  -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/libssl.so;${DEPSDIR}/lib/libcrypto.so" \
   -DSQLite3_INCLUDE_DIR:PATH=${DEPSDIR}/include \
   -DSQLite3_LIBRARY:FILEPATH=${DEPSDIR}/lib/libsqlite3.a \
   -DZLIB_INCLUDE_DIR:PATH=${DEPSDIR}/include \
   -DZLIB_LIBRARY:FILEPATH=${DEPSDIR}/lib/libz.so \
   -DLZMA_INCLUDE_PATH:PATH=${DEPSDIR}/include \
-  -DLZMA_LIBRARY:FILEPATH=${DEPSDIR}/lib/liblzma.a \
+  -DLZMA_LIBRARY:FILEPATH=${DEPSDIR}/lib/liblzma.so \
   -DBZIP2_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-  -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libbz2.a \
+  -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libbz2.so \
   -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/include \
   -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.so \
   -DREADLINE_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/readline/readline.h \
-  -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.a \
-  -DUUID_LIBRARY:FILEPATH=${DEPSDIR}/lib/libuuid.a \
-  -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.a \
-  -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.a \
+  -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.so \
+  -DUUID_LIBRARY:FILEPATH=${DEPSDIR}/lib/libuuid.so \
+  -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.so \
+  -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.so \
   -DGDBM_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/gdbm.h \
-  -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.a \
-  -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.a \
+  -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.so \
+  -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.so \
   -DNDBM_TAG=NDBM \
   -DNDBM_USE=NDBM \
   -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tk.h \
-  -DTK_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtk8.6.a \
+  -DTK_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtk8.6.so \
   -DTCL_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tcl.h \
-  -DTCL_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtcl8.6.a \
+  -DTCL_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtcl8.6.so \
   -DX11_INCLUDE_DIR:PATH=${DEPSDIR}/include/X11 \
-  -DX11_LIBRARIES="${DEPSDIR}/lib/libXau.a;${DEPSDIR}/lib/libXdmcp.a;${DEPSDIR}/lib/libX11.a;${DEPSDIR}/lib/libXext.a;${DEPSDIR}/lib/libICE.a;${DEPSDIR}/lib/libSM.a;${DEPSDIR}/lib/libXrender.a;${DEPSDIR}/lib/libXft.a;${DEPSDIR}/lib/libXss.a;${DEPSDIR}/lib/libxcb.a" \
+  -DX11_LIBRARIES="${DEPSDIR}/lib/libXau.so;${DEPSDIR}/lib/libXdmcp.so;${DEPSDIR}/lib/libX11.so;${DEPSDIR}/lib/libXext.so;${DEPSDIR}/lib/libICE.so;${DEPSDIR}/lib/libSM.so;${DEPSDIR}/lib/libXrender.so;${DEPSDIR}/lib/libXft.so;${DEPSDIR}/lib/libXss.so;${DEPSDIR}/lib/libxcb.so" \
   ../portable-python-cmake-buildsystem
 make -j4
 make install
 
 cd ${BUILDDIR}
-cp ${DEPSDIR}/lib/libz.so.* ./python-install/lib
-cp ${DEPSDIR}/lib/libffi.so.* ./python-install/lib
-cp ${DEPSDIR}/lib/libxml2.so.* ./python-install/lib
+cp ${DEPSDIR}/lib/lib*.so.* ./python-install/lib
 cp -r ${LICENSEDIR} ./python-install
 
 echo "::endgroup::"
