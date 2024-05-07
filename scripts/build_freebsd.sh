@@ -8,7 +8,7 @@ export CPPFLAGS="-I${DEPSDIR}/include"
 export CXXFLAGS="${CPPFLAGS}"
 export LDFLAGS="-L${DEPSDIR}/lib"
 export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig:${DEPSDIR}/share/pkgconfig"
-export AL_OPTS="-I/usr/local/share/aclocal"
+export AL_OPTS="-I/usr/local/share/aclocal -I${DEPSDIR}/share/aclocal"
 
 ########
 # zlib #
@@ -296,7 +296,7 @@ function build_x11_lib_core() {
   file=$pkg.tar.gz
   download_verify_extract $file
   cd $pkg
-  autoreconf -vfi
+  autoreconf -vfi ${AL_OPTS}
   ./configure $ext_flags --host=${CHOST} --prefix=${DEPSDIR}
   gmake -j4
   gmake install
