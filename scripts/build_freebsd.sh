@@ -310,7 +310,7 @@ function build_x11_lib () {
   install_license
 }
 
-build_x11_lib_core util-macros-1.17
+build_x11_lib_core util-macros-1.20.1
 build_x11_lib_core xorgproto-2023.2
 build_x11_lib xproto-7.0.31
 build_x11_lib xextproto-7.3.0
