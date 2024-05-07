@@ -18,7 +18,7 @@ cd ${BUILDDIR}
 download_verify_extract zlib-1.3.1.tar.gz
 cd zlib*
 ./configure --prefix=${DEPSDIR}
-make
+make -j4
 make install
 install_license
 
@@ -32,7 +32,7 @@ cd ${BUILDDIR}
 download_verify_extract openssl-1.1.1w.tar.gz
 cd openssl*
 ./Configure BSD-${ARCH} no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
-make
+make -j4
 make install_sw
 install_license
 
@@ -46,7 +46,7 @@ cd ${BUILDDIR}
 download_verify_extract libffi-3.4.6.tar.gz
 cd libffi*
 ./configure --prefix=${DEPSDIR}
-make
+make -j4
 make install
 install_license
 
@@ -60,7 +60,7 @@ cd ${BUILDDIR}
 download_verify_extract sqlite-autoconf-3450000.tar.gz
 cd sqlite*
 ./configure --prefix=${DEPSDIR}
-make
+make -j4
 make install
 
 echo "::endgroup::"
@@ -73,7 +73,7 @@ cd ${BUILDDIR}
 download_verify_extract expat-2.6.2.tar.gz
 cd expat*
 ./configure --disable-shared --prefix=${DEPSDIR}
-make
+make -j4
 make install
 install_license
 
@@ -101,7 +101,7 @@ cd ${BUILDDIR}
 download_verify_extract readline-8.2.tar.gz
 cd readline*
 ./configure --with-curses --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
-make
+make -j4
 make install
 install_license
 
@@ -119,7 +119,7 @@ cd commontk-bzip2*
 mkdir build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
-make
+make -j4
 make install
 cd ..
 install_license ./LICENSE bzip2-1.0.8
@@ -136,7 +136,7 @@ cd xz*
 mkdir build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
-make
+make -j4
 make install
 cd ..
 install_license
@@ -153,7 +153,7 @@ cd brotli*
 mkdir build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
-make
+make -j4
 make install
 cd ..
 install_license
@@ -169,7 +169,7 @@ download_verify_extract util-linux-2.39.3.tar.gz
 cd util-linux*
 ./autogen.sh
 AL_OPTS="-I/usr/local/share/aclocal" ./configure --disable-all-programs --enable-libuuid --prefix=${DEPSDIR}
-make
+make -j4
 make install
 install_license ./Documentation/licenses/COPYING.BSD-3-Clause libuuid-2.39.3
 
@@ -197,7 +197,7 @@ cd ${BUILDDIR}
 download_verify_extract libxml2-2.12.4.tar.xz
 cd libxml2*
 ./configure --enable-static --disable-shared --without-python --prefix=${DEPSDIR}
-make
+make -j4
 make install
 install_license ./Copyright
 
@@ -211,7 +211,7 @@ cd ${BUILDDIR}
 download_verify_extract libpng-1.6.41.tar.gz
 cd libpng*
 ./configure --with-zlib-prefix=${DEPSDIR} --disable-tools --prefix=${DEPSDIR}
-make
+make -j4
 make install
 
 echo "::endgroup::"
@@ -224,7 +224,7 @@ cd ${BUILDDIR}
 download_verify_extract libgpg-error-1.47.tar.bz2
 cd libgpg-error*
 ./configure --prefix=${DEPSDIR}
-make
+make -j4
 make install
 install_license ./COPYING.LIB
 
@@ -233,7 +233,7 @@ cd ${BUILDDIR}
 download_verify_extract libgcrypt-1.10.3.tar.bz2
 cd libgcrypt*
 ./configure --disable-asm --prefix=${DEPSDIR}
-make
+make -j4
 make install
 install_license ./COPYING.LIB
 
@@ -247,7 +247,7 @@ cd ${BUILDDIR}
 download_verify_extract libxslt-1.1.39.tar.xz
 cd libxslt*
 CFLAGS="-I${DEPSDIR}/include/libxml2" ./configure --with-libxml-prefix=${DEPSDIR} --without-python --prefix=${DEPSDIR}
-make
+make -j4
 make install
 install_license
 
@@ -261,7 +261,7 @@ cd ${BUILDDIR}
 download_verify_extract freetype-2.13.2.tar.gz
 cd freetype*
 ./configure --prefix=${DEPSDIR}
-make
+make -j4
 make install
 install_license ./docs/FTL.TXT
 
@@ -275,7 +275,7 @@ cd ${BUILDDIR}
 download_verify_extract fontconfig-2.15.0.tar.gz
 cd fontconfig*
 ./configure --enable-static --disable-shared --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
-make
+make -j4
 make install
 install_license
 
@@ -297,7 +297,7 @@ function build_x11_lib_core() {
   cd $pkg
   autoreconf -vfi
   ./configure $ext_flags --host=${CHOST} --prefix=${DEPSDIR}
-  make
+  make -j4
   make install
 
   echo "::endgroup::"
@@ -339,7 +339,7 @@ cd ${BUILDDIR}
 download_verify_extract tcl8.6.13-src.tar.gz
 cd tcl*/unix
 LDFLAGS="-lxml2" ./configure --disable-shared --prefix=${DEPSDIR}
-make
+make -j4
 make install
 cd ..
 install_license ./license.terms
@@ -354,7 +354,7 @@ cd ${BUILDDIR}
 download_verify_extract tk8.6.13-src.tar.gz
 cd tk*/unix
 LDFLAGS="-lxml2" ./configure --disable-shared --prefix=${DEPSDIR}
-make
+make -j4
 make install
 cd ..
 install_license ./license.terms
@@ -415,7 +415,7 @@ cmake \
   -DX11_INCLUDE_DIR:PATH=${DEPSDIR}/include/X11 \
   -DX11_LIBRARIES="${DEPSDIR}/lib/libXau.a;${DEPSDIR}/lib/libXdmcp.a;${DEPSDIR}/lib/libX11.a;${DEPSDIR}/lib/libXext.a;${DEPSDIR}/lib/libICE.a;${DEPSDIR}/lib/libSM.a;${DEPSDIR}/lib/libXrender.a;${DEPSDIR}/lib/libXft.a;${DEPSDIR}/lib/libXss.a;${DEPSDIR}/lib/libxcb.a" \
   ../portable-python-cmake-buildsystem
-make
+make -j4
 make install
 
 cd ${BUILDDIR}
