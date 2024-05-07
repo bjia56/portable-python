@@ -8,6 +8,7 @@ export CPPFLAGS="-I${DEPSDIR}/include"
 export CXXFLAGS="${CPPFLAGS}"
 export LDFLAGS="-L${DEPSDIR}/lib"
 export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig:${DEPSDIR}/share/pkgconfig"
+export AL_OPTS="-I/usr/local/share/aclocal"
 
 ########
 # zlib #
@@ -18,8 +19,8 @@ cd ${BUILDDIR}
 download_verify_extract zlib-1.3.1.tar.gz
 cd zlib*
 ./configure --prefix=${DEPSDIR}
-make -j4
-make install
+gmake -j4
+gmake install
 install_license
 
 echo "::endgroup::"
@@ -32,8 +33,8 @@ cd ${BUILDDIR}
 download_verify_extract openssl-1.1.1w.tar.gz
 cd openssl*
 ./Configure BSD-${ARCH} no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
-make -j4
-make install_sw
+gmake -j4
+gmake install_sw
 install_license
 
 echo "::endgroup::"
@@ -46,8 +47,8 @@ cd ${BUILDDIR}
 download_verify_extract libffi-3.4.6.tar.gz
 cd libffi*
 ./configure --prefix=${DEPSDIR}
-make -j4
-make install
+gmake -j4
+gmake install
 install_license
 
 echo "::endgroup::"
@@ -60,8 +61,8 @@ cd ${BUILDDIR}
 download_verify_extract sqlite-autoconf-3450000.tar.gz
 cd sqlite*
 ./configure --prefix=${DEPSDIR}
-make -j4
-make install
+gmake -j4
+gmake install
 
 echo "::endgroup::"
 #########
@@ -73,8 +74,8 @@ cd ${BUILDDIR}
 download_verify_extract expat-2.6.2.tar.gz
 cd expat*
 ./configure --disable-shared --prefix=${DEPSDIR}
-make -j4
-make install
+gmake -j4
+gmake install
 install_license
 
 echo "::endgroup::"
@@ -87,8 +88,8 @@ cd ${BUILDDIR}
 download_verify_extract ncurses-6.4.tar.gz
 cd ncurses*
 ./configure --with-normal --without-progs --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
-make
-make install.libs
+gmake -j4
+gmake install.libs
 install_license
 
 echo "::endgroup::"
@@ -101,8 +102,8 @@ cd ${BUILDDIR}
 download_verify_extract readline-8.2.tar.gz
 cd readline*
 ./configure --with-curses --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
-make -j4
-make install
+gmake -j4
+gmake install
 install_license
 
 echo "::endgroup::"
@@ -168,9 +169,9 @@ cd ${BUILDDIR}
 download_verify_extract util-linux-2.39.3.tar.gz
 cd util-linux*
 ./autogen.sh
-AL_OPTS="-I/usr/local/share/aclocal" ./configure --disable-all-programs --enable-libuuid --prefix=${DEPSDIR}
-make -j4
-make install
+./configure --disable-all-programs --enable-libuuid --prefix=${DEPSDIR}
+gmake -j4
+gmake install
 install_license ./Documentation/licenses/COPYING.BSD-3-Clause libuuid-2.39.3
 
 echo "::endgroup::"
@@ -183,8 +184,8 @@ cd ${BUILDDIR}
 download_verify_extract gdbm-1.23.tar.gz
 cd gdbm*
 ./configure --enable-libgdbm-compat --prefix=${DEPSDIR}
-make -j4
-make install
+gmake -j4
+gmake install
 install_license
 
 echo "::endgroup::"
@@ -197,8 +198,8 @@ cd ${BUILDDIR}
 download_verify_extract libxml2-2.12.4.tar.xz
 cd libxml2*
 ./configure --enable-static --disable-shared --without-python --prefix=${DEPSDIR}
-make -j4
-make install
+gmake -j4
+gmake install
 install_license ./Copyright
 
 echo "::endgroup::"
@@ -211,8 +212,8 @@ cd ${BUILDDIR}
 download_verify_extract libpng-1.6.41.tar.gz
 cd libpng*
 ./configure --with-zlib-prefix=${DEPSDIR} --disable-tools --prefix=${DEPSDIR}
-make -j4
-make install
+gmake -j4
+gmake install
 
 echo "::endgroup::"
 #############
@@ -224,8 +225,8 @@ cd ${BUILDDIR}
 download_verify_extract libgpg-error-1.47.tar.bz2
 cd libgpg-error*
 ./configure --prefix=${DEPSDIR}
-make -j4
-make install
+gmake -j4
+gmake install
 install_license ./COPYING.LIB
 
 cd ${BUILDDIR}
@@ -233,8 +234,8 @@ cd ${BUILDDIR}
 download_verify_extract libgcrypt-1.10.3.tar.bz2
 cd libgcrypt*
 ./configure --disable-asm --prefix=${DEPSDIR}
-make -j4
-make install
+gmake -j4
+gmake install
 install_license ./COPYING.LIB
 
 echo "::endgroup::"
@@ -246,9 +247,9 @@ cd ${BUILDDIR}
 
 download_verify_extract libxslt-1.1.39.tar.xz
 cd libxslt*
-CFLAGS="-I${DEPSDIR}/include/libxml2" ./configure --with-libxml-prefix=${DEPSDIR} --without-python --prefix=${DEPSDIR}
-make -j4
-make install
+CFLAGS="${CFLAGS} -I${DEPSDIR}/include/libxml2" ./configure --with-libxml-prefix=${DEPSDIR} --without-python --prefix=${DEPSDIR}
+gmake -j4
+gmake install
 install_license
 
 echo "::endgroup::"
@@ -261,8 +262,8 @@ cd ${BUILDDIR}
 download_verify_extract freetype-2.13.2.tar.gz
 cd freetype*
 ./configure --prefix=${DEPSDIR}
-make -j4
-make install
+gmake -j4
+gmake install
 install_license ./docs/FTL.TXT
 
 echo "::endgroup::"
@@ -275,8 +276,8 @@ cd ${BUILDDIR}
 download_verify_extract fontconfig-2.15.0.tar.gz
 cd fontconfig*
 ./configure --enable-static --disable-shared --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
-make -j4
-make install
+gmake -j4
+gmake install
 install_license
 
 echo "::endgroup::"
@@ -297,8 +298,8 @@ function build_x11_lib_core() {
   cd $pkg
   autoreconf -vfi
   ./configure $ext_flags --host=${CHOST} --prefix=${DEPSDIR}
-  make -j4
-  make install
+  gmake -j4
+  gmake install
 
   echo "::endgroup::"
 }
@@ -338,9 +339,9 @@ cd ${BUILDDIR}
 
 download_verify_extract tcl8.6.13-src.tar.gz
 cd tcl*/unix
-LDFLAGS="-lxml2" ./configure --disable-shared --prefix=${DEPSDIR}
-make -j4
-make install
+LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --prefix=${DEPSDIR}
+gmake -j4
+gmake install
 cd ..
 install_license ./license.terms
 
@@ -353,9 +354,9 @@ cd ${BUILDDIR}
 
 download_verify_extract tk8.6.13-src.tar.gz
 cd tk*/unix
-LDFLAGS="-lxml2" ./configure --disable-shared --prefix=${DEPSDIR}
-make -j4
-make install
+LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --prefix=${DEPSDIR}
+gmake -j4
+gmake install
 cd ..
 install_license ./license.terms
 
@@ -373,7 +374,7 @@ mv *portable-python-cmake-buildsystem* portable-python-cmake-buildsystem
 mkdir python-build
 mkdir python-install
 cd python-build
-cmake \
+LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
   "${cmake_verbose_flags[@]}" \
   -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
