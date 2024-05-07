@@ -375,15 +375,20 @@ jobs:
           envs: 'RUN_TESTS DEBUG_CI VERBOSE_CI PORTABLE_PYTHON_BUILDSYSTEM_BRANCH'
           usesh: true
           release: ${{ steps.parse_release.outputs.release }}
+          prepare: |
+            pkg install -y bash
           run: |
-            unzip python/python-${{ inputs.python_version }}-freebsd${{ matrix.release }}-x86_64.zip
+            cat > /tmp/test.sh <<EOF 
+              unzip python/python-${{ inputs.python_version }}-freebsd${{ matrix.release }}-x86_64.zip
 
-            cd python-${{ inputs.python_version }}-freebsd${{ matrix.release }}-x86_64
-            chmod +x ./bin/python
-            ./bin/python --version
-            ./bin/python -m sysconfig
-            ./bin/python ${{ github.workspace }}/scripts/test.py
+              cd python-${{ inputs.python_version }}-freebsd${{ matrix.release }}-x86_64
+              chmod +x ./bin/python
+              ./bin/python --version
+              ./bin/python -m sysconfig
+              ./bin/python ${{ github.workspace }}/scripts/test.py
 
-            if [[ "${{ inputs.run_tests }}" == "true" ]]; then
-              ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
-            fi
+              if [[ "${{ inputs.run_tests }}" == "true" ]]; then
+                ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
+              fi
+            EOF
+            bash /tmp/test.sh

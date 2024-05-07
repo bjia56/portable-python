@@ -408,7 +408,7 @@ make -j4
 make install
 
 cd ${BUILDDIR}
-cp ${DEPSDIR}/lib/lib*.so.* ./python-install/lib
+cp ${DEPSDIR}/lib/lib*.so* ./python-install/lib
 cp -r ${LICENSEDIR} ./python-install
 
 echo "::endgroup::"
