@@ -1,6 +1,6 @@
 import { createWriteStream, existsSync, rm, rmSync, mkdirSync, chmodSync } from "fs";
 import { join, dirname } from "path";
-import { platform, arch } from "os";
+import { platform, arch, release } from "os";
 import { Readable } from 'stream';
 import { finished } from 'stream/promises';
 import { ReadableStream } from 'stream/web';
@@ -11,6 +11,11 @@ const packageJson = require("../package.json");
 const DL_PLATFORM = (() => {
     if (platform() == "win32") {
         return "windows";
+    }
+    if (platform() == "freebsd") {
+        const releaseName = release();
+        const releaseMajor = parseInt(releaseName.split(".")[0]);
+        return `freebsd${releaseMajor}`;
     }
     return platform();
 })();

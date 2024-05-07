@@ -197,8 +197,8 @@ cd ${BUILDDIR}
 
 python3 -m pip install pyclean
 python3 -m pyclean -v python-install
-mv python-install python-${PYTHON_FULL_VER}-windows-${ARCH}
-tar -czf ${WORKDIR}/python-${PYTHON_FULL_VER}-windows-${ARCH}.tar.gz python-${PYTHON_FULL_VER}-windows-${ARCH}
-7z.exe a ${WORKDIR}/python-${PYTHON_FULL_VER}-windows-${ARCH}.zip python-${PYTHON_FULL_VER}-windows-${ARCH}
+mv python-install python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
+tar -czf ${WORKDIR}/python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
+7z.exe a ${WORKDIR}/python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.zip python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
 
 echo "::endgroup::"

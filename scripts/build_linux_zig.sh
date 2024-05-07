@@ -600,8 +600,8 @@ cd ${BUILDDIR}
 
 python3 -m pip install pyclean
 python3 -m pyclean -v python-install
-mv python-install python-${PYTHON_FULL_VER}-linux-${ARCH}
-tar -czf ${WORKDIR}/python-${PYTHON_FULL_VER}-linux-${ARCH}.tar.gz python-${PYTHON_FULL_VER}-linux-${ARCH}
-zip ${WORKDIR}/python-${PYTHON_FULL_VER}-linux-${ARCH}.zip $(tar tf ${WORKDIR}/python-${PYTHON_FULL_VER}-linux-${ARCH}.tar.gz)
+mv python-install python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
+tar -czf ${WORKDIR}/python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
+zip ${WORKDIR}/python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.zip $(tar tf ${WORKDIR}/python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz)
 
 echo "::endgroup::"
