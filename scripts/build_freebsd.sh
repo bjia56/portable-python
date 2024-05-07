@@ -137,7 +137,7 @@ download_verify_extract xz-5.4.5.tar.gz
 cd xz*
 mkdir build
 cd build
-cmake -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
+cmake -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DBUILD_SHARED_LIBS=ON ..
 make -j4
 make install
 cd ..
@@ -198,7 +198,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libxml2-2.12.4.tar.xz
 cd libxml2*
-./configure --without-python --without-lzma --prefix=${DEPSDIR}
+./configure --without-python --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license ./Copyright
