@@ -162,21 +162,6 @@ install_license
 
 echo "::endgroup::"
 ########
-# uuid #
-########
-echo "::group::uuid"
-cd ${BUILDDIR}
-
-download_verify_extract util-linux-2.39.3.tar.gz
-cd util-linux*
-./autogen.sh
-./configure --disable-all-programs --enable-libuuid --prefix=${DEPSDIR}
-gmake -j4
-gmake install
-install_license ./Documentation/licenses/COPYING.BSD-3-Clause libuuid-2.39.3
-
-echo "::endgroup::"
-########
 # gdbm #
 ########
 echo "::group::gdbm"
@@ -405,7 +390,6 @@ cmake \
   -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.so \
   -DREADLINE_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/readline/readline.h \
   -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.so \
-  -DUUID_LIBRARY:FILEPATH=${DEPSDIR}/lib/libuuid.so \
   -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.so \
   -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.so \
   -DGDBM_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/gdbm.h \
