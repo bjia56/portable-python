@@ -61,7 +61,7 @@ cd ${BUILDDIR}
 
 download_verify_extract sqlite-autoconf-3450000.tar.gz
 cd sqlite*
-./configure --prefix=${DEPSDIR}
+./configure --enable-shared --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 
@@ -88,7 +88,7 @@ cd ${BUILDDIR}
 
 download_verify_extract ncurses-6.4.tar.gz
 cd ncurses*
-./configure --with-normal --without-progs --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
+./configure --with-normal --with-shared --without-progs --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
 gmake -j4
 gmake install.libs
 install_license
@@ -298,7 +298,7 @@ function build_x11_lib_core() {
   download_verify_extract $file
   cd $pkg
   autoreconf -vfi ${AL_OPTS}
-  ./configure $ext_flags --host=${CHOST} --prefix=${DEPSDIR}
+  ./configure $ext_flags --prefix=${DEPSDIR}
   gmake -j4
   gmake install
 
@@ -394,7 +394,7 @@ cmake \
   -DOPENSSL_INCLUDE_DIR:PATH=${DEPSDIR}/include \
   -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/libssl.so;${DEPSDIR}/lib/libcrypto.so" \
   -DSQLite3_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-  -DSQLite3_LIBRARY:FILEPATH=${DEPSDIR}/lib/libsqlite3.a \
+  -DSQLite3_LIBRARY:FILEPATH=${DEPSDIR}/lib/libsqlite3.so \
   -DZLIB_INCLUDE_DIR:PATH=${DEPSDIR}/include \
   -DZLIB_LIBRARY:FILEPATH=${DEPSDIR}/lib/libz.so \
   -DLZMA_INCLUDE_PATH:PATH=${DEPSDIR}/include \
@@ -406,8 +406,8 @@ cmake \
   -DREADLINE_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/readline/readline.h \
   -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.so \
   -DUUID_LIBRARY:FILEPATH=${DEPSDIR}/lib/libuuid.so \
-  -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.a \
-  -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.a \
+  -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.so \
+  -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.so \
   -DGDBM_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/gdbm.h \
   -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.so \
   -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.so \
