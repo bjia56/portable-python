@@ -341,7 +341,7 @@ cd ${BUILDDIR}
 
 download_verify_extract tcl8.6.13-src.tar.gz
 cd tcl*/unix
-LDFLAGS="${LDFLAGS} -lxml2" ./configure --prefix=${DEPSDIR}
+./configure --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 cd ..
@@ -356,7 +356,7 @@ cd ${BUILDDIR}
 
 download_verify_extract tk8.6.13-src.tar.gz
 cd tk*/unix
-LDFLAGS="${LDFLAGS} -lxml2" ./configure --prefix=${DEPSDIR}
+./configure --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 cd ..
@@ -376,7 +376,7 @@ mv *portable-python-cmake-buildsystem* portable-python-cmake-buildsystem
 mkdir python-build
 mkdir python-install
 cd python-build
-LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
+cmake \
   "${cmake_verbose_flags[@]}" \
   -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
