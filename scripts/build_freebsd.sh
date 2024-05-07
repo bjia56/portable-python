@@ -197,7 +197,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libxml2-2.12.4.tar.xz
 cd libxml2*
-./configure --enable-static --disable-shared --without-python --prefix=${DEPSDIR}
+./configure --without-python --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license ./Copyright
@@ -422,6 +422,7 @@ make install
 cd ${BUILDDIR}
 cp ${DEPSDIR}/lib/libz.so.* ./python-install/lib
 cp ${DEPSDIR}/lib/libffi.so.* ./python-install/lib
+cp ${DEPSDIR}/lib/libxml2.so.* ./python-install/lib
 cp -r ${LICENSEDIR} ./python-install
 
 echo "::endgroup::"
