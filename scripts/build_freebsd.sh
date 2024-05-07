@@ -376,7 +376,7 @@ mv *portable-python-cmake-buildsystem* portable-python-cmake-buildsystem
 mkdir python-build
 mkdir python-install
 cd python-build
-cmake \
+LD_LIBRARY_PATH="${DEPSDIR}/lib:$LD_LIBRARY_PATH" cmake \
   "${cmake_verbose_flags[@]}" \
   -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
