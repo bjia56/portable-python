@@ -376,7 +376,9 @@ mv *portable-python-cmake-buildsystem* portable-python-cmake-buildsystem
 mkdir python-build
 mkdir python-install
 cd python-build
-LD_LIBRARY_PATH="${DEPSDIR}/lib:$LD_LIBRARY_PATH" cmake \
+LD_LIBRARY_PATH_OLD=$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH="${DEPSDIR}/lib:$LD_LIBRARY_PATH"
+cmake \
   "${cmake_verbose_flags[@]}" \
   -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
@@ -420,6 +422,7 @@ LD_LIBRARY_PATH="${DEPSDIR}/lib:$LD_LIBRARY_PATH" cmake \
   ../portable-python-cmake-buildsystem
 make -j4
 make install
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH_OLD
 
 cd ${BUILDDIR}
 cp ${DEPSDIR}/lib/lib*.so.* ./python-install/lib
