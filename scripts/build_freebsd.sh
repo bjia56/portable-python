@@ -197,7 +197,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libxml2-2.12.4.tar.xz
 cd libxml2*
-./configure --without-python --prefix=${DEPSDIR}
+./configure --without-python --without-lzma --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license ./Copyright
