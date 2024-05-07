@@ -374,6 +374,7 @@ jobs:
         with:
           envs: 'RUN_TESTS DEBUG_CI VERBOSE_CI PORTABLE_PYTHON_BUILDSYSTEM_BRANCH'
           usesh: true
+          copyback: false
           release: ${{ steps.parse_release.outputs.release }}
           prepare: |
             pkg install -y bash
