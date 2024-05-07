@@ -408,6 +408,14 @@ make -j4
 make install
 
 cd ${BUILDDIR}
+patchelf \
+  --add-needed libfontconfig.so.1 \
+  --add-needed libfreetype.so.6 \
+  --add-needed libxml2.so.2 \
+  --add-needed libpng16.so.16 \
+  --add-needed libbrotlidec.so.1 \
+  --add-needed libbrotlicommon.so.1 \
+  ./python-install/bin/python
 cp ${DEPSDIR}/lib/lib*.so* ./python-install/lib
 cp -r ${LICENSEDIR} ./python-install
 
