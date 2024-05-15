@@ -9,7 +9,7 @@ on:
       platforms:
         required: true
         type: string
-        default: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,linux-s390x,macos,windows"
+        default: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,linux-s390x,macos,windows,freebsd13-x86_64,freebsd14-x86_64"
       buildsystem_branch:
         required: false
         type: string
@@ -53,10 +53,12 @@ env:
   VERBOSE_CI: ${{ inputs.verbose }}
   PORTABLE_PYTHON_BUILDSYSTEM_BRANCH: ${{ inputs.buildsystem_branch || 'portable-python' }}
   image_map: '{"x86_64": "amd64/centos:7", "i386": "i386/centos:7", "aarch64": "arm64v8/centos:7", "arm": "arm32v7/debian:bullseye", "riscv64": "riscv64/debian:sid", "s390x": "s390x/debian:bullseye"}'
+  freebsd_release_map: '{"14": "14.0", "13": "13.2"}'
 
 jobs:
   build_linux:
     name: Linux ${{ inputs.python_version }} ${{ matrix.arch }}
+    if: ${{ contains(inputs.platforms, 'linux') }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -72,47 +74,41 @@ jobs:
 
     steps:
       - name: Parse image
-        if: ${{ matrix.arch }}
         id: parse_image
         run: |
           IMAGE=$(echo ${{ toJSON(env.image_map) }} | jq -r '.["${{ matrix.arch }}"]')
           echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
 
       - name: Set up zig
-        if: ${{ matrix.arch }}
         uses: goto-bus-stop/setup-zig@v2
         with:
-          version: 0.12.0-dev.3097+5c0766b6c
+          version: 0.13.0-dev.211+6a65561e3
 
       - name: Checkout
-        if: ${{ matrix.arch }}
         uses: actions/checkout@v4
 
       - name: Build
-        if: ${{ matrix.arch }}
         run: |
           ./scripts/build_linux_zig.sh ${{ matrix.arch }} ${{ inputs.python_version }}
 
       - name: Interactive debugging
-        if: ${{ always() && matrix.arch && inputs.debug_interactive }}
+        if: ${{ always() && inputs.debug_interactive }}
         uses: fawazahmed0/action-debug@v2
 
       - name: Upload artifacts
-        if: ${{ matrix.arch }}
         uses: actions/upload-artifact@v4
         with:
           name: python-linux-${{ matrix.arch }}-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
-        if: ${{ always() && matrix.arch && inputs.debug }}
+        if: ${{ always()  && inputs.debug }}
         uses: actions/upload-artifact@v4
         with:
           name: build-python-linux-${{ matrix.arch }}-${{ inputs.python_version }}
           path: ./*python*.tar.gz
 
       - name: Test python in clean environment
-        if: ${{ matrix.arch }}
         uses: addnab/docker-run-action@v3
         with:
           image: ${{ steps.parse_image.outputs.image }}
@@ -225,7 +221,7 @@ jobs:
   build_macos:
     name: MacOS ${{ inputs.python_version }} universal2 (build)
     if: ${{ contains(inputs.platforms, 'macos') }}
-    runs-on: macos-latest
+    runs-on: macos-12
 
     steps:
       - name: Checkout
@@ -294,3 +290,107 @@ jobs:
           if [[ "${{ inputs.run_tests }}" == "true" ]]; then
             ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
           fi
+
+  build_freebsd:
+    name: FreeBSD ${{ matrix.release }} ${{ inputs.python_version }} x86_64 (build)
+    if: ${{ contains(inputs.platforms, 'freebsd') }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        release: [13, 14]
+        exclude:
+          - release: ${{ !contains(inputs.platforms, 'freebsd13-x86_64') && '13' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd14-x86_64') && '14' || '' }}
+
+    steps:
+      - name: Parse release
+        id: parse_release
+        run: |
+          RELEASE=$(echo ${{ toJSON(env.freebsd_release_map) }} | jq -r '.["${{ matrix.release }}"]')
+          echo "release=$RELEASE" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build in VM
+        uses: vmactions/freebsd-vm@v1
+        with:
+          envs: 'RUN_TESTS DEBUG_CI VERBOSE_CI PORTABLE_PYTHON_BUILDSYSTEM_BRANCH'
+          usesh: true
+          release: ${{ steps.parse_release.outputs.release }}
+          prepare: |
+            pkg install -y cmake bash wget patch git zip python3 autoconf automake libtool gettext bison pkgconf gmake gperf patchelf
+          run: |
+            export PLATFORM=freebsd${{ matrix.release }}
+            bash ./scripts/build_freebsd.sh x86_64 ${{ inputs.python_version }}
+
+      - name: Interactive debugging
+        if: ${{ always() && inputs.debug_interactive }}
+        uses: fawazahmed0/action-debug@v2
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-freebsd${{ matrix.release }}-x86_64-${{ inputs.python_version }}
+          path: ./python*.zip
+
+      - name: Upload artifacts
+        if: ${{ always() && inputs.debug }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-python-freebsd${{ matrix.release }}-x86_64-${{ inputs.python_version }}
+          path: ./*python*.tar.gz
+
+  test_freebsd:
+    name: FreeBSD ${{ matrix.release }} ${{ inputs.python_version }} x86_64 (test)
+    needs: build_freebsd
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        release: [13, 14]
+        exclude:
+          - release: ${{ !contains(inputs.platforms, 'freebsd13-x86_64') && '13' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd14-x86_64') && '14' || '' }}
+
+    steps:
+      - name: Parse release
+        id: parse_release
+        run: |
+          RELEASE=$(echo ${{ toJSON(env.freebsd_release_map) }} | jq -r '.["${{ matrix.release }}"]')
+          echo "release=$RELEASE" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: python-freebsd${{ matrix.release }}-x86_64-${{ inputs.python_version }}
+          path: ./python/
+
+      - name: Test in VM
+        uses: vmactions/freebsd-vm@v1
+        with:
+          envs: 'RUN_TESTS DEBUG_CI VERBOSE_CI PORTABLE_PYTHON_BUILDSYSTEM_BRANCH'
+          usesh: true
+          copyback: false
+          release: ${{ steps.parse_release.outputs.release }}
+          prepare: |
+            pkg install -y bash
+          run: |
+            cat > /tmp/test.sh <<EOF
+              unzip python/python-${{ inputs.python_version }}-freebsd${{ matrix.release }}-x86_64.zip
+
+              cd python-${{ inputs.python_version }}-freebsd${{ matrix.release }}-x86_64
+              chmod +x ./bin/python
+              ./bin/python --version
+              ./bin/python -m sysconfig
+              ./bin/python ${{ github.workspace }}/scripts/test.py
+
+              if [[ "${{ inputs.run_tests }}" == "true" ]]; then
+                ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
+              fi
+            EOF
+            bash /tmp/test.sh
