@@ -1,5 +1,6 @@
 import sys
 
+# adapted from https://stackoverflow.com/a/57567228
 new_shebang = """#!/bin/sh
 "true" '''\\'
 exec "$(dirname "$(readlink -f "$0")")"/python "$0" "$@"
