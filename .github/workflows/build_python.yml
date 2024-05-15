@@ -133,6 +133,7 @@ jobs:
             ./bin/python --version
             ./bin/python -m sysconfig
             ./bin/python /work/scripts/test.py
+            ./bin/pip3
 
             if [[ "${{ inputs.run_tests }}" == "true" ]]; then
               ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
@@ -285,6 +286,7 @@ jobs:
           ./bin/python --version
           ./bin/python -m sysconfig
           ./bin/python ${{ github.workspace }}/scripts/test.py
+          ./bin/pip3
 
           if [[ "${{ inputs.run_tests }}" == "true" ]]; then
             ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
@@ -379,7 +381,7 @@ jobs:
           prepare: |
             pkg install -y bash
           run: |
-            cat > /tmp/test.sh <<EOF 
+            cat > /tmp/test.sh <<EOF
               unzip python/python-${{ inputs.python_version }}-freebsd${{ matrix.release }}-x86_64.zip
 
               cd python-${{ inputs.python_version }}-freebsd${{ matrix.release }}-x86_64
@@ -387,6 +389,7 @@ jobs:
               ./bin/python --version
               ./bin/python -m sysconfig
               ./bin/python ${{ github.workspace }}/scripts/test.py
+              ./bin/pip3
 
               if [[ "${{ inputs.run_tests }}" == "true" ]]; then
                 ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
