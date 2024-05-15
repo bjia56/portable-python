@@ -42,7 +42,7 @@ case "$ARCH" in
     sudo ln -s /usr/riscv64-linux-gnu/lib/ld-linux-riscv64-lp64d.so.1 /lib/ld-linux-riscv64-lp64.so.1
     ;;
   s390x)
-    sudo apt -y install libc6-s390x-cross crossbuild-essential-s390x
+    sudo apt -y install libc6-s390x-cross
     sudo ln -s /usr/s390x-linux-gnu/lib/ld64.so.1 /lib/ld64.so.1
     ;;
 esac
@@ -85,11 +85,6 @@ elif [[ "${ARCH}" == "i386" ]]; then
   export CPPFLAGS="-m32 ${CPPFLAGS}"
   export CXXFLAGS="-m32 ${CXXFLAGS}"
   export LDFLAGS="-m32 ${LDFLAGS}"
-elif [[ "${ARCH}" == "s390x" ]]; then
-  export AR="s390x-linux-gnu-gcc-ar"
-  export CC="s390x-linux-gnu-gcc"
-  export CXX="s390x-linux-gnu-g++"
-  export CHOST=s390x-linux-gnu
 else
   # See above comment
   sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/${ARCH}-linux-gnu-gcc-ar
@@ -101,6 +96,8 @@ else
   if [[ "${ARCH}" == "riscv64" ]]; then
     export ZIG_FLAGS="-target riscv64-linux-gnu.2.27"
     export CFLAGS="-Wl,--undefined-version ${CFLAGS}"
+  elif [[ "${ARCH}" == "s390x" ]]; then
+    export ZIG_FLAGS="-target s390x-linux-gnu.2.19"
   else
     export ZIG_FLAGS="-target ${ARCH}-linux-gnu.2.17"
   fi
@@ -146,9 +143,6 @@ elif [[ "${ARCH}" == "i386" ]]; then
   ./Configure linux-x86 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 elif [[ "${ARCH}" == "riscv64" ]]; then
   CFLAGS="${CFLAGS} -fgnuc-version=0 -D__STDC_NO_ATOMICS__" ./Configure linux-generic64 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
-elif [[ "${ARCH}" == "s390x" ]]; then
-  ./Configure linux64-s390x no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
-else
   ./Configure linux-${ARCH} no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 fi
 make -j4
@@ -164,11 +158,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libffi-3.4.6.tar.gz
 cd libffi*
-if [[ "${ARCH}" == "s390x" ]]; then
-  ./configure --host=${CHOST} --prefix=${DEPSDIR}
-else
-  CFLAGS="${CFLAGS} -Wl,--undefined-version" ./configure --host=${CHOST} --prefix=${DEPSDIR}
-fi
+CFLAGS="${CFLAGS} -Wl,--undefined-version" ./configure --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
 install_license
@@ -355,11 +345,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libgcrypt-1.10.3.tar.bz2
 cd libgcrypt*
-if [[ "${ARCH}" == "s390x" ]]; then
-  ./configure --disable-asm --host=${CHOST} --prefix=${DEPSDIR}
-else
-  LDFLAGS="${LDFLAGS} -Wl,--undefined-version" ./configure --disable-asm --host=${CHOST} --prefix=${DEPSDIR}
-fi
+LDFLAGS="${LDFLAGS} -Wl,--undefined-version" ./configure --disable-asm --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
 install_license ./COPYING.LIB
@@ -513,8 +499,6 @@ additionalparams=()
 if [[ "${ARCH}" == "arm" ]]; then
   additionalparams+=(-DUSE_SYSTEM_LIBMPDEC=ON)
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${DEPSDIR}/lib
-elif [[ "${ARCH}" == "s390x" ]]; then
-  additionalparams+=(-DCMAKE_LIBRARY_PATH=/usr/s390x-linux-gnu/lib)
 fi
 
 wget --no-verbose -O portable-python-cmake-buildsystem.tar.gz https://github.com/bjia56/portable-python-cmake-buildsystem/tarball/${CMAKE_BUILDSYSTEM_BRANCH}
