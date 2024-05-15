@@ -86,6 +86,16 @@ export class PortablePython {
     }
 
     /**
+     * Contains the path to the bundled pip executable.
+     */
+    get pipPath() {
+        if (platform() === "win32") {
+            return join(this.installDir, this.pythonDistributionName, "Scripts", `pip${this.major}.exe`);
+        }
+        return join(this.installDir, this.pythonDistributionName, "bin", `pip${this.major}`);
+    }
+
+    /**
      * Contains the selected Python version.
      */
     get version() {
@@ -165,6 +175,10 @@ export class PortablePython {
                 renameSync(`${this.executablePath}${this.major}_`, `${this.executablePath}${this.major}`);
                 symlinkSync("python", `${this.executablePath}${this.major}.${this.minor}_`, "file");
                 renameSync(`${this.executablePath}${this.major}.${this.minor}_`, `${this.executablePath}${this.major}.${this.minor}`);
+
+                // ensure the pip script is executable
+                chmodSync(this.pipPath, 0o777);
+                chmodSync(`${this.pipPath}.${this.minor}`, 0o777);
             }
         }
 
