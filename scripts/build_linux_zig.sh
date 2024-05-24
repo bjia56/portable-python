@@ -98,15 +98,12 @@ else
   export CHOST=${ARCH}-linux-gnu
 fi
 
-# RISC-V hack for zig's glibc
-# https://github.com/ziglang/zig/issues/3340
-if [[ "${ARCH}" == "riscv64" ]]; then
-  cd /tmp
-  wget -O glibc.patch https://patch-diff.githubusercontent.com/raw/ziglang/zig/pull/18803.patch
-  cd $(dirname $(which zig))
-  patch -p1 < /tmp/glibc.patch || true
-  cd ${WORKDIR}
-fi
+# apply some zig patches
+cd $(dirname $(which zig))
+for patchfile in ${WORKDIR}/zigshim/patches/*.patch; do
+  patch -p1 < $patchfile
+done
+cd ${WORKDIR}
 
 echo "::endgroup::"
 ########
