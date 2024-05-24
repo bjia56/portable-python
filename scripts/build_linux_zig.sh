@@ -66,7 +66,7 @@ if [[ "${ARCH}" == "arm" ]]; then
   export CC="${ARCH}-linux-gnueabihf-gcc"
   export CXX="${ARCH}-linux-gnueabihf-g++"
   export CHOST=${ARCH}-linux-gnueabihf
-  export ZIG_FLAGS="-target ${ARCH}-linux-gnueabihf.2.35 -mfpu=vfp -mfloat-abi=hard -mcpu=arm1176jzf_s"
+  export ZIG_FLAGS="-target ${ARCH}-linux-gnueabihf.2.31 -mfpu=vfp -mfloat-abi=hard -mcpu=arm1176jzf_s"
 elif [[ "${ARCH}" == "i386" ]]; then
   # See above comment
   sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/i686-linux-gnu-gcc-ar
