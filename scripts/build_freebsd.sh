@@ -454,6 +454,9 @@ cd python-install
 ./bin/python -m ensurepip
 ./bin/python -m pip install -r ${WORKDIR}/baseline/requirements.txt
 
+python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip3
+python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip${PYTHON_VER}
+
 echo "::endgroup::"
 ###################
 # Compress output #

@@ -1,4 +1,4 @@
-import { createWriteStream, existsSync, rm, rmSync, mkdirSync, chmodSync } from "fs";
+import { createWriteStream, existsSync, rm, rmSync, mkdirSync, chmodSync, symlinkSync, renameSync } from "fs";
 import { join, dirname } from "path";
 import { platform, arch, release } from "os";
 import { Readable } from 'stream';
@@ -86,10 +86,41 @@ export class PortablePython {
     }
 
     /**
+     * Contains the path to the bundled pip executable.
+     */
+    get pipPath() {
+        if (platform() === "win32") {
+            return join(this.installDir, this.pythonDistributionName, "Scripts", `pip${this.major}.exe`);
+        }
+        return join(this.installDir, this.pythonDistributionName, "bin", `pip${this.major}`);
+    }
+
+    /**
      * Contains the selected Python version.
      */
     get version() {
         return this._version;
+    }
+
+    /**
+     * Contains the major version number.
+     */
+    get major() {
+        return this.version.split(".")[0];
+    }
+
+    /**
+     * Contains the minor version number.
+     */
+    get minor() {
+        return this.version.split(".")[1];
+    }
+
+    /**
+     * Contains the patch version number.
+     */
+    get patch() {
+        return this.version.split(".")[2];
     }
 
     /**
@@ -124,16 +155,44 @@ export class PortablePython {
     /**
      * Will download the compressed Python installation and extract it to
      * the installation directory.
+     * @param [zipFile=null] - Install from an existing zip file on the filesystem, instead of downloading.
      */
-    async install() {
+    async install(zipFile: string | null = null) {
         if (this.isInstalled()) {
+            return;
+        }
+
+        const postProcess = () => {
+            if (!this.isInstalled()) {
+                throw Error("something went wrong and the installation failed");
+            }
+
+            chmodSync(this.executablePath, 0o777);
+            if (platform() != "win32") {
+                // node can't create symlinks over existing files, so we create symlinks with temp names,
+                // then rename to overwrite existing files
+                symlinkSync("python", `${this.executablePath}${this.major}_`, "file");
+                renameSync(`${this.executablePath}${this.major}_`, `${this.executablePath}${this.major}`);
+                symlinkSync("python", `${this.executablePath}${this.major}.${this.minor}_`, "file");
+                renameSync(`${this.executablePath}${this.major}.${this.minor}_`, `${this.executablePath}${this.major}.${this.minor}`);
+
+                // ensure the pip script is executable
+                chmodSync(this.pipPath, 0o777);
+                chmodSync(`${this.pipPath}.${this.minor}`, 0o777);
+            }
+        }
+
+        mkdirSync(this.installDir, { recursive: true });
+
+        if (zipFile) {
+            const zip = new AdmZip(zipFile);
+            zip.extractAllTo(this.installDir, true)
+            postProcess();
             return;
         }
 
         const url = `https://github.com/bjia56/portable-python/releases/download/${this.releaseTag}/${this.pythonDistributionName}.zip`
         const downloadPath = join(this.installDir, `${this.pythonDistributionName}.zip`);
-
-        mkdirSync(this.installDir, { recursive: true });
 
         const installDir = this.installDir;
         await download(url, downloadPath);
@@ -142,11 +201,7 @@ export class PortablePython {
         zip.extractAllTo(installDir, true)
 
         rmSync(downloadPath);
-        if (!this.isInstalled()) {
-            throw Error("something went wrong and the installation failed");
-        }
-
-        chmodSync(this.executablePath, 0o777);
+        postProcess();
     }
 
     /**
