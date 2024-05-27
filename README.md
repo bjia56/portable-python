@@ -1,7 +1,4 @@
 # portable-python
-
-![NPM Downloads](https://img.shields.io/npm/dm/%40bjia56%2Fportable-python)
-
 This project provides self-contained (hence, "portable") Python distributions to a variety of target platforms and architectures. These Python distributions can be downloaded and extracted to anywhere on the filesystem, making installation trivially easy and configurable.
 
 ## Usage
