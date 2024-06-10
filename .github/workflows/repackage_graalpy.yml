@@ -24,7 +24,7 @@ env:
 
 jobs:
   build_linux:
-    name: Linux GraalPy ${{ inputs.graalpy_version }} ${{ matrix.arch }}
+    name: Linux ${{ inputs.graalpy_version }} ${{ matrix.arch }}
     if: ${{ contains(inputs.platforms, 'linux') }}
     runs-on: ubuntu-latest
     strategy:
@@ -65,7 +65,7 @@ jobs:
           path: ./graalpy*.zip
 
   build_windows:
-    name: Windows GraalPy ${{ inputs.graalpy_version }} x86_64
+    name: Windows ${{ inputs.graalpy_version }} x86_64
     if: ${{ contains(inputs.platforms, 'windows') }}
     runs-on: windows-latest
 
@@ -91,7 +91,7 @@ jobs:
           path: ./graalpy*.zip
 
   build_macos:
-    name: MacOS GraalPy ${{ inputs.graalpy_version }} ${{ matrix.arch }}
+    name: MacOS ${{ inputs.graalpy_version }} ${{ matrix.arch }}
     if: ${{ contains(inputs.platforms, 'macos') }}
     runs-on: ${{ matrix.runner }}
     strategy:
