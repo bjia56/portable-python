@@ -22,9 +22,11 @@ UPLOAD_FILENAME=graalpy-community-jvm-${GRAALPY_VERSION}-${PLATFORM}-${ARCH}
 if [[ "${PLATFORM}" == "windows" ]]; then
   curl -L https://github.com/oracle/graalpython/releases/download/graal-${GRAALPY_VERSION}/${DL_FILENAME}.zip --output ${DL_FILENAME}.zip
   7z.exe x ${DL_FILENAME}.zip
+  rm ${DL_FILENAME}.zip
 else
   curl -L https://github.com/oracle/graalpython/releases/download/graal-${GRAALPY_VERSION}/${DL_FILENAME}.tar.gz --output ${DL_FILENAME}.tar.gz
   tar -xf ${DL_FILENAME}.tar.gz
+  rm ${DL_FILENAME}.tar.gz
 fi
 
 cd ${EXTRACTED_FILENAME}
