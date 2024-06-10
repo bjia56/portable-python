@@ -6,8 +6,8 @@ PLATFORM=$3
 
 WORKDIR=$(pwd)
 
-wget -q https://github.com/oracle/graalpython/releases/download/graal-${GRAALPY_VERSION}/graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${ARCH}.tar.gz
-tar -xf graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${ARCH}
+curl -L https://github.com/oracle/graalpython/releases/download/graal-${GRAALPY_VERSION}/graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${ARCH}.tar.gz --output graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${ARCH}.tar.gz
+tar -xf graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${ARCH}.tar.gz
 cd graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${ARCH}
 ./bin/python -m ensurepip
 
