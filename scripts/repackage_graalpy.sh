@@ -9,22 +9,34 @@ if [[ "${ARCH}" == "x86_64" ]]; then
   DL_ARCH=amd64
 fi
 
-WORKDIR=$(pwd)
-
-if [[ "${PLATFORM}" == "windows" ]]; then
-  curl -L https://github.com/oracle/graalpython/releases/download/graal-${GRAALPY_VERSION}/graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${DL_ARCH}.zip --output graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${DL_ARCH}.zip
-  7z.exe x graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${DL_ARCH}.zip
-else
-  curl -L https://github.com/oracle/graalpython/releases/download/graal-${GRAALPY_VERSION}/graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${DL_ARCH}.tar.gz --output graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${DL_ARCH}.tar.gz
-  tar -xf graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${DL_ARCH}.tar.gz
+if [[ "${PLATFORM}" == "linux" ]]; then
+  yum -y install zip
 fi
 
-cd graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${DL_ARCH}
+WORKDIR=$(pwd)
+
+DL_FILENAME=graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${DL_ARCH}
+UPLOAD_FILENAME=graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${ARCH}
+
+if [[ "${PLATFORM}" == "windows" ]]; then
+  curl -L https://github.com/oracle/graalpython/releases/download/graal-${GRAALPY_VERSION}/${DL_FILENAME}.zip --output ${DL_FILENAME}.zip
+  7z.exe x ${DL_FILENAME}.zip
+else
+  curl -L https://github.com/oracle/graalpython/releases/download/graal-${GRAALPY_VERSION}/${DL_FILENAME}.tar.gz --output ${DL_FILENAME}.tar.gz
+  tar -xf ${DL_FILENAME}.tar.gz
+fi
+
+cd ${DL_FILENAME}
 ./bin/python -m ensurepip
 
-tar -czf ${WORKDIR}/graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${ARCH}.tar.gz graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${ARCH}
+cd ${WORKDIR}
+if [[ "${DL_FILENAME}" != "${UPLOAD_FILENAME}" ]]; then
+  mv ${DL_FILENAME} ${UPLOAD_FILENAME}
+fi
+
+tar -czf ${WORKDIR}/${UPLOAD_FILENAME}.tar.gz ${UPLOAD_FILENAME}
 if [[ "${PLATFORM}" == "windows" ]]; then
-  7z.exe a ${WORKDIR}/graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${ARCH}.zip graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${ARCH}
+  7z.exe a ${WORKDIR}/${UPLOAD_FILENAME}.zip ${UPLOAD_FILENAME}
 else
-  zip ${WORKDIR}/graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${ARCH}.zip $(tar tf ${WORKDIR}/graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${ARCH}.tar.gz)
+  zip ${WORKDIR}/${UPLOAD_FILENAME}.zip $(tar tf ${WORKDIR}/${UPLOAD_FILENAME}.tar.gz)
 fi
