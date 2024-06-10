@@ -4,9 +4,14 @@ ARCH=$1
 GRAALPY_VERSION=$2
 PLATFORM=$3
 
+DL_ARCH=${ARCH}
+if [[ "${ARCH}" == "x86_64" ]]; then
+  DL_ARCH=amd64
+fi
+
 WORKDIR=$(pwd)
 
-curl -L https://github.com/oracle/graalpython/releases/download/graal-${GRAALPY_VERSION}/graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${ARCH}.tar.gz --output graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${ARCH}.tar.gz
+curl -L https://github.com/oracle/graalpython/releases/download/graal-${GRAALPY_VERSION}/graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${DL_ARCH}.tar.gz --output graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${ARCH}.tar.gz
 tar -xf graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${ARCH}.tar.gz
 cd graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${ARCH}
 ./bin/python -m ensurepip
