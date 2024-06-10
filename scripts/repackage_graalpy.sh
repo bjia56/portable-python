@@ -16,6 +16,7 @@ fi
 WORKDIR=$(pwd)
 
 DL_FILENAME=graalpy-community-jvm-${GRAALPY_VERSION}-${PLATFORM}-${DL_ARCH}
+EXTRACTED_FILENAME=graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${DL_ARCH}
 UPLOAD_FILENAME=graalpy-community-jvm-${GRAALPY_VERSION}-${PLATFORM}-${ARCH}
 
 if [[ "${PLATFORM}" == "windows" ]]; then
@@ -26,14 +27,12 @@ else
   tar -xf ${DL_FILENAME}.tar.gz
 fi
 
-cd ${DL_FILENAME}
+cd ${EXTRACTED_FILENAME}
 ./libexec/graalpy-polyglot-get js-community
 ./bin/python -m ensurepip
 
 cd ${WORKDIR}
-if [[ "${DL_FILENAME}" != "${UPLOAD_FILENAME}" ]]; then
-  mv ${DL_FILENAME} ${UPLOAD_FILENAME}
-fi
+mv ${EXTRACTED_FILENAME} ${UPLOAD_FILENAME}
 
 tar -czf ${WORKDIR}/${UPLOAD_FILENAME}.tar.gz ${UPLOAD_FILENAME}
 if [[ "${PLATFORM}" == "windows" ]]; then
