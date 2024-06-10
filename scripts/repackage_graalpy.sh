@@ -10,7 +10,7 @@ if [[ "${ARCH}" == "x86_64" ]]; then
 fi
 
 if [[ "${PLATFORM}" == "linux" ]]; then
-  yum -y install zip
+  yum -y install zip python3
 fi
 
 WORKDIR=$(pwd)
@@ -36,6 +36,8 @@ cd ${EXTRACTED_FILENAME}
 cd ${WORKDIR}
 mv ${EXTRACTED_FILENAME} ${UPLOAD_FILENAME}
 
+python3 -m pip install pyclean
+python3 -m pyclean -v ${UPLOAD_FILENAME}
 tar -czf ${WORKDIR}/${UPLOAD_FILENAME}.tar.gz ${UPLOAD_FILENAME}
 if [[ "${PLATFORM}" == "windows" ]]; then
   7z.exe a ${WORKDIR}/${UPLOAD_FILENAME}.zip ${UPLOAD_FILENAME}
