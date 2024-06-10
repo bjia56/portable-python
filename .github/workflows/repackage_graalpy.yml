@@ -52,7 +52,7 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: ${{ steps.parse_image.outputs.image }}
-          options: -v ${{ github.workspace }}:/work --workdir /tmp
+          options: -v ${{ github.workspace }}:/work --workdir /work
           shell: bash
           run: |
             set -ex
