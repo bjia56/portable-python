@@ -1,0 +1,120 @@
+name: Repackage GraalPy
+
+on:
+  workflow_dispatch:
+    inputs:
+      graalpy_version:
+        required: true
+        type: string
+      platforms:
+        required: true
+        type: string
+        default: "linux-x86_64,linux-aarch64,macos,windows"
+  workflow_call:
+    inputs:
+      graalpy_version:
+        required: true
+        type: string
+      platforms:
+        required: true
+        type: string
+
+env:
+  image_map: '{"x86_64": "amd64/centos:7", "aarch64": "arm64v8/centos:7"}'
+
+jobs:
+  build_linux:
+    name: Linux GraalPy ${{ inputs.graalpy_version }} ${{ matrix.arch }}
+    if: ${{ contains(inputs.platforms, 'linux') }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x86_64, aarch64]
+        exclude:
+          - arch: ${{ !contains(inputs.platforms, 'linux-x86_64') && 'x86_64' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'linux-aarch64') && 'aarch64' || '' }}
+
+    steps:
+      - name: Parse image
+        id: parse_image
+        run: |
+          IMAGE=$(echo ${{ toJSON(env.image_map) }} | jq -r '.["${{ matrix.arch }}"]')
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Repackage
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ${{ steps.parse_image.outputs.image }}
+          options: -v ${{ github.workspace }}:/work --workdir /tmp
+          shell: bash
+          run: |
+            set -ex
+            ./scripts/repackage_graalpy.sh ${{ matrix.arch }} ${{ inputs.graalpy_version }} linux
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: graalpy-linux-${{ matrix.arch }}-${{ inputs.graalpy_version }}
+          path: ./graalpy*.zip
+
+  build_windows:
+    name: Windows GraalPy ${{ inputs.graalpy_version }} x86_64
+    if: ${{ contains(inputs.platforms, 'windows') }}
+    runs-on: windows-latest
+
+    steps:
+      - name: Set git to use LF
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Repackage
+        shell: bash
+        run: |
+          set -ex
+          ./scripts/repackage_graalpy.sh x86_64 ${{ inputs.graalpy_version }} windows
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: graalpy-windows-x86_64-${{ inputs.graalpy_version }}
+          path: ./graalpy*.zip
+
+  build_macos:
+    name: MacOS GraalPy ${{ inputs.graalpy_version }} ${{ matrix.arch }}
+    if: ${{ contains(inputs.platforms, 'macos') }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x86_64, aarch64]
+        include:
+          - arch: x86_64
+            runner: macos-12
+          - arch: aarch64
+            runner: macos-14
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Repackage
+        run: |
+          set -ex
+          ./scripts/repackage_graalpy.sh ${{ matrix.arch }} ${{ inputs.graalpy_version }} macos
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: graalpy-darwin-${{ matrix.arch }}-${{ inputs.graalpy_version }}
+          path: ./graalpy*.zip
