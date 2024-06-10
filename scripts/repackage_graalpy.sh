@@ -15,8 +15,8 @@ fi
 
 WORKDIR=$(pwd)
 
-DL_FILENAME=graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${DL_ARCH}
-UPLOAD_FILENAME=graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${ARCH}
+DL_FILENAME=graalpy-community-jvm-${GRAALPY_VERSION}-${PLATFORM}-${DL_ARCH}
+UPLOAD_FILENAME=graalpy-community-jvm-${GRAALPY_VERSION}-${PLATFORM}-${ARCH}
 
 if [[ "${PLATFORM}" == "windows" ]]; then
   curl -L https://github.com/oracle/graalpython/releases/download/graal-${GRAALPY_VERSION}/${DL_FILENAME}.zip --output ${DL_FILENAME}.zip
@@ -27,6 +27,7 @@ else
 fi
 
 cd ${DL_FILENAME}
+./libexec/graalpy-polyglot-get js-community
 ./bin/python -m ensurepip
 
 cd ${WORKDIR}
