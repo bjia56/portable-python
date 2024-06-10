@@ -23,8 +23,8 @@ on:
         default: "portable-python"
 
 jobs:
-  build:
-    name: ${{ matrix.python_version }}
+  cpython:
+    name: CPython ${{ matrix.python_version }}
     strategy:
       fail-fast: false
       matrix:
@@ -38,8 +38,8 @@ jobs:
       platforms: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,macos,windows,freebsd13-x86_64,freebsd14-x86_64"
       buildsystem_branch: ${{ inputs.buildsystem_branch || 'portable-python' }}
 
-  repackage_graalpy:
-    name: ${{ matrix.graalpy_version }}
+  graalpy:
+    name: GraalPy ${{ matrix.graalpy_version }}
     strategy:
       fail-fast: false
       matrix:
