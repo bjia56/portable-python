@@ -1,6 +1,6 @@
 {
   "name": "@bjia56/portable-python-3.12",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "Portable Python 3.12",
   "main": "./dist/index.js",
   "files": [
