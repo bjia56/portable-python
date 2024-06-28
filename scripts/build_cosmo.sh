@@ -47,7 +47,7 @@ cd ${BUILDDIR}
 
 download_verify_extract openssl-1.1.1w.tar.gz
 cd openssl*
-./Configure no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+./Configure linux-generic64 no-asm no-shared no-dso no-engine --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 make -j4
 make install_sw
 install_license
