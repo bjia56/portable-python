@@ -31,7 +31,6 @@ echo "::endgroup::"
 echo "::group::zlib"
 cd ${BUILDDIR}
 
-export BUILDLOG=/tmp/zlib.log
 download_verify_extract zlib-1.3.1.tar.gz
 cd zlib*
 ./configure --prefix=${DEPSDIR} --static
@@ -46,7 +45,6 @@ echo "::endgroup::"
 echo "::group::OpenSSL"
 cd ${BUILDDIR}
 
-export BUILDLOG=/tmp/openssl.log
 download_verify_extract openssl-1.1.1w.tar.gz
 cd openssl*
 ./Configure linux-generic64 no-asm no-shared no-dso no-engine --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
@@ -61,7 +59,6 @@ echo "::endgroup::"
 echo "::group::libffi"
 cd ${BUILDDIR}
 
-export BUILDLOG=/tmp/libffi.log
 download_verify_extract libffi-3.4.6.tar.gz
 cp -r libffi-3.4.6 libffi-3.4.6-arm64
 cd libffi-3.4.6
@@ -87,7 +84,6 @@ echo "::endgroup::"
 echo "::group::sqlite3"
 cd ${BUILDDIR}
 
-export BUILDLOG=/tmp/sqlite.log
 download_verify_extract sqlite-autoconf-3450000.tar.gz
 cd sqlite*
 ./configure --prefix=${DEPSDIR}
@@ -101,7 +97,6 @@ echo "::endgroup::"
 echo "::group::expat"
 cd ${BUILDDIR}
 
-export BUILDLOG=/tmp/expat.log
 download_verify_extract expat-2.6.2.tar.gz
 cd expat*
 ./configure --disable-shared --prefix=${DEPSDIR}
@@ -116,7 +111,6 @@ echo "::endgroup::"
 echo "::group::ncurses"
 cd ${BUILDDIR}
 
-export BUILDLOG=/tmp/ncurses.log
 download_verify_extract ncurses-6.4.tar.gz
 cd ncurses*
 ./configure --with-normal --without-progs --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
@@ -131,7 +125,6 @@ echo "::endgroup::"
 echo "::group::readline"
 cd ${BUILDDIR}
 
-export BUILDLOG=/tmp/readline.log
 download_verify_extract readline-8.2.tar.gz
 cd readline*
 ./configure --with-curses --disable-shared --prefix=${DEPSDIR}
@@ -146,7 +139,6 @@ echo "::endgroup::"
 echo "::group::bzip2"
 cd ${BUILDDIR}
 
-export BUILDLOG=/tmp/bzip.log
 wget --no-verbose -O bzip2.tar.gz https://github.com/commontk/bzip2/tarball/master
 tar -xf bzip2*.tar.gz
 rm *.tar.gz
@@ -166,7 +158,6 @@ echo "::endgroup::"
 echo "::group::xz"
 cd ${BUILDDIR}
 
-export BUILDLOG=/tmp/xz.log
 download_verify_extract xz-5.4.5.tar.gz
 cd xz*
 mkdir build
@@ -184,7 +175,6 @@ echo "::endgroup::"
 echo "::group::Brotli"
 cd ${BUILDDIR}
 
-export BUILDLOG=/tmp/brotli.log
 download_verify_extract brotli-1.1.0.tar.gz
 cd brotli*
 mkdir build
@@ -202,7 +192,6 @@ echo "::endgroup::"
 echo "::group::uuid"
 cd ${BUILDDIR}
 
-export BUILDLOG=/tmp/uuid.log
 download_verify_extract util-linux-2.39.3.tar.gz
 cd util-linux*
 ./autogen.sh
@@ -218,7 +207,6 @@ echo "::endgroup::"
 echo "::group::gdbm"
 cd ${BUILDDIR}
 
-export BUILDLOG=/tmp/gdbm.log
 download_verify_extract gdbm-1.23.tar.gz
 cd gdbm*
 ./configure --enable-libgdbm-compat --prefix=${DEPSDIR}
@@ -233,7 +221,6 @@ echo "::endgroup::"
 echo "::group::libxml2"
 cd ${BUILDDIR}
 
-export BUILDLOG=/tmp/libxml2.log
 download_verify_extract libxml2-2.12.4.tar.xz
 cd libxml2*
 ./configure --enable-static --disable-shared --without-python --prefix=${DEPSDIR}
@@ -248,7 +235,6 @@ echo "::endgroup::"
 echo "::group::libpng16"
 cd ${BUILDDIR}
 
-export BUILDLOG=/tmp/libpng16.log
 download_verify_extract libpng-1.6.41.tar.gz
 cd libpng*
 ./configure --with-zlib-prefix=${DEPSDIR} --disable-tools --prefix=${DEPSDIR}
@@ -262,8 +248,6 @@ echo "::endgroup::"
 echo "::group::libgcrypt"
 cd ${BUILDDIR}
 
-
-export BUILDLOG=/tmp/libgpg-error.log
 download_verify_extract libgpg-error-1.47.tar.bz2
 cd libgpg-error*
 ./configure --prefix=${DEPSDIR}
@@ -273,7 +257,6 @@ install_license ./COPYING.LIB
 
 cd ${BUILDDIR}
 
-export BUILDLOG=/tmp/libgcrypt.log
 download_verify_extract libgcrypt-1.10.3.tar.bz2
 cd libgcrypt*
 ./configure --disable-asm --prefix=${DEPSDIR}
@@ -288,7 +271,6 @@ echo "::endgroup::"
 echo "::group::libxslt"
 cd ${BUILDDIR}
 
-export BUILDLOG=/tmp/libxslt.log
 download_verify_extract libxslt-1.1.39.tar.xz
 cd libxslt*
 CFLAGS="${CFLAGS} -I${DEPSDIR}/include/libxml2" ./configure --with-libxml-prefix=${DEPSDIR} --without-python --prefix=${DEPSDIR}
@@ -303,7 +285,6 @@ echo "::endgroup::"
 echo "::group::freetype"
 cd ${BUILDDIR}
 
-export BUILDLOG=/tmp/freetype.log
 download_verify_extract freetype-2.13.2.tar.gz
 cd freetype*
 ./configure --prefix=${DEPSDIR}
@@ -318,7 +299,6 @@ echo "::endgroup::"
 echo "::group::fontconfig"
 cd ${BUILDDIR}
 
-export BUILDLOG=/tmp/fontconfig.log
 download_verify_extract fontconfig-2.15.0.tar.gz
 cd fontconfig*
 LDFLAGS="${LDFLAGS} -lxml2" ./configure --enable-static --disable-shared --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
@@ -340,7 +320,6 @@ function build_x11_lib_core() {
   pkg=$1
   ext_flags="$2"
   file=$pkg.tar.gz
-  export BUILDLOG=/tmp/$pkg.log
   download_verify_extract $file
   cd $pkg
   autoreconf -vfi
@@ -384,7 +363,6 @@ build_x11_lib libXScrnSaver-1.2.4 --enable-malloc0returnsnull
 echo "::group::tcl"
 cd ${BUILDDIR}
 
-export BUILDLOG=/tmp/tcl8.6.log
 download_verify_extract tcl8.6.13-src.tar.gz
 cd tcl*/unix
 LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --prefix=${DEPSDIR}
@@ -400,7 +378,6 @@ echo "::endgroup::"
 echo "::group::tk"
 cd ${BUILDDIR}
 
-export BUILDLOG=/tmp/tk8.6.log
 download_verify_extract tk8.6.13-src.tar.gz
 cd tk*/unix
 LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --prefix=${DEPSDIR}
@@ -416,7 +393,6 @@ echo "::endgroup::"
 echo "::group::Python"
 cd ${BUILDDIR}
 
-export BUILDLOG=/tmp/python.log
 wget --no-verbose -O portable-python-cmake-buildsystem.tar.gz https://github.com/bjia56/portable-python-cmake-buildsystem/tarball/${CMAKE_BUILDSYSTEM_BRANCH}
 tar -xf portable-python-cmake-buildsystem.tar.gz
 rm *.tar.gz
