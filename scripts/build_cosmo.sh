@@ -4,9 +4,6 @@ PLATFORM=cosmo
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 source ${SCRIPT_DIR}/utils.sh
 
-which zig
-zig version
-
 ########################
 # Install dependencies #
 ########################
