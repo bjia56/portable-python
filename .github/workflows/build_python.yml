@@ -396,3 +396,69 @@ jobs:
               fi
             EOF
             bash /tmp/test.sh
+
+  build_cosmo:
+    name: Linux ${{ inputs.python_version }} cosmo
+    if: ${{ contains(inputs.platforms, 'cosmo') }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Parse image
+        id: parse_image
+        run: |
+          IMAGE=$(echo ${{ toJSON(env.image_map) }} | jq -r '.["${{ x86_64 }}"]')
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+
+      - name: Set up cosmocc
+        uses: bjia56/setup-cosmocc@main
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build
+        run: |
+          ./scripts/build_cosmo.sh cosmo ${{ inputs.python_version }}
+
+      - name: Interactive debugging
+        if: ${{ always() && inputs.debug_interactive }}
+        uses: fawazahmed0/action-debug@v2
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-linux-cosmo-${{ inputs.python_version }}
+          path: ./python*.zip
+
+      - name: Upload artifacts
+        if: ${{ always()  && inputs.debug }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-python-linux-cosmo-${{ inputs.python_version }}
+          path: ./*python*.tar.gz
+
+      - name: Test python in clean environment
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ${{ steps.parse_image.outputs.image }}
+          options: -v ${{ github.workspace }}:/work --workdir /tmp
+          shell: bash
+          run: |
+            set -e
+            uname -a
+
+            yum -y install unzip
+
+            cp /work/python*.zip .
+            unzip ./python*.zip
+
+            cd python-${{ inputs.python_version }}-linux-cosmo
+            chmod +x ./bin/python
+            ldd -v -r ./bin/python
+            ./bin/python --version
+            ./bin/python -m sysconfig
+            ./bin/python /work/scripts/test.py
+            ./bin/pip3
+
+            if [[ "${{ inputs.run_tests }}" == "true" ]]; then
+              ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
+            fi
