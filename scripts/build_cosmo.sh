@@ -90,7 +90,7 @@ cd ${BUILDDIR}
 download_verify_extract sqlite-autoconf-3450000.tar.gz
 cd sqlite*
 sed -i "s/PACKAGE_STRING='sqlite 3.45.0'/PACKAGE_STRING='sqlite-3.45.0'/g" configure
-./configure --prefix=${DEPSDIR}
+./configure --prefix=${DEPSDIR} --disable-shared
 make -j4
 make install
 
