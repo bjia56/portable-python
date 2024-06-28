@@ -33,7 +33,7 @@ cd ${BUILDDIR}
 
 download_verify_extract zlib-1.3.1.tar.gz
 cd zlib*
-./configure --prefix=${DEPSDIR}
+./configure --prefix=${DEPSDIR} --disable-shared --enable-static
 make -j4
 make install
 install_license
