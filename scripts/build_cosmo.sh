@@ -60,11 +60,22 @@ echo "::group::libffi"
 cd ${BUILDDIR}
 
 download_verify_extract libffi-3.4.6.tar.gz
-cd libffi*
-./configure --prefix=${DEPSDIR} --disable-shared --enable-static --without-pic --with-gnu-ld --disable-exec-static-tramp
+cp -r libffi-3.4.6 libffi-3.4.6-arm64
+cd libffi-3.4.6
+CC="x86_64-unknown-cosmo-cc" ./configure --prefix ${DEPSDIR} --disable-shared --enable-static --disable-exec-static-tramp
+make -j4
+make install
+cd ${BUILDDIR}
+mkdir libffi-arm64-out
+cd libffi-3.4.6-arm64
+CC="aarch64-unknown-cosmo-cc" ./configure --prefix ${BUILDDIR}/libffi-arm64-out --disable-shared --enable-static --disable-exec-static-tramp --host=aarch64
 make -j4
 make install
 install_license
+
+cd ${BUILDDIR}
+apelink -o libffi.a ${DEPSDIR}/lib/libffi.a ${BUILDDIR}/libffi-arm64-out/lib/libffi.a
+mv libffi.a ${DEPSDIR}/lib/libffi.a
 
 echo "::endgroup::"
 ###########
