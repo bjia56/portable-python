@@ -74,8 +74,11 @@ make install
 install_license
 
 cd ${BUILDDIR}
-apelink -o libffi.a ${DEPSDIR}/lib/libffi.a ${BUILDDIR}/libffi-arm64-out/lib/libffi.a
+mkdir ${DEPSDIR}/lib/.aarch64
+cp ${BUILDDIR}/libffi-arm64-out/lib/libffi.a ${DEPSDIR}/lib/.aarch64/libffi.a
+cosmoar rc libffi.a ${DEPSDIR}/lib/libffi.a
 mv libffi.a ${DEPSDIR}/lib/libffi.a
+rm -rf ${DEPSDIR}/lib/.aarch64
 
 echo "::endgroup::"
 ###########
