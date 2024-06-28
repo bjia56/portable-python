@@ -406,7 +406,7 @@ jobs:
       - name: Parse image
         id: parse_image
         run: |
-          IMAGE=$(echo ${{ toJSON(env.image_map) }} | jq -r '.["${{ x86_64 }}"]')
+          IMAGE=$(echo ${{ toJSON(env.image_map) }} | jq -r '.["x86_64"]')
           echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
 
       - name: Set up cosmocc
