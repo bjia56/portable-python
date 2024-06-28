@@ -62,13 +62,13 @@ cd ${BUILDDIR}
 download_verify_extract libffi-3.4.6.tar.gz
 cp -r libffi-3.4.6 libffi-3.4.6-arm64
 cd libffi-3.4.6
-CC="x86_64-unknown-cosmo-cc" ./configure --prefix ${DEPSDIR} --disable-shared --enable-static --disable-exec-static-tramp
+CC="x86_64-unknown-cosmo-cc" AR="x86_64-unknown-cosmo-ar" ./configure --prefix ${DEPSDIR} --disable-shared --enable-static --disable-exec-static-tramp
 make -j4
 make install
 cd ${BUILDDIR}
 mkdir libffi-arm64-out
 cd libffi-3.4.6-arm64
-CC="aarch64-unknown-cosmo-cc" ./configure --prefix ${BUILDDIR}/libffi-arm64-out --disable-shared --enable-static --disable-exec-static-tramp --host=aarch64
+CC="aarch64-unknown-cosmo-cc" AR="aarch64-unknown-cosmo-ar" ./configure --prefix ${BUILDDIR}/libffi-arm64-out --disable-shared --enable-static --disable-exec-static-tramp --host=aarch64
 make -j4
 make install
 install_license
