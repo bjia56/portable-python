@@ -61,7 +61,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libffi-3.4.6.tar.gz
 cd libffi*
-./configure --prefix=${DEPSDIR}
+./configure --prefix=${DEPSDIR} --disable-exec-static-tramp
 make -j4
 make install
 install_license
