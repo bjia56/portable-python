@@ -250,7 +250,8 @@ cd ${BUILDDIR}
 
 download_verify_extract libgpg-error-1.47.tar.bz2
 cd libgpg-error*
-./configure --prefix=${DEPSDIR}
+sed -i '1i #include <errno.h>' src/mkerrcodes.c 
+./configure --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
 cp .aarch64/* ${DEPSDIR}/lib/.aarch64
@@ -260,7 +261,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libgcrypt-1.10.3.tar.bz2
 cd libgcrypt*
-./configure --disable-asm --prefix=${DEPSDIR}
+./configure --disable-asm --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
 cp .aarch64/* ${DEPSDIR}/lib/.aarch64
@@ -275,7 +276,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libxslt-1.1.39.tar.xz
 cd libxslt*
-CFLAGS="${CFLAGS} -I${DEPSDIR}/include/libxml2" ./configure --with-libxml-prefix=${DEPSDIR} --without-python --prefix=${DEPSDIR}
+CFLAGS="${CFLAGS} -I${DEPSDIR}/include/libxml2" ./configure --with-libxml-prefix=${DEPSDIR} --without-python --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
 cp .aarch64/* ${DEPSDIR}/lib/.aarch64
@@ -290,9 +291,10 @@ cd ${BUILDDIR}
 
 download_verify_extract freetype-2.13.2.tar.gz
 cd freetype*
-./configure --prefix=${DEPSDIR}
+./configure --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
+cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 install_license ./docs/FTL.TXT
 
 echo "::endgroup::"
@@ -326,9 +328,10 @@ function build_x11_lib_core() {
   download_verify_extract $file
   cd $pkg
   autoreconf -vfi
-  ./configure $ext_flags --prefix=${DEPSDIR}
+  ./configure $ext_flags --disable-shared --prefix=${DEPSDIR}
   make -j4
   make install
+  cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 
   echo "::endgroup::"
 }
@@ -371,6 +374,7 @@ cd tcl*/unix
 LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
+cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 cd ..
 install_license ./license.terms
 
@@ -386,6 +390,7 @@ cd tk*/unix
 LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
+cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 cd ..
 install_license ./license.terms
 
