@@ -53,6 +53,7 @@ cd openssl*
 ./Configure linux-generic64 no-asm no-shared no-dso no-engine --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 make -j4
 make install_sw
+cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 install_license
 
 echo "::endgroup::"
@@ -77,11 +78,7 @@ make install
 install_license
 
 cd ${BUILDDIR}
-mkdir ${DEPSDIR}/lib/.aarch64
 cp ${BUILDDIR}/libffi-arm64-out/lib/libffi.a ${DEPSDIR}/lib/.aarch64/libffi.a
-cosmoar rc libffi.a ${DEPSDIR}/lib/libffi.a
-mv libffi.a ${DEPSDIR}/lib/libffi.a
-rm -rf ${DEPSDIR}/lib/.aarch64
 
 echo "::endgroup::"
 ###########
@@ -96,6 +93,7 @@ sed -i "s/PACKAGE_STRING='sqlite 3.45.0'/PACKAGE_STRING='sqlite\\\\\\\\x203.45.0
 ./configure --prefix=${DEPSDIR} --disable-shared
 make -j4
 make install
+cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 
 echo "::endgroup::"
 #########
@@ -109,6 +107,7 @@ cd expat*
 ./configure --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
+cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 install_license
 
 echo "::endgroup::"
@@ -123,6 +122,7 @@ cd ncurses*
 ./configure --with-normal --without-progs --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
 make -j4
 make install
+cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 install_license
 
 echo "::endgroup::"
@@ -137,6 +137,7 @@ cd readline*
 ./configure --with-curses --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
+cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 install_license
 
 echo "::endgroup::"
