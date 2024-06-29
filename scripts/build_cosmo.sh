@@ -260,12 +260,21 @@ install_license ./COPYING.LIB
 cd ${BUILDDIR}
 
 download_verify_extract libgcrypt-1.10.3.tar.bz2
-cd libgcrypt*
-./configure --disable-asm --disable-shared --prefix=${DEPSDIR}
+cp -r libgcrypt-1.10.3 libgcrypt-1.10.3-arm64
+cd libgcrypt-1.10.3
+CC="x86_64-unknown-cosmo-cc" AR="x86_64-unknown-cosmo-ar" ./configure --disable-asm --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
+cd ${BUILDDIR}
+mkdir libgcrypt-arm64-out
+cd libgcrypt-1.10.3-arm64
+CC="aarch64-unknown-cosmo-cc" AR="aarch64-unknown-cosmo-ar" ./configure --disable-asm --disable-shared --prefix=${DEPSDIR}
+make -j4
+make install
 install_license ./COPYING.LIB
+
+cd ${BUILDDIR}
+cp ${BUILDDIR}/libgcrypt-arm64-out/lib/libgcrypt.a ${DEPSDIR}/lib/.aarch64/libgcrypt.a
 
 echo "::endgroup::"
 ###########
