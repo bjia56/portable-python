@@ -236,7 +236,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libpng-1.6.41.tar.gz
 cd libpng*
-./configure --with-zlib-prefix=${DEPSDIR} --disable-tools --disable-shared --prefix=${DEPSDIR}
+./configure --with-zlib-prefix=${DEPSDIR} --disable-tools --disable-arm-neon --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
 cp .aarch64/* ${DEPSDIR}/lib/.aarch64
