@@ -24,6 +24,8 @@ export CXXFLAGS="${CPPFLAGS} -fexceptions"
 export LDFLAGS="-L${DEPSDIR}/lib"
 export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig:${DEPSDIR}/share/pkgconfig"
 
+mkdir -p ${DEPSDIR}/lib/.aarch64
+
 echo "::endgroup::"
 ########
 # zlib #
@@ -36,6 +38,7 @@ cd zlib*
 ./configure --prefix=${DEPSDIR} --static
 make -j4
 make install
+cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 install_license
 
 echo "::endgroup::"
