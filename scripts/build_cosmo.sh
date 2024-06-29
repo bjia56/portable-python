@@ -184,7 +184,7 @@ download_verify_extract brotli-1.1.0.tar.gz
 cd brotli*
 mkdir build
 cd build
-cmake .. -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DBUILD_SHARED_LIBS=OFF
+cmake .. -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DBUILD_SHARED_LIBS=OFF -DCMAKE_C_COMPILER=${CC} -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_CXX_FLAGS="${CXXFLAGS}" -DCMAKE_AR=${AR}
 make -j4
 make install
 cd ..
@@ -407,8 +407,10 @@ mkdir python-install
 cd python-build
 LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
   "${cmake_verbose_flags[@]}" \
-  -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
-  -DCMAKE_CROSSCOMPILING_EMULATOR=${WORKDIR}/scripts/qemu_${ARCH}_interpreter \
+  -DCMAKE_C_COMPILER=${CC} \
+  -DCMAKE_CXX_COMPILER=${CXX} \
+  -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
+  -DCMAKE_AR=${AR} \
   -DCMAKE_IGNORE_PATH=/usr/include \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
   -DPORTABLE_PYTHON_BUILD=ON \
