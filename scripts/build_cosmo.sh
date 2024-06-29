@@ -199,7 +199,7 @@ cd ${BUILDDIR}
 
 download_verify_extract gdbm-1.23.tar.gz
 cd gdbm*
-./configure --enable-libgdbm-compat --prefix=${DEPSDIR}
+./configure --enable-libgdbm-compat --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
 install_license
