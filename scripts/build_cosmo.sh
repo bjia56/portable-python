@@ -89,7 +89,7 @@ cd ${BUILDDIR}
 
 download_verify_extract sqlite-autoconf-3450000.tar.gz
 cd sqlite*
-sed -i "s/PACKAGE_STRING='sqlite 3.45.0'/PACKAGE_STRING='sqlite-3.45.0'/g" configure
+sed -i "s/PACKAGE_STRING='sqlite 3.45.0'/PACKAGE_STRING='sqlite\\\\\\\\x203.45.0'/g" configure
 ./configure --prefix=${DEPSDIR} --disable-shared
 make -j4
 make install
@@ -164,6 +164,7 @@ cd ${BUILDDIR}
 
 download_verify_extract xz-5.4.5.tar.gz
 cd xz*
+sed -i "s/PACKAGE_NAME \"XZ Utils\"/PACKAGE_NAME \"XZ\\\\\\\\x20Utils\"/g" CMakeLists.txt
 mkdir build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
