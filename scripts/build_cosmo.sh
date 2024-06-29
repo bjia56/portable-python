@@ -15,7 +15,8 @@ sudo apt -y install \
   wget pkg-config autoconf git patch \
   gettext bison libtool autopoint gperf ncurses-bin xutils-dev
 
-export AR=$(command -v cosmoar)
+export INSTALL=cosmoinstall
+export AR=cosmoar
 export CC=cosmocc
 export CXX=cosmoc++
 export CFLAGS="-I${DEPSDIR}/include"
@@ -38,7 +39,6 @@ cd zlib*
 ./configure --prefix=${DEPSDIR} --static
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 install_license
 
 echo "::endgroup::"
@@ -53,7 +53,6 @@ cd openssl*
 ./Configure linux-generic64 no-asm no-shared no-dso no-engine --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 make -j4
 make install_sw
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 install_license
 
 echo "::endgroup::"
@@ -66,13 +65,13 @@ cd ${BUILDDIR}
 download_verify_extract libffi-3.4.6.tar.gz
 cp -r libffi-3.4.6 libffi-3.4.6-arm64
 cd libffi-3.4.6
-CC="x86_64-unknown-cosmo-cc" AR="x86_64-unknown-cosmo-ar" ./configure --prefix ${DEPSDIR} --disable-shared --enable-static --disable-exec-static-tramp
+CC="x86_64-unknown-cosmo-cc" AR="x86_64-unknown-cosmo-ar" INSTALL="" ./configure --prefix ${DEPSDIR} --disable-shared --enable-static --disable-exec-static-tramp
 make -j4
 make install
 cd ${BUILDDIR}
 mkdir libffi-arm64-out
 cd libffi-3.4.6-arm64
-CC="aarch64-unknown-cosmo-cc" AR="aarch64-unknown-cosmo-ar" ./configure --prefix ${BUILDDIR}/libffi-arm64-out --disable-shared --enable-static --disable-exec-static-tramp --host=aarch64
+CC="aarch64-unknown-cosmo-cc" AR="aarch64-unknown-cosmo-ar" INSTALL="" ./configure --prefix ${BUILDDIR}/libffi-arm64-out --disable-shared --enable-static --disable-exec-static-tramp --host=aarch64
 make -j4
 make install
 install_license
@@ -93,7 +92,6 @@ sed -i "s/PACKAGE_STRING='sqlite 3.45.0'/PACKAGE_STRING='sqlite\\\\\\\\x203.45.0
 ./configure --prefix=${DEPSDIR} --disable-shared
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 
 echo "::endgroup::"
 #########
@@ -107,7 +105,6 @@ cd expat*
 ./configure --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 install_license
 
 echo "::endgroup::"
@@ -122,7 +119,6 @@ cd ncurses*
 ./configure --with-normal --without-progs --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 install_license
 
 echo "::endgroup::"
@@ -137,7 +133,6 @@ cd readline*
 ./configure --with-curses --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 install_license
 
 echo "::endgroup::"
@@ -156,7 +151,6 @@ cd build
 cmake .. -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DCMAKE_C_COMPILER=${CC} -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_CXX_FLAGS="${CXXFLAGS}" -DCMAKE_AR=${AR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 cd ..
 install_license ./LICENSE bzip2-1.0.8
 
@@ -175,7 +169,6 @@ cd build
 cmake .. -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DCMAKE_C_COMPILER=${CC} -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_CXX_FLAGS="${CXXFLAGS}" -DCMAKE_AR=${AR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 cd ..
 install_license
 
@@ -193,7 +186,6 @@ cd build
 cmake .. -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DBUILD_SHARED_LIBS=OFF -DCMAKE_C_COMPILER=${CC} -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_CXX_FLAGS="${CXXFLAGS}" -DCMAKE_AR=${AR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 cd ..
 install_license
 
@@ -209,7 +201,6 @@ cd gdbm*
 ./configure --enable-libgdbm-compat --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 install_license
 
 echo "::endgroup::"
@@ -224,7 +215,6 @@ cd libxml2*
 ./configure --enable-static --disable-shared --without-python --prefix=${DEPSDIR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 install_license ./Copyright
 
 echo "::endgroup::"
@@ -239,7 +229,6 @@ cd libpng*
 ./configure --with-zlib-prefix=${DEPSDIR} --disable-tools --disable-arm-neon --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 
 echo "::endgroup::"
 #############
@@ -254,7 +243,6 @@ sed -i '1i #include <errno.h>' src/mkerrcodes.c
 ./configure --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 install_license ./COPYING.LIB
 
 cd ${BUILDDIR}
@@ -264,7 +252,6 @@ cd libgcrypt*
 ./configure --disable-asm --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 install_license ./COPYING.LIB
 
 echo "::endgroup::"
@@ -279,7 +266,6 @@ cd libxslt*
 CFLAGS="${CFLAGS} -I${DEPSDIR}/include/libxml2" ./configure --with-libxml-prefix=${DEPSDIR} --without-python --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 install_license
 
 echo "::endgroup::"
@@ -294,7 +280,6 @@ cd freetype*
 ./configure --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 install_license ./docs/FTL.TXT
 
 echo "::endgroup::"
@@ -331,7 +316,6 @@ function build_x11_lib_core() {
   ./configure $ext_flags --disable-shared --prefix=${DEPSDIR}
   make -j4
   make install
-  cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 
   echo "::endgroup::"
 }
@@ -374,7 +358,6 @@ cd tcl*/unix
 LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 cd ..
 install_license ./license.terms
 
@@ -390,7 +373,6 @@ cd tk*/unix
 LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 cd ..
 install_license ./license.terms
 
