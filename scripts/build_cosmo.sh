@@ -184,7 +184,7 @@ download_verify_extract brotli-1.1.0.tar.gz
 cd brotli*
 mkdir build
 cd build
-cmake -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
+cmake .. -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DBUILD_SHARED_LIBS=OFF
 make -j4
 make install
 cd ..
