@@ -268,7 +268,7 @@ make install
 cd ${BUILDDIR}
 mkdir libgcrypt-arm64-out
 cd libgcrypt-1.10.3-arm64
-CC="aarch64-unknown-cosmo-cc" AR="aarch64-unknown-cosmo-ar" ./configure --disable-asm --disable-shared --prefix=${DEPSDIR}
+CC="aarch64-unknown-cosmo-cc" AR="aarch64-unknown-cosmo-ar" ./configure --disable-asm --disable-shared --host=aarch64 --prefix=${DEPSDIR}
 make -j4
 make install
 install_license ./COPYING.LIB
