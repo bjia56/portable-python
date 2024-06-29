@@ -156,6 +156,7 @@ cd build
 cmake .. -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DCMAKE_C_COMPILER=${CC} -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_CXX_FLAGS="${CXXFLAGS}" -DCMAKE_AR=${AR}
 make -j4
 make install
+cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 cd ..
 install_license ./LICENSE bzip2-1.0.8
 
@@ -174,6 +175,7 @@ cd build
 cmake .. -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DCMAKE_C_COMPILER=${CC} -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_CXX_FLAGS="${CXXFLAGS}" -DCMAKE_AR=${AR}
 make -j4
 make install
+cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 cd ..
 install_license
 
@@ -191,6 +193,7 @@ cd build
 cmake .. -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DBUILD_SHARED_LIBS=OFF -DCMAKE_C_COMPILER=${CC} -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_CXX_FLAGS="${CXXFLAGS}" -DCMAKE_AR=${AR}
 make -j4
 make install
+cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 cd ..
 install_license
 
@@ -206,6 +209,7 @@ cd gdbm*
 ./configure --enable-libgdbm-compat --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
+cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 install_license
 
 echo "::endgroup::"
@@ -220,6 +224,7 @@ cd libxml2*
 ./configure --enable-static --disable-shared --without-python --prefix=${DEPSDIR}
 make -j4
 make install
+cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 install_license ./Copyright
 
 echo "::endgroup::"
@@ -234,6 +239,7 @@ cd libpng*
 ./configure --with-zlib-prefix=${DEPSDIR} --disable-tools --prefix=${DEPSDIR}
 make -j4
 make install
+cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 
 echo "::endgroup::"
 #############
@@ -247,6 +253,7 @@ cd libgpg-error*
 ./configure --prefix=${DEPSDIR}
 make -j4
 make install
+cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 install_license ./COPYING.LIB
 
 cd ${BUILDDIR}
@@ -256,6 +263,7 @@ cd libgcrypt*
 ./configure --disable-asm --prefix=${DEPSDIR}
 make -j4
 make install
+cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 install_license ./COPYING.LIB
 
 echo "::endgroup::"
@@ -270,6 +278,7 @@ cd libxslt*
 CFLAGS="${CFLAGS} -I${DEPSDIR}/include/libxml2" ./configure --with-libxml-prefix=${DEPSDIR} --without-python --prefix=${DEPSDIR}
 make -j4
 make install
+cp .aarch64/* ${DEPSDIR}/lib/.aarch64
 install_license
 
 echo "::endgroup::"
