@@ -269,7 +269,7 @@ cd ${BUILDDIR}
 mkdir libgcrypt-arm64-out
 cd libgcrypt-1.10.3-arm64
 CC="aarch64-unknown-cosmo-cc" AR="aarch64-unknown-cosmo-ar" LDFLAGS="-L${DEPSDIR}/lib/.aarch64" ./configure --disable-asm --disable-shared --host=aarch64 --prefix=${BUILDDIR}/libgcrypt-arm64-out
-make -j4
+LDFLAGS="-L${DEPSDIR}/lib/.aarch64" make -j4
 make install
 install_license ./COPYING.LIB
 
