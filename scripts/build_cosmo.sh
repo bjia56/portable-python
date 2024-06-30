@@ -38,7 +38,7 @@ cd zlib*
 ./configure --prefix=${DEPSDIR} --static
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
+cp .aarch64/libz.a ${DEPSDIR}/lib/.aarch64
 install_license
 
 echo "::endgroup::"
@@ -53,7 +53,7 @@ cd openssl*
 ./Configure linux-generic64 no-asm no-shared no-dso no-engine --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 make -j4
 make install_sw
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
+cp .aarch64/lib*.a ${DEPSDIR}/lib/.aarch64
 install_license
 
 echo "::endgroup::"
@@ -93,7 +93,7 @@ sed -i "s/PACKAGE_STRING='sqlite 3.45.0'/PACKAGE_STRING='sqlite\\\\\\\\x203.45.0
 ./configure --prefix=${DEPSDIR} --disable-shared
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
+cp .libs/.aarch64/libsqlite3.a ${DEPSDIR}/lib/.aarch64
 
 echo "::endgroup::"
 #########
@@ -107,7 +107,7 @@ cd expat*
 ./configure --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
+cp lib/.libs/.aarch64/libexpat.a ${DEPSDIR}/lib/.aarch64
 install_license
 
 echo "::endgroup::"
@@ -122,7 +122,7 @@ cd ncurses*
 ./configure --with-normal --without-progs --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
+cp lib/.aarch64/lib*.a ${DEPSDIR}/lib/.aarch64
 install_license
 
 echo "::endgroup::"
@@ -137,7 +137,7 @@ cd readline*
 ./configure --with-curses --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
+cp .aarch64/lib*.a ${DEPSDIR}/lib/.aarch64
 install_license
 
 echo "::endgroup::"
@@ -156,7 +156,7 @@ cd build
 cmake .. -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DCMAKE_C_COMPILER=${CC} -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_CXX_FLAGS="${CXXFLAGS}" -DCMAKE_AR=${AR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
+cp .aarch64/libbz2.a ${DEPSDIR}/lib/.aarch64
 cd ..
 install_license ./LICENSE bzip2-1.0.8
 
@@ -175,7 +175,7 @@ cd build
 cmake .. -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DCMAKE_C_COMPILER=${CC} -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_CXX_FLAGS="${CXXFLAGS}" -DCMAKE_AR=${AR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
+cp .aarch64/liblzma.a ${DEPSDIR}/lib/.aarch64
 cd ..
 install_license
 
@@ -193,7 +193,7 @@ cd build
 cmake .. -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DBUILD_SHARED_LIBS=OFF -DCMAKE_C_COMPILER=${CC} -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_CXX_FLAGS="${CXXFLAGS}" -DCMAKE_AR=${AR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
+cp .aarch64/lib*.a ${DEPSDIR}/lib/.aarch64
 cd ..
 install_license
 
@@ -209,7 +209,8 @@ cd gdbm*
 ./configure --enable-libgdbm-compat --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
+cp src/.libs/.aarch64/libgdbm.a ${DEPSDIR}/lib/.aarch64
+cp compat/.libs/.aarch64/libgdbm_compat.a ${DEPSDIR}/lib/.aarch64
 install_license
 
 echo "::endgroup::"
@@ -224,7 +225,7 @@ cd libxml2*
 ./configure --enable-static --disable-shared --without-python --prefix=${DEPSDIR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
+cp .libs/.aarch64/libxml2.a ${DEPSDIR}/lib/.aarch64
 install_license ./Copyright
 
 echo "::endgroup::"
@@ -239,7 +240,7 @@ cd libpng*
 ./configure --with-zlib-prefix=${DEPSDIR} --disable-tools --disable-arm-neon --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
+cp .libs/.aarch64/libpng16.a ${DEPSDIR}/lib/.aarch64
 
 echo "::endgroup::"
 #############
@@ -254,7 +255,7 @@ sed -i '1i #include <errno.h>' src/mkerrcodes.c
 ./configure --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
+cp src/.libs/.aarch64/libgpg-error.a ${DEPSDIR}/lib/.aarch64
 install_license ./COPYING.LIB
 
 cd ${BUILDDIR}
