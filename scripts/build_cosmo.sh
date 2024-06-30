@@ -418,8 +418,8 @@ echo "::endgroup::"
 echo "::group::Compress output"
 cd ${BUILDDIR}
 
-#python3 -m pip install pyclean
-#python3 -m pyclean -v python-install
+python3 -m pip install pyclean
+python3 -m pyclean -v python-install
 mv python-install python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
 tar -czf ${WORKDIR}/python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
 zip ${WORKDIR}/python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.zip $(tar tf ${WORKDIR}/python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz)
