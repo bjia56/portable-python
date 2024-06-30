@@ -411,7 +411,7 @@ jobs:
 
       - name: Build
         run: |
-          ./scripts/build_cosmo.sh cosmo ${{ inputs.python_version }}
+          ./scripts/build_cosmo.sh unknown ${{ inputs.python_version }}
 
       - name: Interactive debugging
         if: ${{ always() && inputs.debug_interactive }}
