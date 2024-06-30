@@ -355,6 +355,7 @@ LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
   -DBUILD_TESTING=${INSTALL_TEST} \
   -DINSTALL_TEST=${INSTALL_TEST} \
   -DINSTALL_MANUAL=OFF \
+  -DENABLE_CTYPES=OFF \
   -DOPENSSL_INCLUDE_DIR:PATH=${DEPSDIR}/include \
   -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/libssl.a;${DEPSDIR}/lib/libcrypto.a" \
   -DEXPAT_INCLUDE_DIRS:PATH=${DEPSDIR}/include \
@@ -404,8 +405,8 @@ echo "::group::Preload pip"
 cd ${BUILDDIR}
 
 cd python-install
-#./bin/python -m ensurepip
-#./bin/python -m pip install -r ${WORKDIR}/baseline/requirements.txt
+./bin/python.com -m ensurepip
+./bin/python.com -m pip install -r ${WORKDIR}/baseline/requirements.txt
 
 #python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip3
 #python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip${PYTHON_VER}
