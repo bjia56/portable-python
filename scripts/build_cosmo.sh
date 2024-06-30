@@ -385,6 +385,7 @@ make install
 
 cd ${BUILDDIR}
 cp ./python-install/bin/python ./python-install/bin/python.com
+cp ./python-build/bin/python.com.dbg ./python-install/bin/
 cp -r ${LICENSEDIR} ./python-install
 
 echo "::endgroup::"
