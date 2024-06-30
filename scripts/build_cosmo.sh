@@ -322,7 +322,7 @@ cd fontconfig*
 LDFLAGS="${LDFLAGS} -lxml2" ./configure --enable-static --disable-shared --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
 make -j4
 make install
-cp .fail_here
+cp src/.libs/.aarch64/libfontconfig.a ${DEPSDIR}/lib/.aarch64
 install_license
 
 echo "::endgroup::"
