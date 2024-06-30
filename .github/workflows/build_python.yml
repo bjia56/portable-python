@@ -259,9 +259,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-11, macos-14 ]
+        os: [ macos-12, macos-14 ]
         include:
-          - os: macos-11
+          - os: macos-12
             arch: x86_64
           - os: macos-14
             arch: arm64
@@ -437,9 +437,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: [ macos-11, macos-14, ubuntu-latest, windows-latest ]
+        runner: [ macos-12, macos-14, ubuntu-latest, windows-latest ]
         include:
-          - runner: macos-11
+          - runner: macos-12
             arch: x86_64
             os: MacOS
           - runner: macos-14
@@ -488,13 +488,13 @@ jobs:
 
           cd python-${{ inputs.python_version }}-cosmo-unknown
           chmod +x ./bin/python
-          ./bin/python --version
-          ./bin/python -m sysconfig
-          ./bin/python ${{ github.workspace }}/scripts/test.py
+          ./bin/python.com --version
+          ./bin/python.com -m sysconfig
+          ./bin/python.com ${{ github.workspace }}/scripts/test.py
           ./bin/pip3
 
           if [[ "${{ inputs.run_tests }}" == "true" ]]; then
-            ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
+            ./bin/python.com -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
           fi
 
       - name: Test python in clean environment
@@ -510,17 +510,16 @@ jobs:
 
             yum -y install unzip
 
-            cp /work/python*.zip .
+            cp /work/python/python*.zip .
             unzip ./python*.zip
 
             cd python-${{ inputs.python_version }}-cosmo-unknown
-            chmod +x ./bin/python
-            ldd -v -r ./bin/python
-            ./bin/python --version
-            ./bin/python -m sysconfig
-            ./bin/python /work/scripts/test.py
+            chmod +x ./bin/python.com 
+            ./bin/python.com --version
+            ./bin/python.com -m sysconfig
+            ./bin/python.com /work/scripts/test.py
             ./bin/pip3
 
             if [[ "${{ inputs.run_tests }}" == "true" ]]; then
-              ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
+              ./bin/python.com -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
             fi
