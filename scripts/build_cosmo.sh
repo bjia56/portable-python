@@ -265,13 +265,13 @@ cd ${BUILDDIR}
 download_verify_extract libgcrypt-1.10.3.tar.bz2
 cp -r libgcrypt-1.10.3 libgcrypt-1.10.3-arm64
 cd libgcrypt-1.10.3
-CC="x86_64-unknown-cosmo-cc" AR="x86_64-unknown-cosmo-ar" ./configure --disable-asm --disable-shared --disable-install-gpg-error-config --prefix=${DEPSDIR}
+CC="x86_64-unknown-cosmo-cc" AR="x86_64-unknown-cosmo-ar" ./configure --disable-asm --disable-shared --disable-doc --prefix=${DEPSDIR}
 make -j4
 make install
 cd ${BUILDDIR}
 mkdir libgcrypt-arm64-out
 cd libgcrypt-1.10.3-arm64
-CC="aarch64-unknown-cosmo-cc" AR="aarch64-unknown-cosmo-ar" LDFLAGS="-L${DEPSDIR}/lib/.aarch64" ./configure --disable-asm --disable-shared --disable-install-gpg-error-config --host=aarch64 --prefix=${BUILDDIR}/libgcrypt-arm64-out
+CC="aarch64-unknown-cosmo-cc" AR="aarch64-unknown-cosmo-ar" LDFLAGS="-L${DEPSDIR}/lib/.aarch64" ./configure --disable-asm --disable-shared --disable-doc --host=aarch64 --prefix=${BUILDDIR}/libgcrypt-arm64-out
 make -j4
 make install
 install_license ./COPYING.LIB
