@@ -398,7 +398,7 @@ jobs:
             bash /tmp/test.sh
 
   build_cosmo:
-    name: Cosmopolitan ${{ inputs.python_version }} (build)
+    name: Cosmopolitan ${{ inputs.python_version }} unknown (build)
     if: ${{ contains(inputs.platforms, 'cosmo') }}
     runs-on: ubuntu-latest
 
