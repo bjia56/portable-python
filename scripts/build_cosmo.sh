@@ -400,7 +400,7 @@ cd ${BUILDDIR}
 
 download_verify_extract tk8.6.13-src.tar.gz
 cd tk*/unix
-LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --prefix=${DEPSDIR}
+LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --disable-cache-build --prefix=${DEPSDIR}
 make -j4
 make install
 cp .aarch64/* ${DEPSDIR}/lib/.aarch64
