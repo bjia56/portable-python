@@ -251,7 +251,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libgpg-error-1.47.tar.bz2
 cd libgpg-error*
-sed -i '1i #include <errno.h>' src/mkerrcodes.c
+sed -i '1i #include <errno.h>' src/mkerrcodes.c 
 ./configure --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
@@ -343,12 +343,13 @@ function build_x11_lib_core() {
   ./configure $ext_flags --disable-shared --prefix=${DEPSDIR}
   make -j4
   make install
+  cp .aarch64/* ${DEPSDIR}/lib/.aarch64
+
   echo "::endgroup::"
 }
 
 function build_x11_lib () {
   build_x11_lib_core "$1" "$2"
-  cp .aarch64/* ${DEPSDIR}/lib/.aarch64
   install_license
 }
 
