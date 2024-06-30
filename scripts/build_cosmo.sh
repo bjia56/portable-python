@@ -337,7 +337,7 @@ mv *portable-python-cmake-buildsystem* portable-python-cmake-buildsystem
 mkdir python-build
 mkdir python-install
 cd python-build
-LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
+LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype -lexpat" cmake \
   "${cmake_verbose_flags[@]}" \
   -DCMAKE_C_COMPILER=${CC} \
   -DCMAKE_CXX_COMPILER=${CXX} \
