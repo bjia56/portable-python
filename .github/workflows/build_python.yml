@@ -398,11 +398,17 @@ jobs:
             bash /tmp/test.sh
 
   build_cosmo:
-    name: Cosmopolitan ${{ inputs.python_version }} (build)
+    name: Cosmopolitan ${{ inputs.python_version }}
     if: ${{ contains(inputs.platforms, 'cosmo') }}
     runs-on: ubuntu-latest
 
     steps:
+      - name: Parse image
+        id: parse_image
+        run: |
+          IMAGE=$(echo ${{ toJSON(env.image_map) }} | jq -r '.["x86_64"]')
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+
       - name: Set up cosmocc
         uses: bjia56/setup-cosmocc@main
 
@@ -430,50 +436,29 @@ jobs:
           name: build-python-linux-cosmo-${{ inputs.python_version }}
           path: ./*python*.tar.gz
 
-  test_cosmo:
-    name: Cosmopolitan ${{ inputs.python_version }} ${{ matrix.os-readable }} ${{ matrix.arch }} (test)
-    needs: build_cosmo
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ macos-11, macos-14, ubuntu-latest ]
-        include:
-          - os: macos-11
-            arch: x86_64
-            os-readable: MacOS
-          - os: macos-14
-            arch: arm64
-            os-readable: MacOS
-          - os: ubuntu-latest
-            arch: x86_64
-            os-readable: Linux
-          - os: ubuntu-latest
-            arch: aarch64
-            os-readable: Linux
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: python-darwin-universal2-${{ inputs.python_version }}
-          path: ./python/
-
       - name: Test python in clean environment
-        shell: bash
-        run: |
-          unzip python/python-${{ inputs.python_version }}-darwin-universal2.zip
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ${{ steps.parse_image.outputs.image }}
+          options: -v ${{ github.workspace }}:/work --workdir /tmp
+          shell: bash
+          run: |
+            set -e
+            uname -a
 
-          cd python-${{ inputs.python_version }}-darwin-universal2
-          chmod +x ./bin/python
-          ./bin/python --version
-          ./bin/python -m sysconfig
-          ./bin/python ${{ github.workspace }}/scripts/test.py
-          ./bin/pip3
+            yum -y install unzip
 
-          if [[ "${{ inputs.run_tests }}" == "true" ]]; then
-            ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
-          fi
+            cp /work/python*.zip .
+            unzip ./python*.zip
+
+            cd python-${{ inputs.python_version }}-linux-cosmo
+            chmod +x ./bin/python
+            ldd -v -r ./bin/python
+            ./bin/python --version
+            ./bin/python -m sysconfig
+            ./bin/python /work/scripts/test.py
+            ./bin/pip3
+
+            if [[ "${{ inputs.run_tests }}" == "true" ]]; then
+              ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
+            fi
