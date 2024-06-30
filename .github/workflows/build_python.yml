@@ -420,54 +420,73 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: python-linux-cosmo-${{ inputs.python_version }}
+          name: python-cosmo-unknown-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
         if: ${{ always()  && inputs.debug }}
         uses: actions/upload-artifact@v4
         with:
-          name: build-python-linux-cosmo-${{ inputs.python_version }}
+          name: build-python-cosmo-unknown-${{ inputs.python_version }}
           path: ./*python*.tar.gz
 
   test_cosmo:
-    name: Cosmopolitan ${{ inputs.python_version }} ${{ matrix.os-readable }} ${{ matrix.arch }} (test)
+    name: Cosmopolitan ${{ inputs.python_version }} ${{ matrix.os }} ${{ matrix.arch }} (test)
     needs: build_cosmo
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-11, macos-14, ubuntu-latest ]
+        runner: [ macos-11, macos-14, ubuntu-latest, windows-latest ]
         include:
-          - os: macos-11
+          - runner: macos-11
             arch: x86_64
-            os-readable: MacOS
-          - os: macos-14
+            os: MacOS
+          - runner: macos-14
             arch: arm64
-            os-readable: MacOS
-          - os: ubuntu-latest
+            os: MacOS
+          - runner: ubuntu-latest
             arch: x86_64
-            os-readable: Linux
-          - os: ubuntu-latest
+            os: Linux
+          - runner: ubuntu-latest
             arch: aarch64
-            os-readable: Linux
+            os: Linux
+          - runner: windows-latest
+            arch: x86_64
+            os: Windows
 
     steps:
+      - name: Parse image
+        if: ${{ matrix.os == 'Linux' }}
+        id: parse_image
+        run: |
+          IMAGE=$(echo ${{ toJSON(env.image_map) }} | jq -r '.["${{ matrix.arch }}"]')
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+
+      - name: Set up QEMU
+        if: ${{ matrix.os == 'Linux' }}
+        uses: docker/setup-qemu-action@v3
+
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: python-darwin-universal2-${{ inputs.python_version }}
+          name: python-cosmo-unknown-${{ inputs.python_version }}
           path: ./python/
 
       - name: Test python in clean environment
+        if: ${{ matrix.os != 'Linux' }}
         shell: bash
         run: |
-          unzip python/python-${{ inputs.python_version }}-darwin-universal2.zip
+          if [[ "${{ matrix.os }}" == "Windows" ]]; then
+            7z.exe x python/python-${{ inputs.python_version }}-cosmo-unknown.zip
+          else
+            unzip python/python-${{ inputs.python_version }}-cosmo-unknown.zip
+          fi
 
-          cd python-${{ inputs.python_version }}-darwin-universal2
+          cd python-${{ inputs.python_version }}-cosmo-unknown
           chmod +x ./bin/python
           ./bin/python --version
           ./bin/python -m sysconfig
@@ -477,3 +496,31 @@ jobs:
           if [[ "${{ inputs.run_tests }}" == "true" ]]; then
             ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
           fi
+
+      - name: Test python in clean environment
+        if: ${{ matrix.os == 'Linux' }}
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ${{ steps.parse_image.outputs.image }}
+          options: -v ${{ github.workspace }}:/work --workdir /tmp
+          shell: bash
+          run: |
+            set -e
+            uname -a
+
+            yum -y install unzip
+
+            cp /work/python*.zip .
+            unzip ./python*.zip
+
+            cd python-${{ inputs.python_version }}-cosmo-unknown
+            chmod +x ./bin/python
+            ldd -v -r ./bin/python
+            ./bin/python --version
+            ./bin/python -m sysconfig
+            ./bin/python /work/scripts/test.py
+            ./bin/pip3
+
+            if [[ "${{ inputs.run_tests }}" == "true" ]]; then
+              ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
+            fi
