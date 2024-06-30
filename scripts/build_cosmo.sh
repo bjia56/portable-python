@@ -383,7 +383,7 @@ make -j4
 make install
 
 cd ${BUILDDIR}
-mv ./python-install/bin/python ./python-install/bin/python.com
+cp ./python-install/bin/python ./python-install/bin/python.com
 cp -r ${LICENSEDIR} ./python-install
 
 echo "::endgroup::"
