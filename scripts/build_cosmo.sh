@@ -307,6 +307,7 @@ cd freetype*
 make -j4
 make install
 cp objs/.libs/.aarch64/libfreetype.a ${DEPSDIR}/lib/.aarch64
+sed -i "s/libbrotlidec/libbrotlidec, libbrotlicommon/g" ${DEPSDIR}/lib/pkgconfig/freetype2.pc
 install_license ./docs/FTL.TXT
 
 echo "::endgroup::"
@@ -318,7 +319,7 @@ cd ${BUILDDIR}
 
 download_verify_extract fontconfig-2.15.0.tar.gz
 cd fontconfig*
-LDFLAGS="${LDFLAGS} -lxml2 -lbrotlicommon" ./configure --enable-static --disable-shared --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
+LDFLAGS="${LDFLAGS} -lxml2" ./configure --enable-static --disable-shared --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
 make -j4
 make install
 cp .fail_here
@@ -400,7 +401,7 @@ cd ${BUILDDIR}
 
 download_verify_extract tk8.6.13-src.tar.gz
 cd tk*/unix
-LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --disable-cache-build --prefix=${DEPSDIR}
+LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
 cp .aarch64/* ${DEPSDIR}/lib/.aarch64
