@@ -437,9 +437,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: [ macos-12, macos-14, ubuntu-latest, windows-latest ]
         include:
-          - runner: macos-12
+          - runner: macos-14-large
             arch: x86_64
             os: MacOS
           - runner: macos-14
@@ -488,10 +487,11 @@ jobs:
             7z.exe x python/python-${{ inputs.python_version }}-cosmo-unknown.zip
           else
             unzip python/python-${{ inputs.python_version }}-cosmo-unknown.zip
+            chmod +x python-${{ inputs.python_version }}-cosmo-unknown/bin/python.com 
           fi
 
           cd python-${{ inputs.python_version }}-cosmo-unknown
-          chmod +x ./bin/python
+          
           ./bin/python.com --version
           ./bin/python.com -m sysconfig
           ./bin/python.com ${{ github.workspace }}/scripts/test.py
