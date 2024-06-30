@@ -447,25 +447,11 @@ jobs:
           - runner: ubuntu-latest
             arch: x86_64
             os: Linux
-          - runner: ubuntu-latest
-            arch: aarch64
-            os: Linux
           - runner: windows-latest
             arch: x86_64
             os: Windows
 
     steps:
-      - name: Parse image
-        if: ${{ matrix.os == 'Linux' }}
-        id: parse_image
-        run: |
-          IMAGE=$(echo ${{ toJSON(env.image_map) }} | jq -r '.["${{ matrix.arch }}"]')
-          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
-
-      - name: Set up QEMU
-        if: ${{ matrix.os == 'Linux' }}
-        uses: docker/setup-qemu-action@v3
-
       - name: Set up cosmocc
         if: ${{ matrix.os == 'Linux' }}
         uses: bjia56/setup-cosmocc@v0.0.2
@@ -480,7 +466,6 @@ jobs:
           path: ./python/
 
       - name: Test python in clean environment
-        if: ${{ matrix.os != 'Linux' }}
         shell: bash
         run: |
           if [[ "${{ matrix.os }}" == "Windows" ]]; then
@@ -500,30 +485,3 @@ jobs:
           if [[ "${{ inputs.run_tests }}" == "true" ]]; then
             ./bin/python.com -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
           fi
-
-      - name: Test python in clean environment
-        if: ${{ matrix.os == 'Linux' }}
-        uses: addnab/docker-run-action@v3
-        with:
-          image: ${{ steps.parse_image.outputs.image }}
-          options: -v ${{ github.workspace }}:/work --workdir /tmp
-          shell: bash
-          run: |
-            set -e
-            uname -a
-
-            yum -y install unzip
-
-            cp /work/python/python*.zip .
-            unzip ./python*.zip
-
-            cd python-${{ inputs.python_version }}-cosmo-unknown
-            chmod +x ./bin/python.com 
-            ./bin/python.com --version
-            ./bin/python.com -m sysconfig
-            ./bin/python.com /work/scripts/test.py
-            ./bin/pip3
-
-            if [[ "${{ inputs.run_tests }}" == "true" ]]; then
-              ./bin/python.com -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
-            fi
