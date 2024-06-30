@@ -404,7 +404,7 @@ jobs:
 
     steps:
       - name: Set up cosmocc
-        uses: bjia56/setup-cosmocc@main
+        uses: bjia56/setup-cosmocc@v0.0.2
 
       - name: Checkout
         uses: actions/checkout@v4
