@@ -289,7 +289,7 @@ cd libxslt*
 CFLAGS="${CFLAGS} -I${DEPSDIR}/include/libxml2" ./configure --with-libxml-prefix=${DEPSDIR} --without-python --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
+cp libxslt/.libs/.aarch64/libxslt.a ${DEPSDIR}/lib/.aarch64
 install_license
 
 echo "::endgroup::"
@@ -304,7 +304,7 @@ cd freetype*
 ./configure --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
+cp objs/.libs/.aarch64/libfreetype.a ${DEPSDIR}/lib/.aarch64
 install_license ./docs/FTL.TXT
 
 echo "::endgroup::"
