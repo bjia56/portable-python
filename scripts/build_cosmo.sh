@@ -383,23 +383,7 @@ make -j4
 make install
 
 cd ${BUILDDIR}
-cp -r ${DEPSDIR}/lib/tcl8.6 ./python-install/lib
-cp -r ${DEPSDIR}/lib/tk8.6 ./python-install/lib
 cp -r ${LICENSEDIR} ./python-install
-
-echo "::endgroup::"
-#################################
-# Check executable dependencies #
-#################################
-echo "::group::Check executable dependencies"
-cd ${BUILDDIR}
-
-cd python-install
-echo "python dependencies"
-readelf -d ./bin/python
-echo
-echo "libpython dependencies"
-readelf -d ./lib/libpython${PYTHON_VER}.so
 
 echo "::endgroup::"
 ###############
@@ -409,7 +393,7 @@ echo "::group::Test python"
 cd ${BUILDDIR}
 
 cd python-install
-${WORKDIR}/scripts/qemu_${ARCH}_interpreter ./bin/python --version
+./bin/python --version
 
 echo "::endgroup::"
 ###############
@@ -419,11 +403,11 @@ echo "::group::Preload pip"
 cd ${BUILDDIR}
 
 cd python-install
-${WORKDIR}/scripts/qemu_${ARCH}_interpreter ./bin/python -m ensurepip
-${WORKDIR}/scripts/qemu_${ARCH}_interpreter ./bin/python -m pip install -r ${WORKDIR}/baseline/requirements.txt
+#./bin/python -m ensurepip
+#./bin/python -m pip install -r ${WORKDIR}/baseline/requirements.txt
 
-python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip3
-python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip${PYTHON_VER}
+#python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip3
+#python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip${PYTHON_VER}
 
 echo "::endgroup::"
 ###################
@@ -432,8 +416,8 @@ echo "::endgroup::"
 echo "::group::Compress output"
 cd ${BUILDDIR}
 
-python3 -m pip install pyclean
-python3 -m pyclean -v python-install
+#python3 -m pip install pyclean
+#python3 -m pyclean -v python-install
 mv python-install python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
 tar -czf ${WORKDIR}/python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
 zip ${WORKDIR}/python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.zip $(tar tf ${WORKDIR}/python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz)
