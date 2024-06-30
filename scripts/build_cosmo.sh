@@ -316,9 +316,10 @@ cd ${BUILDDIR}
 
 download_verify_extract fontconfig-2.15.0.tar.gz
 cd fontconfig*
-LDFLAGS="${LDFLAGS} -lxml2" ./configure --enable-static --disable-shared --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
+LDFLAGS="${LDFLAGS} -lxml2 -lbrotlicommon" ./configure --enable-static --disable-shared --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
 make -j4
 make install
+cp .fail_here
 install_license
 
 echo "::endgroup::"
