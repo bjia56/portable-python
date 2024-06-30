@@ -326,89 +326,6 @@ cp src/.libs/.aarch64/libfontconfig.a ${DEPSDIR}/lib/.aarch64
 install_license
 
 echo "::endgroup::"
-#######
-# X11 #
-#######
-#echo "::group::X11"
-#cd ${BUILDDIR}
-
-function build_x11_lib_core() {
-  echo "::group::$1"
-  cd ${BUILDDIR}
-
-  pkg=$1
-  ext_flags="$2"
-  file=$pkg.tar.gz
-  download_verify_extract $file
-  cd $pkg
-  autoreconf -vfi
-  ./configure $ext_flags --disable-shared --prefix=${DEPSDIR}
-  make -j4
-  make install
-  cp .aarch64/* ${DEPSDIR}/lib/.aarch64
-
-  echo "::endgroup::"
-}
-
-function build_x11_lib () {
-  build_x11_lib_core "$1" "$2"
-  install_license
-}
-
-build_x11_lib_core xorgproto-2023.2
-build_x11_lib xproto-7.0.31
-build_x11_lib xextproto-7.3.0
-build_x11_lib kbproto-1.0.7
-build_x11_lib inputproto-2.3.2
-build_x11_lib renderproto-0.11.1
-build_x11_lib scrnsaverproto-1.2.2
-build_x11_lib xcb-proto-1.16.0
-build_x11_lib libpthread-stubs-0.5
-build_x11_lib xtrans-1.5.0
-build_x11_lib libXau-1.0.11
-build_x11_lib libxcb-1.16
-build_x11_lib libXdmcp-1.1.2
-build_x11_lib libX11-1.8.7 --enable-malloc0returnsnull
-build_x11_lib libXext-1.3.5 --enable-malloc0returnsnull
-build_x11_lib libICE-1.0.7
-build_x11_lib libSM-1.2.2
-build_x11_lib libXrender-0.9.11 --enable-malloc0returnsnull
-build_x11_lib libXft-2.3.8
-build_x11_lib libXScrnSaver-1.2.4 --enable-malloc0returnsnull
-
-#echo "::endgroup::"
-#######
-# tcl #
-#######
-echo "::group::tcl"
-cd ${BUILDDIR}
-
-download_verify_extract tcl8.6.13-src.tar.gz
-cd tcl*/unix
-LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --prefix=${DEPSDIR}
-make -j4
-make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
-cd ..
-install_license ./license.terms
-
-echo "::endgroup::"
-######
-# tk #
-######
-echo "::group::tk"
-cd ${BUILDDIR}
-
-download_verify_extract tk8.6.13-src.tar.gz
-cd tk*/unix
-LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --prefix=${DEPSDIR}
-make -j4
-make install
-cp .aarch64/* ${DEPSDIR}/lib/.aarch64
-cd ..
-install_license ./license.terms
-
-echo "::endgroup::"
 ##########
 # Python #
 ##########
@@ -434,7 +351,8 @@ LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
   -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
   -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install \
   -DBUILD_EXTENSIONS_AS_BUILTIN=ON \
-  -DBUILD_LIBPYTHON_SHARED=ON \
+  -DWITH_STATIC_DEPENDENCIES=ON \
+  -DBUILD_LIBPYTHON_SHARED=OFF \
   -DUSE_SYSTEM_LIBRARIES=OFF \
   -DBUILD_TESTING=${INSTALL_TEST} \
   -DINSTALL_TEST=${INSTALL_TEST} \
@@ -460,12 +378,6 @@ LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
   -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.a \
   -DNDBM_TAG=NDBM \
   -DNDBM_USE=NDBM \
-  -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tk.h \
-  -DTK_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtk8.6.a \
-  -DTCL_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tcl.h \
-  -DTCL_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtcl8.6.a \
-  -DX11_INCLUDE_DIR:PATH=${DEPSDIR}/include/X11 \
-  -DX11_LIBRARIES="${DEPSDIR}/lib/libXau.a;${DEPSDIR}/lib/libXdmcp.a;${DEPSDIR}/lib/libX11.a;${DEPSDIR}/lib/libXext.a;${DEPSDIR}/lib/libICE.a;${DEPSDIR}/lib/libSM.a;${DEPSDIR}/lib/libXrender.a;${DEPSDIR}/lib/libXft.a;${DEPSDIR}/lib/libXss.a;${DEPSDIR}/lib/libxcb.a" \
   ../portable-python-cmake-buildsystem
 make -j4
 make install
