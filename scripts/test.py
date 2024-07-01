@@ -27,7 +27,7 @@ def import_with_timeout(mod_name):
     start = time.time()
     while True:
         # We're not using p.join() here because Cosmopolitan libc doesn't seem to
-        # react to the child process's exit
+        # react to the child process's exit on Windows
         if p.is_alive():
             if time.time() - start > 10:
                 p.terminate()
