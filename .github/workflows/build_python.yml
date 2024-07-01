@@ -52,7 +52,7 @@ env:
   DEBUG_CI: ${{ inputs.debug }}
   VERBOSE_CI: ${{ inputs.verbose }}
   PORTABLE_PYTHON_BUILDSYSTEM_BRANCH: ${{ inputs.buildsystem_branch || 'portable-python' }}
-  image_map: '{"x86_64": "amd64/centos:7", "i386": "i386/centos:7", "aarch64": "arm64v8/centos:7", "arm": "arm32v7/debian:bullseye", "riscv64": "riscv64/debian:sid"}'
+  image_map: '{"x86_64": "amd64/ubuntu:18.04", "i386": "i386/ubuntu:18.04", "aarch64": "arm64v8/ubuntu:18.04", "arm": "arm32v7/debian:bullseye", "riscv64": "riscv64/debian:sid"}'
   freebsd_release_map: '{"14": "14.0", "13": "13.2"}'
 
 jobs:
@@ -117,12 +117,8 @@ jobs:
             set -e
             uname -a
 
-            if [ "${{ matrix.arch }}" == "arm" ] || [ "${{ matrix.arch }}" == "riscv64" ]; then
-              apt update
-              apt -y install unzip
-            else
-              yum -y install unzip
-            fi
+            apt update
+            apt -y install unzip
 
             cp /work/python*.zip .
             unzip ./python*.zip
