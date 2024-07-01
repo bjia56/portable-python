@@ -90,6 +90,21 @@ cp lib/.libs/.aarch64/libexpat.a ${DEPSDIR}/lib/.aarch64
 install_license
 
 echo "::endgroup::"
+###########
+# ncurses #
+###########
+echo "::group::ncurses"
+cd ${BUILDDIR}
+
+download_verify_extract ncurses-6.4.tar.gz
+cd ncurses*
+./configure --with-normal --without-progs --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
+make -j4
+make install
+cp lib/.aarch64/lib*.a ${DEPSDIR}/lib/.aarch64
+install_license
+
+echo "::endgroup::"
 ############
 # readline #
 ############
@@ -206,6 +221,8 @@ cmake \
   -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libbz2.a \
   -DREADLINE_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/readline/readline.h \
   -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.a \
+  -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.a \
+  -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.a \
   -DGDBM_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/gdbm.h \
   -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.a \
   -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.a \
