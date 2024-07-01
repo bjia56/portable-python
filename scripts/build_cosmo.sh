@@ -220,8 +220,7 @@ rm ./python-install/bin/python${PYTHON_VER}
 if [[ "${DEBUG_CI}" == "true" ]]; then
   cp ./python-build/bin/python.com.dbg ./python-install/bin/
 fi
-rm ./python-install/lib/libpython*.a
-#cp -r ./python-build/lib/.aarch64 ./python-install/lib/
+cp -r ./python-build/lib/.aarch64 ./python-install/lib/
 cp -r ${LICENSEDIR} ./python-install
 
 echo "::endgroup::"
