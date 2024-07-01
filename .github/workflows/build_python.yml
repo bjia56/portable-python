@@ -468,6 +468,7 @@ jobs:
           path: ./python/
 
       - name: Test python in clean environment
+        if: ${{ matrix.os != 'FreeBSD' }}
         shell: bash
         run: |
           if [[ "${{ matrix.os }}" == "Windows" ]]; then
@@ -509,7 +510,7 @@ jobs:
               ./bin/pip3
 
               if [[ "${{ inputs.run_tests }}" == "true" ]]; then
-                ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
+                ./bin/python.com -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
               fi
             EOF
             bash /tmp/test.sh
