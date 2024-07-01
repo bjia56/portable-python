@@ -446,12 +446,21 @@ jobs:
           - runner: ubuntu-latest
             arch: x86_64
             os: Linux
-          - runner: ubuntu-latest
-            arch: x86_64
-            os: FreeBSD
           - runner: windows-latest
             arch: x86_64
             os: Windows
+          - runner: ubuntu-latest
+            arch: x86_64
+            os: FreeBSD
+            vmactions: vmactions/freebsd-vm@v1
+          - runner: ubuntu-latest
+            arch: x86_64
+            os: NetBSD
+            vmactions: vmactions/netbsd-vm@v1
+          - runner: ubuntu-latest
+            arch: x86_64
+            os: OpenBSD
+            vmactions: vmactions/openbsd-vm@v1
 
     steps:
       - name: Set up cosmocc
@@ -468,7 +477,7 @@ jobs:
           path: ./python/
 
       - name: Test python in clean environment
-        if: ${{ matrix.os != 'FreeBSD' }}
+        if: ${{ !contains(matrix.os, 'BSD') }}
         shell: bash
         run: |
           if [[ "${{ matrix.os }}" == "Windows" ]]; then
@@ -490,14 +499,14 @@ jobs:
           fi
 
       - name: Test in VM
-        if: ${{ matrix.os == 'FreeBSD' }}
-        uses: vmactions/freebsd-vm@v1
+        if: ${{ contains(matrix.os, 'BSD') }}
+        uses: ${{ matrix.vmactions }}
         with:
           envs: 'RUN_TESTS DEBUG_CI VERBOSE_CI PORTABLE_PYTHON_BUILDSYSTEM_BRANCH'
           usesh: true
           copyback: false
           prepare: |
-            pkg install -y bash
+            pkg install -y bash || pkg_add bash
           run: |
             cat > /tmp/test.sh <<EOF
               unzip python/python-${{ inputs.python_version }}-cosmo-unknown.zip
