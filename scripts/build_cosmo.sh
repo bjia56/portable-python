@@ -216,8 +216,6 @@ cmake \
   -DLZMA_LIBRARY:FILEPATH=${DEPSDIR}/lib/liblzma.a \
   -DBZIP2_INCLUDE_DIR:PATH=${DEPSDIR}/include \
   -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libbz2.a \
-  -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-  -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.a \
   -DREADLINE_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/readline/readline.h \
   -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.a \
   -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.a \
