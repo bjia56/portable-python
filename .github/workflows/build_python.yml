@@ -482,7 +482,7 @@ jobs:
 
           ./bin/python.com --version
           ./bin/python.com -m sysconfig
-          ./bin/python.com ${{ github.workspace }}/scripts/test.py
+          ./bin/python.com ../scripts/test.py
           ./bin/pip3
 
           if [[ "${{ inputs.run_tests }}" == "true" ]]; then
