@@ -57,30 +57,6 @@ cp .aarch64/lib*.a ${DEPSDIR}/lib/.aarch64
 install_license
 
 echo "::endgroup::"
-##########
-# libffi #
-##########
-echo "::group::libffi"
-cd ${BUILDDIR}
-
-download_verify_extract libffi-3.4.6.tar.gz
-cp -r libffi-3.4.6 libffi-3.4.6-arm64
-cd libffi-3.4.6
-CC="x86_64-unknown-cosmo-cc" AR="x86_64-unknown-cosmo-ar" ./configure --prefix ${DEPSDIR} --disable-shared --enable-static --disable-exec-static-tramp
-make -j4
-make install
-cd ${BUILDDIR}
-mkdir libffi-arm64-out
-cd libffi-3.4.6-arm64
-CC="aarch64-unknown-cosmo-cc" AR="aarch64-unknown-cosmo-ar" ./configure --prefix ${BUILDDIR}/libffi-arm64-out --disable-shared --enable-static --disable-exec-static-tramp --host=aarch64
-make -j4
-make install
-install_license
-
-cd ${BUILDDIR}
-cp ${BUILDDIR}/libffi-arm64-out/lib/libffi.a ${DEPSDIR}/lib/.aarch64/libffi.a
-
-echo "::endgroup::"
 ###########
 # sqlite3 #
 ###########
