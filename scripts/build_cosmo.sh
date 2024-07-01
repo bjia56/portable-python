@@ -214,6 +214,9 @@ make install
 
 cd ${BUILDDIR}
 cp ./python-install/bin/python ./python-install/bin/python.com
+rm ./python-install/bin/python
+rm ./python-install/bin/python3
+rm ./python-install/bin/python${PYTHON_VER}
 cp ./python-build/bin/python.com.dbg ./python-install/bin/
 cp -r ${LICENSEDIR} ./python-install
 
@@ -225,7 +228,7 @@ echo "::group::Test python"
 cd ${BUILDDIR}
 
 cd python-install
-./bin/python --version
+./bin/python.com --version
 
 echo "::endgroup::"
 ###############
@@ -235,11 +238,11 @@ echo "::group::Preload pip"
 cd ${BUILDDIR}
 
 cd python-install
-./bin/python -m ensurepip
-./bin/python -m pip install -r ${WORKDIR}/baseline/requirements.txt
+./bin/python.com -m ensurepip
+./bin/python.com -m pip install -r ${WORKDIR}/baseline/requirements.txt
 
-python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip3
-python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip${PYTHON_VER}
+python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip3 .com
+python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip${PYTHON_VER} .com
 
 echo "::endgroup::"
 ###################
