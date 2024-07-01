@@ -529,7 +529,7 @@ jobs:
           usesh: true
           copyback: false
           prepare: |
-            pkg_add bash
+            /usr/sbin/pkg_add bash
           run: |
             cat > /tmp/test.sh <<EOF
               unzip python/python-${{ inputs.python_version }}-cosmo-unknown.zip
