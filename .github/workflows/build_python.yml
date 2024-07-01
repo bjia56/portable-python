@@ -400,9 +400,9 @@ jobs:
 
     steps:
       - name: Set up cosmocc
-        uses: bjia56/setup-cosmocc@main
+        uses: bjia56/setup-cosmocc@v0.0.3
         with:
-          version: 3.5.3
+          version: 3.5.4
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -458,7 +458,7 @@ jobs:
     steps:
       - name: Set up cosmocc
         if: ${{ matrix.os == 'Linux' }}
-        uses: bjia56/setup-cosmocc@v0.0.2
+        uses: bjia56/setup-cosmocc@v0.0.3
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -551,7 +551,7 @@ jobs:
           usesh: true
           copyback: false
           prepare: |
-            pkg_add bash unzip
+            pkg_add bash unzip-6.0p17
           run: |
             cat > /tmp/test.sh <<EOF
               unzip python/python-${{ inputs.python_version }}-cosmo-unknown.zip
