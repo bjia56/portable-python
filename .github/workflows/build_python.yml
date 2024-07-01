@@ -391,7 +391,7 @@ jobs:
                 ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
               fi
             EOF
-            bash /tmp/test.sh
+            bash -e /tmp/test.sh
 
   build_cosmo:
     name: Cosmopolitan ${{ inputs.python_version }} (build)
@@ -515,7 +515,7 @@ jobs:
                 ./bin/python.com -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
               fi
             EOF
-            bash /tmp/test.sh
+            bash -e /tmp/test.sh
 
       - name: Test in VM
         if: ${{ matrix.os == 'NetBSD' }}
@@ -541,7 +541,7 @@ jobs:
                 ./bin/python.com -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
               fi
             EOF
-            bash /tmp/test.sh
+            bash -e /tmp/test.sh
 
       - name: Test in VM
         if: ${{ matrix.os == 'OpenBSD' }}
@@ -567,4 +567,4 @@ jobs:
                 ./bin/python.com -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
               fi
             EOF
-            bash /tmp/test.sh
+            bash -e /tmp/test.sh
