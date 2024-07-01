@@ -217,7 +217,9 @@ cp ./python-install/bin/python ./python-install/bin/python.com
 rm ./python-install/bin/python
 rm ./python-install/bin/python3
 rm ./python-install/bin/python${PYTHON_VER}
-cp ./python-build/bin/python.com.dbg ./python-install/bin/
+if [[ "${DEBUG_CI}" == "true" ]]; then
+  cp ./python-build/bin/python.com.dbg ./python-install/bin/
+fi
 cp -r ${LICENSEDIR} ./python-install
 
 echo "::endgroup::"
