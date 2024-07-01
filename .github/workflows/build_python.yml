@@ -255,10 +255,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-<<<<<<< HEAD
         os: [ macos-12, macos-14 ]
-=======
->>>>>>> origin/main
         include:
           - os: macos-12
             arch: x86_64
@@ -395,7 +392,6 @@ jobs:
               fi
             EOF
             bash /tmp/test.sh
-<<<<<<< HEAD
 
   build_cosmo:
     name: Cosmopolitan ${{ inputs.python_version }} (build)
@@ -555,7 +551,7 @@ jobs:
           usesh: true
           copyback: false
           prepare: |
-            pkg_add bash
+            pkg_add bash unzip
           run: |
             cat > /tmp/test.sh <<EOF
               unzip python/python-${{ inputs.python_version }}-cosmo-unknown.zip
@@ -572,5 +568,3 @@ jobs:
               fi
             EOF
             bash /tmp/test.sh
-=======
->>>>>>> origin/main
