@@ -26,6 +26,9 @@ export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig:${DEPSDIR}/share/pkgconfig"
 
 mkdir -p ${DEPSDIR}/lib/.aarch64
 
+cd $(dirname $(which cosmocc))
+install_license
+
 echo "::endgroup::"
 ########
 # zlib #

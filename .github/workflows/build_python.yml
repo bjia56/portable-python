@@ -400,7 +400,7 @@ jobs:
 
     steps:
       - name: Set up cosmocc
-        uses: bjia56/setup-cosmocc@v0.0.2
+        uses: bjia56/setup-cosmocc@main
         with:
           version: 3.5.3
 
