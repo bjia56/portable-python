@@ -58,7 +58,7 @@ async function download(url: string, dest: string) {
 
 export class PortablePython {
     _version: string
-    distribution: string = "standard"
+    distribution: string = "auto"
     installDir = dirname(__dirname);
 
     constructor(version: string, installDir: string | null = null, options: any = {}) {
@@ -69,7 +69,7 @@ export class PortablePython {
         if (options.distribution) {
             this.distribution = options.distribution;
         }
-        if (!["standard", "cosmo"].includes(this.distribution)) {
+        if (!["auto", "cosmo"].includes(this.distribution)) {
             throw Error("invalid distribution");
         }
 
