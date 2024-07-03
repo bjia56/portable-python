@@ -1,4 +1,8 @@
 # portable-python
+[![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/bjia56/portable-python/total)](https://bjia56.github.io/portable-python/)
+[![NPM Version](https://img.shields.io/npm/v/%40bjia56%2Fportable-python)](https://www.npmjs.com/package/@bjia56/portable-python)
+
+
 This project provides self-contained (hence, "portable") Python distributions to a variety of target platforms and architectures. These Python distributions can be downloaded and extracted to anywhere on the filesystem, making installation trivially easy and configurable.
 
 ## Usage
@@ -45,8 +49,6 @@ Python 3.8 builds are available, but will no longer be actively updated.
 <sub><b id="f1">1</b> The arm builds target armv6, specifically the configuration of the Raspberry Pi 1. Current arm builds do not work properly on old glibc, but a recent version of Raspbian like Debian bullseye should provide a new enough glibc to work. [↩](#a1)</sub>
 
 <sub><b id="f2">2</b> MacOS distributions are provided as universal2, which will work on both x86_64 and arm64. [↩](#a2)</sub>
-
-Download stats: <a href="https://bjia56.github.io/portable-python/">📊</a>
 
 ## Licensing
 
