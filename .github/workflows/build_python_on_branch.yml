@@ -3,9 +3,9 @@ name: Build Python on branch
 on:
   push:
     branches: ["main"]
-    paths: ["scripts/**", ".github/workflows/**", "zigshim/**", "checksums/**"]
+    paths: ["scripts/**", ".github/workflows/**", "zigshim/**", "checksums/**", "baseline/**"]
   pull_request:
-    paths: ["scripts/**", ".github/workflows/**", "zigshim/**", "checksums/**"]
+    paths: ["scripts/**", ".github/workflows/**", "zigshim/**", "checksums/**", "baseline/**"]
   workflow_dispatch:
     inputs:
       run_tests:
