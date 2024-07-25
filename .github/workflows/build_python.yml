@@ -402,7 +402,7 @@ jobs:
       - name: Set up cosmocc
         uses: bjia56/setup-cosmocc@v0.0.3
         with:
-          version: 3.6.0
+          version: 3.6.1
 
       - name: Checkout
         uses: actions/checkout@v4
