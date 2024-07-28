@@ -404,7 +404,7 @@ jobs:
 
       - name: Load cosmocc version
         run: |
-          version=$(cat .github/workflows/cosmocc_version.txt)
+          version=$(cat .github/cosmocc_version.txt)
           echo "cosmocc_version=${version}" >> "$GITHUB_ENV"
 
       - name: Set up cosmocc
