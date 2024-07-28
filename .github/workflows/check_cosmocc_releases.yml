@@ -1,0 +1,41 @@
+name: Periodic check for new cosmocc releases
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "15 4 * * *"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  check_new_releases:
+    name: Check for new releases
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check versions
+        run: |
+          CURRENT=$(cat .github/workflows/build_python.yml | yq .jobs.build_cosmo.steps[0].with.version)
+          LATEST=$(curl -s -S -H "Authorization: Bearer ${{ github.token }}" https://api.github.com/repos/jart/cosmopolitan/releases | jq -r .[0].tag_name)
+          echo "current=${CURRENT}" >> "$GITHUB_ENV"
+          echo "latest=${LATEST}" >> "$GITHUB_ENV"
+
+      - name: Do update
+        if: ${{ env.current != env.latest }}
+        run: |
+          sed -i 's/${{ env.current }}/${{ env.latest }}/g' .github/workflows/build_python.yml
+
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: '[:robot:] Bump Cosmpolitan to ${{ env.latest }}'
+          title: '[🤖] Bump Cosmpolitan to ${{ env.latest }}'
+          body: Automatically generated PR - Bumping Cosmpolitan from ${{ env.current }} to ${{ env.latest }}
+          branch: bump-cosmocc
+          delete-branch: true
