@@ -21,7 +21,7 @@ jobs:
 
       - name: Check versions
         run: |
-          CURRENT=$(cat .github/workflows/build_python.yml | yq .jobs.build_cosmo.steps[0].with.version)
+          CURRENT=$(cat .github/cosmocc_version.txt | yq .jobs.build_cosmo.steps[0].with.version)
           LATEST=$(curl -s -S -H "Authorization: Bearer ${{ github.token }}" https://api.github.com/repos/jart/cosmopolitan/releases | jq -r .[0].tag_name)
           echo "current=${CURRENT}" >> "$GITHUB_ENV"
           echo "latest=${LATEST}" >> "$GITHUB_ENV"
@@ -29,7 +29,7 @@ jobs:
       - name: Do update
         if: ${{ env.current != env.latest }}
         run: |
-          sed -i 's/${{ env.current }}/${{ env.latest }}/g' .github/workflows/build_python.yml
+          sed -i 's/${{ env.current }}/${{ env.latest }}/g' .github/cosmocc_version.txt
 
       - name: Create PR
         uses: peter-evans/create-pull-request@v6
