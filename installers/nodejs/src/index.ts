@@ -58,11 +58,19 @@ async function download(url: string, dest: string) {
 
 export class PortablePython {
     _version: string
+    distribution: string = "auto"
     installDir = dirname(__dirname);
 
-    constructor(version: string, installDir: string | null = null) {
+    constructor(version: string, installDir: string | null = null, options: any = {}) {
         if (!version) {
             throw Error("version must not be empty");
+        }
+
+        if (options.distribution) {
+            this.distribution = options.distribution;
+        }
+        if (!["auto", "cosmo"].includes(this.distribution)) {
+            throw Error("invalid distribution");
         }
 
         if (installDir) {
@@ -82,14 +90,17 @@ export class PortablePython {
      * Contains the path to the Python executable.
      */
     get executablePath() {
-        return join(this.installDir, this.pythonDistributionName, "bin", "python" + (platform() === "win32" ? ".exe" : ""));
+        return join(this.installDir, this.pythonDistributionName, "bin", "python" + (
+            this.distribution === "cosmo" ? ".com" :
+            (platform() === "win32" ? ".exe" : "")
+        ));
     }
 
     /**
      * Contains the path to the bundled pip executable.
      */
     get pipPath() {
-        if (platform() === "win32") {
+        if (this.distribution != "cosmo" && platform() === "win32") {
             return join(this.installDir, this.pythonDistributionName, "Scripts", `pip${this.major}.exe`);
         }
         return join(this.installDir, this.pythonDistributionName, "bin", `pip${this.major}`);
@@ -134,6 +145,9 @@ export class PortablePython {
      * Contains the full name of the Python distribution.
      */
     get pythonDistributionName() {
+        if (this.distribution === "cosmo") {
+            return `python-${this.version}-cosmo-unknown`;
+        }
         return `python-${this.version}-${DL_PLATFORM}-${DL_ARCH}`;
     }
 
@@ -168,7 +182,7 @@ export class PortablePython {
             }
 
             chmodSync(this.executablePath, 0o777);
-            if (platform() != "win32") {
+            if (this.distribution != "cosmo" && platform() != "win32") {
                 // node can't create symlinks over existing files, so we create symlinks with temp names,
                 // then rename to overwrite existing files
                 symlinkSync("python", `${this.executablePath}${this.major}_`, "file");
