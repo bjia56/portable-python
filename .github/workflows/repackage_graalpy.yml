@@ -20,7 +20,7 @@ on:
         type: string
 
 env:
-  image_map: '{"x86_64": "amd64/centos:7", "aarch64": "arm64v8/centos:7"}'
+  image_map: '{"x86_64": "amd64/ubuntu:20.04", "aarch64": "arm64v8/ubuntu:20.04"}'
 
 jobs:
   build_linux:
