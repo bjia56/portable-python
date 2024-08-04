@@ -9,7 +9,7 @@ on:
       platforms:
         required: true
         type: string
-        default: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,macos,windows,freebsd13-x86_64,freebsd14-x86_64"
+        default: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,macos,windows,cosmo,freebsd13-x86_64,freebsd14-x86_64"
       buildsystem_branch:
         required: false
         type: string
@@ -52,7 +52,7 @@ env:
   DEBUG_CI: ${{ inputs.debug }}
   VERBOSE_CI: ${{ inputs.verbose }}
   PORTABLE_PYTHON_BUILDSYSTEM_BRANCH: ${{ inputs.buildsystem_branch || 'portable-python' }}
-  image_map: '{"x86_64": "amd64/centos:7", "i386": "i386/centos:7", "aarch64": "arm64v8/centos:7", "arm": "arm32v7/debian:bullseye", "riscv64": "riscv64/debian:sid"}'
+  image_map: '{"x86_64": "amd64/ubuntu:18.04", "i386": "i386/ubuntu:18.04", "aarch64": "arm64v8/ubuntu:18.04", "arm": "arm32v7/debian:bullseye", "riscv64": "riscv64/debian:sid"}'
   freebsd_release_map: '{"14": "14.0", "13": "13.2"}'
 
 jobs:
@@ -117,12 +117,8 @@ jobs:
             set -e
             uname -a
 
-            if [ "${{ matrix.arch }}" == "arm" ] || [ "${{ matrix.arch }}" == "riscv64" ]; then
-              apt update
-              apt -y install unzip
-            else
-              yum -y install unzip
-            fi
+            apt update
+            apt -y install unzip
 
             cp /work/python*.zip .
             unzip ./python*.zip
@@ -259,9 +255,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-11, macos-14 ]
+        os: [ macos-12, macos-14 ]
         include:
-          - os: macos-11
+          - os: macos-12
             arch: x86_64
           - os: macos-14
             arch: arm64
@@ -395,4 +391,185 @@ jobs:
                 ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
               fi
             EOF
-            bash /tmp/test.sh
+            bash -e /tmp/test.sh
+
+  build_cosmo:
+    name: Cosmopolitan ${{ inputs.python_version }} (build)
+    if: ${{ contains(inputs.platforms, 'cosmo') }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Load cosmocc version
+        run: |
+          version=$(cat .github/cosmocc_version.txt)
+          echo "cosmocc_version=${version}" >> "$GITHUB_ENV"
+
+      - name: Set up cosmocc
+        uses: bjia56/setup-cosmocc@v0.0.3
+        with:
+          version: ${{ env.cosmocc_version }}
+
+      - name: Build
+        run: |
+          ./scripts/build_cosmo.sh unknown ${{ inputs.python_version }}
+
+      - name: Interactive debugging
+        if: ${{ always() && inputs.debug_interactive }}
+        uses: fawazahmed0/action-debug@v2
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-cosmo-unknown-${{ inputs.python_version }}
+          path: ./python*.zip
+
+      - name: Upload artifacts
+        if: ${{ always()  && inputs.debug }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-python-cosmo-unknown-${{ inputs.python_version }}
+          path: ./*python*.tar.gz
+
+  test_cosmo:
+    name: Cosmopolitan ${{ inputs.python_version }} ${{ matrix.os }} ${{ matrix.arch }} (test)
+    needs: build_cosmo
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-14
+            arch: arm64
+            os: MacOS
+          - runner: ubuntu-latest
+            arch: x86_64
+            os: Linux
+          - runner: windows-latest
+            arch: x86_64
+            os: Windows
+          - runner: ubuntu-latest
+            arch: x86_64
+            os: FreeBSD
+          - runner: ubuntu-latest
+            arch: x86_64
+            os: NetBSD
+          - runner: ubuntu-latest
+            arch: x86_64
+            os: OpenBSD
+
+    steps:
+      - name: Set up cosmocc
+        if: ${{ matrix.os == 'Linux' }}
+        uses: bjia56/setup-cosmocc@v0.0.3
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: python-cosmo-unknown-${{ inputs.python_version }}
+          path: ./python/
+
+      - name: Test python in clean environment
+        if: ${{ !contains(matrix.os, 'BSD') }}
+        shell: bash
+        run: |
+          if [[ "${{ matrix.os }}" == "Windows" ]]; then
+            7z.exe x python/python-${{ inputs.python_version }}-cosmo-unknown.zip
+          else
+            unzip python/python-${{ inputs.python_version }}-cosmo-unknown.zip
+            chmod +x python-${{ inputs.python_version }}-cosmo-unknown/bin/python.com
+          fi
+
+          cd python-${{ inputs.python_version }}-cosmo-unknown
+
+          ./bin/python.com --version
+          ./bin/python.com -m sysconfig
+          ./bin/python.com ../scripts/test.py
+          ./bin/pip3
+
+          if [[ "${{ inputs.run_tests }}" == "true" ]]; then
+            ./bin/python.com -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
+          fi
+
+      - name: Test in VM
+        if: ${{ matrix.os == 'FreeBSD' }}
+        uses: vmactions/freebsd-vm@v1
+        with:
+          envs: 'RUN_TESTS DEBUG_CI VERBOSE_CI PORTABLE_PYTHON_BUILDSYSTEM_BRANCH'
+          usesh: true
+          copyback: false
+          prepare: |
+            pkg install -y bash
+          run: |
+            cat > /tmp/test.sh <<EOF
+              unzip python/python-${{ inputs.python_version }}-cosmo-unknown.zip
+
+              cd python-${{ inputs.python_version }}-cosmo-unknown
+              chmod +x ./bin/python.com
+              ./bin/python.com --version
+              ./bin/python.com -m sysconfig
+              ./bin/python.com ${{ github.workspace }}/scripts/test.py
+              ./bin/pip3
+
+              if [[ "${{ inputs.run_tests }}" == "true" ]]; then
+                ./bin/python.com -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
+              fi
+            EOF
+            bash -e /tmp/test.sh
+
+      - name: Test in VM
+        if: ${{ matrix.os == 'NetBSD' }}
+        uses: vmactions/netbsd-vm@v1
+        with:
+          envs: 'RUN_TESTS DEBUG_CI VERBOSE_CI PORTABLE_PYTHON_BUILDSYSTEM_BRANCH'
+          usesh: true
+          copyback: false
+          prepare: |
+            /usr/sbin/pkg_add bash
+          run: |
+            cat > /tmp/test.sh <<EOF
+              unzip python/python-${{ inputs.python_version }}-cosmo-unknown.zip
+
+              cd python-${{ inputs.python_version }}-cosmo-unknown
+              chmod +x ./bin/python.com
+              ./bin/python.com --version
+              ./bin/python.com -m sysconfig
+              ./bin/python.com ${{ github.workspace }}/scripts/test.py
+              ./bin/pip3
+
+              if [[ "${{ inputs.run_tests }}" == "true" ]]; then
+                ./bin/python.com -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
+              fi
+            EOF
+            bash -e /tmp/test.sh
+
+      - name: Test in VM
+        if: ${{ matrix.os == 'OpenBSD' }}
+        uses: vmactions/openbsd-vm@v1
+        with:
+          envs: 'RUN_TESTS DEBUG_CI VERBOSE_CI PORTABLE_PYTHON_BUILDSYSTEM_BRANCH'
+          usesh: true
+          copyback: false
+          prepare: |
+            pkg_add bash unzip-6.0p17
+          run: |
+            cat > /tmp/test.sh <<EOF
+              unzip python/python-${{ inputs.python_version }}-cosmo-unknown.zip
+
+              cd python-${{ inputs.python_version }}-cosmo-unknown
+              chmod +x ./bin/python.com
+              ./bin/python.com --version
+              ./bin/python.com -m sysconfig
+              ./bin/python.com ${{ github.workspace }}/scripts/test.py
+              ./bin/pip3
+
+              if [[ "${{ inputs.run_tests }}" == "true" ]]; then
+                ./bin/python.com -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
+              fi
+            EOF
+            bash -e /tmp/test.sh
