@@ -16,7 +16,7 @@ tags=$(git tag | grep "$prefix-v$python_version-$suffix")
 
 if [[ -z "$tags" ]]; then
     if [[ "$print_latest" != "true" ]]; then
-        echo "v$python_version-$suffix.0"
+        echo "$prefix-v$python_version-$suffix.0"
     fi
     exit 0
 fi
