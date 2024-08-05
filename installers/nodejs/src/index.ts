@@ -57,7 +57,7 @@ function getVersionBuilds(implementation: string) {
 
 function pickVersion(implementation: string, version: string) {
     const versions = getVersions(implementation);
-    for (let i = 0; i < VERSIONS.length; ++i) {
+    for (let i = 0; i < versions.length; ++i) {
         // TODO: This doesn't handle semver correctly, e.g. 3.8.17 will match 3.8.1
         if (versions[i].startsWith(version)) {
             return versions[i];
