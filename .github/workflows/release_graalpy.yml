@@ -79,7 +79,6 @@ jobs:
       release_tag: ${{ steps.pick_tag.outputs.release_tag }}
 
   update_installers:
-    if: false
     name: Update installers
     needs: publish
     permissions:
