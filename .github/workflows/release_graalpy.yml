@@ -1,9 +1,9 @@
-name: Build and publish CPython
+name: Build and publish GraalPy
 
 on:
   workflow_dispatch:
     inputs:
-      python_version:
+      graalpy_version:
         required: true
         type: string
       beta:
@@ -12,7 +12,7 @@ on:
         default: false
   workflow_call:
     inputs:
-      python_version:
+      graalpy_version:
         required: true
         type: string
       beta:
@@ -22,14 +22,14 @@ on:
 
 jobs:
   build:
-    name: Build CPython ${{ inputs.python_version }}
-    uses: ./.github/workflows/build_python.yml
+    name: Build GraalPy ${{ inputs.graalpy_version }}
+    uses: ./.github/workflows/repackage_graalpy.yml
     with:
-      python_version: ${{ inputs.python_version }}
-      platforms: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,macos,windows,cosmo,freebsd13-x86_64,freebsd14-x86_64"
+      graalpy_version: ${{ inputs.graalpy_version }}
+      platforms: "linux-x86_64,linux-aarch64,macos,windows"
 
   publish:
-    name: Publish CPython ${{ inputs.python_version }}
+    name: Publish GraalPy ${{ inputs.graalpy_version }}
     needs: build
     runs-on: ubuntu-latest
     permissions:
@@ -44,18 +44,18 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          pattern: python-*
-          path: /tmp/python/
+          pattern: graalpy-*
+          path: /tmp/graalpy/
           merge-multiple: true
 
       - name: Get latest
         run: |
-          echo "LATEST_TAG=$(./scripts/pick_semver.sh ${{ inputs.python_version }} ${{ inputs.beta }} cpython true)" >> $GITHUB_ENV
+          echo "LATEST_TAG=$(./scripts/pick_semver.sh ${{ inputs.graalpy_version }} ${{ inputs.beta }} true)" >> $GITHUB_ENV
 
       - name: Pick tag
         id: pick_tag
         run: |
-          SELECTED_TAG=$(./scripts/pick_semver.sh ${{ inputs.python_version }} ${{ inputs.beta }} cpython)
+          SELECTED_TAG=$(./scripts/pick_semver.sh ${{ inputs.graalpy_version }} ${{ inputs.beta }})
           echo "SELECTED_TAG=$SELECTED_TAG" >> $GITHUB_ENV
           echo "::set-output name=release_tag::$SELECTED_TAG"
 
@@ -64,7 +64,7 @@ jobs:
           gh release create ${{ env.SELECTED_TAG }} \
             --title ${{ env.SELECTED_TAG }} \
             --target ${{ github.sha }} \
-            ${{ env.LATEST_TAG && format('--generate-notes --notes-start-tag {0}', env.LATEST_TAG) || format('--notes "Python {0}"', inputs.python_version) }} \
+            ${{ env.LATEST_TAG && format('--generate-notes --notes-start-tag {0}', env.LATEST_TAG) || format('--notes "Python {0}"', inputs.graalpy_version) }} \
             ${{ inputs.beta && '--prerelease' || '' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -72,21 +72,22 @@ jobs:
       - name: Upload files
         uses: softprops/action-gh-release@v2
         with:
-          files: /tmp/python/python*.zip
+          files: /tmp/graalpy/graalpy*.zip
           tag_name: ${{ env.SELECTED_TAG }}
 
     outputs:
       release_tag: ${{ steps.pick_tag.outputs.release_tag }}
 
   update_installers:
+    if: false
     name: Update installers
     needs: publish
     permissions:
       contents: write
     uses: ./.github/workflows/update_nodejs_installers.yml
     with:
-      version: ${{ inputs.python_version }}
+      version: ${{ inputs.graalpy_version }}
       release_tag: ${{ needs.publish.outputs.release_tag }}
       beta: ${{ inputs.beta }}
-      implementation: cpython
+      implementation: graalpy
     secrets: inherit

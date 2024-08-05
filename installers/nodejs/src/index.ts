@@ -37,14 +37,30 @@ const DL_ARCH = (() => {
     return arch();
 })();
 
-const VERSIONS = packageJson.portablePython.versions;
-const VERSION_BUILDS = packageJson.portablePython.versionBuilds;
+const VERSIONS = packageJson.portablePython;
 
-function pickVersion(version: string) {
+function getVersions(implementation: string) {
+    const versions = VERSIONS[implementation].versions;
+    if (!versions) {
+        throw Error("unknown implementation");
+    }
+    return versions;
+}
+
+function getVersionBuilds(implementation: string) {
+    const versionBuilds = VERSIONS[implementation].versionBuilds;
+    if (!versionBuilds) {
+        throw Error("unknown implementation");
+    }
+    return versionBuilds;
+}
+
+function pickVersion(implementation: string, version: string) {
+    const versions = getVersions(implementation);
     for (let i = 0; i < VERSIONS.length; ++i) {
         // TODO: This doesn't handle semver correctly, e.g. 3.8.17 will match 3.8.1
-        if (VERSIONS[i].startsWith(version)) {
-            return VERSIONS[i];
+        if (versions[i].startsWith(version)) {
+            return versions[i];
         }
     }
     return null;
@@ -58,6 +74,7 @@ async function download(url: string, dest: string) {
 
 export class PortablePython {
     _version: string
+    implementation: string = "cpython"
     distribution: string = "auto"
     installDir = dirname(__dirname);
 
@@ -66,23 +83,41 @@ export class PortablePython {
             throw Error("version must not be empty");
         }
 
+        if (options.implementation) {
+            this.implementation = options.implementation;
+        }
         if (options.distribution) {
             this.distribution = options.distribution;
         }
-        if (!["auto", "cosmo"].includes(this.distribution)) {
-            throw Error("invalid distribution");
-        }
+
+        this.validateOptions();
 
         if (installDir) {
             this.installDir = installDir;
         }
 
-        this._version = pickVersion(version);
+        this._version = pickVersion(this.implementation, version);
         if (!this._version) {
             throw Error(`unknown version: ${version}`);
         }
         if (!this.releaseTag) {
             throw Error("no releases available for this version");
+        }
+    }
+
+    private validateOptions() {
+        if (!["cpython", "graalpy"].includes(this.implementation)) {
+            throw Error("invalid implementation");
+        }
+
+        if (!["auto", "cosmo"].includes(this.distribution)) {
+            throw Error("invalid distribution");
+        }
+
+        if (this.implementation === "graalpy") {
+            if (this.distribution !== "auto") {
+                throw Error("invalid distribution selected for graalpy");
+            }
         }
     }
 
@@ -138,7 +173,7 @@ export class PortablePython {
      * Contains the release tag that will be downloaded.
      */
     get releaseTag() {
-        return VERSION_BUILDS[this.version] as string;
+        return getVersionBuilds(this.implementation)[this.version] as string;
     }
 
     /**
