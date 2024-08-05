@@ -50,12 +50,12 @@ jobs:
 
       - name: Get latest
         run: |
-          echo "LATEST_TAG=$(./scripts/pick_semver.sh ${{ inputs.graalpy_version }} ${{ inputs.beta }} true)" >> $GITHUB_ENV
+          echo "LATEST_TAG=$(./scripts/pick_semver.sh ${{ inputs.graalpy_version }} ${{ inputs.beta }} graalpy true)" >> $GITHUB_ENV
 
       - name: Pick tag
         id: pick_tag
         run: |
-          SELECTED_TAG=$(./scripts/pick_semver.sh ${{ inputs.graalpy_version }} ${{ inputs.beta }})
+          SELECTED_TAG=$(./scripts/pick_semver.sh ${{ inputs.graalpy_version }} ${{ inputs.beta }} graalpy)
           echo "SELECTED_TAG=$SELECTED_TAG" >> $GITHUB_ENV
           echo "::set-output name=release_tag::$SELECTED_TAG"
 
@@ -64,7 +64,7 @@ jobs:
           gh release create ${{ env.SELECTED_TAG }} \
             --title ${{ env.SELECTED_TAG }} \
             --target ${{ github.sha }} \
-            ${{ env.LATEST_TAG && format('--generate-notes --notes-start-tag {0}', env.LATEST_TAG) || format('--notes "Python {0}"', inputs.graalpy_version) }} \
+            ${{ env.LATEST_TAG && format('--generate-notes --notes-start-tag {0}', env.LATEST_TAG) || format('--notes "GraalPy {0}"', inputs.graalpy_version) }} \
             ${{ inputs.beta && '--prerelease' || '' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
