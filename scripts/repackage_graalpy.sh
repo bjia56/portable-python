@@ -10,7 +10,7 @@ if [[ "${ARCH}" == "x86_64" ]]; then
 fi
 
 if [[ "${PLATFORM}" == "linux" ]]; then
-  apt update && apt -y install zip python3 curl
+  apt update && apt -y install zip python3-pip curl
 fi
 
 WORKDIR=$(pwd)
