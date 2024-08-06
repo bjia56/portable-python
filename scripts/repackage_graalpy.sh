@@ -15,32 +15,60 @@ fi
 
 WORKDIR=$(pwd)
 
-DL_FILENAME=graalpy-community-jvm-${GRAALPY_VERSION}-${PLATFORM}-${DL_ARCH}
-EXTRACTED_FILENAME=graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${DL_ARCH}
-UPLOAD_FILENAME=graalpy-community-jvm-${GRAALPY_VERSION}-${PLATFORM}-${ARCH}
+function repackage_graal () {
+  DISTRIBUTION=$1
 
-if [[ "${PLATFORM}" == "windows" ]]; then
-  curl -L https://github.com/oracle/graalpython/releases/download/graal-${GRAALPY_VERSION}/${DL_FILENAME}.zip --output ${DL_FILENAME}.zip
-  7z.exe x ${DL_FILENAME}.zip
-  rm ${DL_FILENAME}.zip
-else
-  curl -L https://github.com/oracle/graalpython/releases/download/graal-${GRAALPY_VERSION}/${DL_FILENAME}.tar.gz --output ${DL_FILENAME}.tar.gz
-  tar -xf ${DL_FILENAME}.tar.gz
-  rm ${DL_FILENAME}.tar.gz
-fi
+  DISTRO_MODIFIER="-"
+  if [[ "${DISTRIBUTION}" == *"community"* ]]; then
+    DISTRO_MODIFIER="${DISTRO_MODIFIER}community-"
+  fi
 
-cd ${EXTRACTED_FILENAME}
-./libexec/graalpy-polyglot-get js-community
-./bin/python -m ensurepip
+  if [[ "${DISTRIBUTION}" == *"jvm"* ]]; then
+    DISTRO_MODIFIER="${DISTRO_MODIFIER}jvm-"
+  fi
 
-cd ${WORKDIR}
-mv ${EXTRACTED_FILENAME} ${UPLOAD_FILENAME}
+  DL_FILENAME=graalpy${DISTRO_MODIFIER}${GRAALPY_VERSION}-${PLATFORM}-${DL_ARCH}
+  if [[ "${DISTRIBUTION}" == *"community"* ]]; then
+    EXTRACTED_FILENAME=graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${DL_ARCH}
+  else
+    EXTRACTED_FILENAME=graalpy-${GRAALPY_VERSION}-${PLATFORM}-${DL_ARCH}
+  fi
+  UPLOAD_FILENAME=graalpy${DISTRO_MODIFIER}${GRAALPY_VERSION}-${PLATFORM}-${ARCH}
 
-python3 -m pip install pyclean
-python3 -m pyclean -v ${UPLOAD_FILENAME}
-tar -czf ${WORKDIR}/${UPLOAD_FILENAME}.tar.gz ${UPLOAD_FILENAME}
-if [[ "${PLATFORM}" == "windows" ]]; then
-  7z.exe a ${WORKDIR}/${UPLOAD_FILENAME}.zip ${UPLOAD_FILENAME}
-else
-  zip ${WORKDIR}/${UPLOAD_FILENAME}.zip $(tar tf ${WORKDIR}/${UPLOAD_FILENAME}.tar.gz)
-fi
+  if [[ "${PLATFORM}" == "windows" ]]; then
+    curl -L https://github.com/oracle/graalpython/releases/download/graal-${GRAALPY_VERSION}/${DL_FILENAME}.zip --output ${DL_FILENAME}.zip
+    7z.exe x ${DL_FILENAME}.zip
+    rm ${DL_FILENAME}.zip
+  else
+    curl -L https://github.com/oracle/graalpython/releases/download/graal-${GRAALPY_VERSION}/${DL_FILENAME}.tar.gz --output ${DL_FILENAME}.tar.gz
+    tar -xf ${DL_FILENAME}.tar.gz
+    rm ${DL_FILENAME}.tar.gz
+  fi
+
+  cd ${EXTRACTED_FILENAME}
+  if [[ "${DISTRIBUTION}" == *"jvm"* ]]; then
+    if [[ "${DISTRIBUTION}" == *"community"* ]]; then
+      ./libexec/graalpy-polyglot-get js-community
+    else
+      ./libexec/graalpy-polyglot-get js
+    fi
+  fi
+  ./bin/python -m ensurepip
+
+  cd ${WORKDIR}
+  mv ${EXTRACTED_FILENAME} ${UPLOAD_FILENAME}
+
+  python3 -m pip install pyclean
+  python3 -m pyclean -v ${UPLOAD_FILENAME}
+  tar -czf ${WORKDIR}/${UPLOAD_FILENAME}.tar.gz ${UPLOAD_FILENAME}
+  if [[ "${PLATFORM}" == "windows" ]]; then
+    7z.exe a ${WORKDIR}/${UPLOAD_FILENAME}.zip ${UPLOAD_FILENAME}
+  else
+    zip ${WORKDIR}/${UPLOAD_FILENAME}.zip $(tar tf ${WORKDIR}/${UPLOAD_FILENAME}.tar.gz)
+  fi
+}
+
+repackage_graal
+repackage_graal jvm
+repackage_graal community
+repackage_graal community-jvm

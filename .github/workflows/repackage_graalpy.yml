@@ -116,5 +116,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: graalpy-darwin-${{ matrix.arch }}-${{ inputs.graalpy_version }}
+          name: graalpy-macos-${{ matrix.arch }}-${{ inputs.graalpy_version }}
           path: ./graalpy*.zip
