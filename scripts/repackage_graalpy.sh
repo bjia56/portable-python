@@ -15,6 +15,12 @@ if [[ "${PLATFORM}" == "linux" ]]; then
   echo "::endgroup::"
 fi
 
+DL_PLATFORM="${PLATFORM}"
+if [[ "${PLATFORM}" == "darwin" ]]; then
+  DL_PLATFORM=macos
+fi
+
+python3 -m pip install pyclean
 WORKDIR=$(pwd)
 
 function repackage_graal () {
@@ -30,11 +36,11 @@ function repackage_graal () {
     DISTRO_MODIFIER="${DISTRO_MODIFIER}jvm-"
   fi
 
-  DL_FILENAME=graalpy${DISTRO_MODIFIER}${GRAALPY_VERSION}-${PLATFORM}-${DL_ARCH}
+  DL_FILENAME=graalpy${DISTRO_MODIFIER}${GRAALPY_VERSION}-${DL_PLATFORM}-${DL_ARCH}
   if [[ "${DISTRIBUTION}" == *"community"* ]]; then
-    EXTRACTED_FILENAME=graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${DL_ARCH}
+    EXTRACTED_FILENAME=graalpy-community-${GRAALPY_VERSION}-${DL_PLATFORM}-${DL_ARCH}
   else
-    EXTRACTED_FILENAME=graalpy-${GRAALPY_VERSION}-${PLATFORM}-${DL_ARCH}
+    EXTRACTED_FILENAME=graalpy-${GRAALPY_VERSION}-${DL_PLATFORM}-${DL_ARCH}
   fi
   UPLOAD_FILENAME=graalpy${DISTRO_MODIFIER}${GRAALPY_VERSION}-${PLATFORM}-${ARCH}
 
@@ -61,7 +67,6 @@ function repackage_graal () {
   cd ${WORKDIR}
   mv ${EXTRACTED_FILENAME} ${UPLOAD_FILENAME}
 
-  python3 -m pip install pyclean
   python3 -m pyclean -v ${UPLOAD_FILENAME}
   tar -czf ${WORKDIR}/${UPLOAD_FILENAME}.tar.gz ${UPLOAD_FILENAME}
   if [[ "${PLATFORM}" == "windows" ]]; then
