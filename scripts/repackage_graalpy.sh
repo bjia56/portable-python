@@ -17,6 +17,7 @@ WORKDIR=$(pwd)
 
 function repackage_graal () {
   DISTRIBUTION=$1
+  echo "::group::GraalPy ${DISTRIBUTION}"
 
   DISTRO_MODIFIER="-"
   if [[ "${DISTRIBUTION}" == *"community"* ]]; then
@@ -66,6 +67,8 @@ function repackage_graal () {
   else
     zip ${WORKDIR}/${UPLOAD_FILENAME}.zip $(tar tf ${WORKDIR}/${UPLOAD_FILENAME}.tar.gz)
   fi
+
+  echo "::endgroup::"
 }
 
 repackage_graal
