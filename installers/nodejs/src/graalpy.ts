@@ -8,9 +8,6 @@ const DL_PLATFORM = (() => {
     if (platform() == "win32") {
         return "windows";
     }
-    if (platform() == "darwin") {
-        return "macos";
-    }
     return platform();
 })();
 
