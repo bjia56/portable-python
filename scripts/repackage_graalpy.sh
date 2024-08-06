@@ -10,7 +10,9 @@ if [[ "${ARCH}" == "x86_64" ]]; then
 fi
 
 if [[ "${PLATFORM}" == "linux" ]]; then
+  echo "::group::Install tools"
   apt update && apt -y install zip python3-pip curl
+  echo "::endgroup::"
 fi
 
 WORKDIR=$(pwd)
