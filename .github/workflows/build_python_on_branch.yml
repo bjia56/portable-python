@@ -57,5 +57,5 @@ jobs:
         pypy_version: [ 7.3.16 ]
     uses: ./.github/workflows/repackage_pypy.yml
     with:
-      graalpy_version: ${{ matrix.pypy_version }}
+      pypy_version: ${{ matrix.pypy_version }}
       platforms: "linux-x86_64,linux-aarch64,macos,windows"
