@@ -35,13 +35,6 @@ jobs:
     permissions:
       contents: write
     steps:
-      # softprops/action-gh-release attempts to read all artifacts into memory before
-      # upload, which can crash the GH-hosted runners
-      - name: Expand swap space
-        uses: pierotofy/set-swap-space@v1.0
-        with:
-          swap-size-gb: 10
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -79,7 +72,19 @@ jobs:
       - name: Upload files
         uses: softprops/action-gh-release@v2
         with:
-          files: /tmp/graalpy/graalpy*.zip
+          files: /tmp/graalpy/graalpy*linux*.zip
+          tag_name: ${{ env.SELECTED_TAG }}
+
+      - name: Upload files
+        uses: softprops/action-gh-release@v2
+        with:
+          files: /tmp/graalpy/graalpy*macos*.zip
+          tag_name: ${{ env.SELECTED_TAG }}
+
+      - name: Upload files
+        uses: softprops/action-gh-release@v2
+        with:
+          files: /tmp/graalpy/graalpy*windows*.zip
           tag_name: ${{ env.SELECTED_TAG }}
 
     outputs:
