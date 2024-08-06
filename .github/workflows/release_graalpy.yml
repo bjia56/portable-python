@@ -35,6 +35,13 @@ jobs:
     permissions:
       contents: write
     steps:
+      # softprops/action-gh-release attempts to read all artifacts into memory before
+      # upload, which can crash the GH-hosted runners
+      - name: Expand swap space
+        uses: pierotofy/set-swap-space@v1.0
+        with:
+          swap-size-gb: 10
+
       - name: Checkout
         uses: actions/checkout@v4
 
