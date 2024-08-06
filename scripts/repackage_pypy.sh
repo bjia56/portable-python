@@ -12,6 +12,8 @@ fi
 
 python3 -m pip install pyclean
 
+WORKDIR=$(pwd)
+
 function repackage_pypy () {
   DISTRIBUTION=$1
   echo "::group::PyPy ${DISTRIBUTION}"
