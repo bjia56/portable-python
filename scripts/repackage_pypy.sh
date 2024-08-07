@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 ARCH=$1
 PYPY_VERSION=$2
 PLATFORM=$3
@@ -51,7 +53,11 @@ function repackage_pypy () {
   fi
 
   cd ${DL_FILENAME}
-  ./bin/python -m ensurepip
+  if [[ "${PLATFORM}" == "windows" ]]; then
+    ./python -m ensurepip
+  else
+    ./bin/python -m ensurepip
+  fi
 
   cd ${WORKDIR}
   mv ${DL_FILENAME} ${UPLOAD_FILENAME}
