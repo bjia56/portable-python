@@ -124,7 +124,7 @@ jobs:
             cp /work/python*.zip .
             unzip ./python*.zip
 
-            cd python-${{ inputs.python_version }}-linux-${{ matrix.arch }}
+            cd python-${{ matrix.distribution }}-${{ inputs.python_version }}-linux-${{ matrix.arch }}
             chmod +x ./bin/python
             ldd -v -r ./bin/python
             ./bin/python --version
