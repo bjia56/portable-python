@@ -78,7 +78,9 @@ function repackage_graal () {
   fi
 
   cd ${WORKDIR}
-  mv ${EXTRACTED_FILENAME} ${UPLOAD_FILENAME}
+  if [[ "${EXTRACTED_FILENAME}" != "${UPLOAD_FILENAME}" ]]; then
+    mv ${EXTRACTED_FILENAME} ${UPLOAD_FILENAME}
+  fi
 
   python3 -m pyclean -v ${UPLOAD_FILENAME}
   tar -czf ${WORKDIR}/${UPLOAD_FILENAME}.tar.gz ${UPLOAD_FILENAME}
