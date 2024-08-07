@@ -262,7 +262,7 @@ jobs:
           path: ./*python*.tar.gz
 
   test_macos:
-    name: MacOS ${{ inputs.python_version }} ${{ matrix.arch }} (test)
+    name: MacOS ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (test)
     needs: build_macos
     runs-on: ${{ matrix.os }}
     strategy:
@@ -291,7 +291,7 @@ jobs:
         run: |
           unzip python/python-${{ matrix.distribution }}-${{ inputs.python_version }}-darwin-universal2.zip
 
-          cd python-${{ inputs.python_version }}-darwin-universal2
+          cd python-${{ matrix.distribution }}-${{ inputs.python_version }}-darwin-universal2
           chmod +x ./bin/python
           ./bin/python --version
           ./bin/python -m sysconfig
