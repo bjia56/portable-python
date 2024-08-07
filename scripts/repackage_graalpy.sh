@@ -9,12 +9,6 @@ if [[ "${ARCH}" == "x86_64" ]]; then
   DL_ARCH=amd64
 fi
 
-if [[ "${PLATFORM}" == "linux" ]]; then
-  echo "::group::Install tools"
-  apt update && apt -y install zip python3-pip curl
-  echo "::endgroup::"
-fi
-
 DL_PLATFORM="${PLATFORM}"
 if [[ "${PLATFORM}" == "darwin" ]]; then
   DL_PLATFORM=macos
