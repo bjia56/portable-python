@@ -38,7 +38,7 @@ function repackage_pypy () {
     DL_LINK=https://downloads.python.org/pypy/pypy${DISTRIBUTION}-v${PYPY_VERSION}-win64.zip
     DL_FILENAME=pypy${DISTRIBUTION}-v${PYPY_VERSION}-win64
   fi
-  UPLOAD_FILENAME=pypy${DISTRIBUTION}-${PLATFORM}-${ARCH}
+  UPLOAD_FILENAME=pypy${DISTRIBUTION}-${PYPY_VERSION}-${PLATFORM}-${ARCH}
 
   if [[ "${PLATFORM}" == "windows" ]]; then
     curl -L ${DL_LINK} --output ${DL_FILENAME}.zip
