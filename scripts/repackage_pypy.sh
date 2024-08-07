@@ -12,6 +12,11 @@ if [[ "${PLATFORM}" == "linux" ]]; then
   echo "::endgroup::"
 fi
 
+if [[ "${PLATFORM}" == "darwin" ]]; then
+  python3 -m venv venv
+  source venv/bin/activate
+fi
+
 python3 -m pip install pyclean
 
 WORKDIR=$(pwd)
