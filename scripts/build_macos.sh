@@ -52,36 +52,40 @@ make install
 install_license
 
 echo "::endgroup::"
-#######
-# tcl #
-#######
-echo "::group::tcl"
-cd ${BUILDDIR}
 
-download_verify_extract tcl8.6.13-src.tar.gz
-cd tcl*/unix
-CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --disable-shared --enable-aqua --prefix=${DEPSDIR}
-make -j${NPROC}
-make install
-cd ..
-install_license ./license.terms
+if [[ "${DISTRIBUTION}" == "tkinter" ]]; then
+  #######
+  # tcl #
+  #######
+  echo "::group::tcl"
+  cd ${BUILDDIR}
 
-echo "::endgroup::"
-######
-# tk #
-######
-echo "::group::tk"
-cd ${BUILDDIR}
+  download_verify_extract tcl8.6.13-src.tar.gz
+  cd tcl*/unix
+  CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --disable-shared --enable-aqua --prefix=${DEPSDIR}
+  make -j${NPROC}
+  make install
+  cd ..
+  install_license ./license.terms
 
-download_verify_extract tk8.6.13-src.tar.gz
-cd tk*/unix
-CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --disable-shared --enable-aqua --prefix=${DEPSDIR}
-make -j${NPROC}
-make install
-cd ..
-install_license ./license.terms
+  echo "::endgroup::"
+  ######
+  # tk #
+  ######
+  echo "::group::tk"
+  cd ${BUILDDIR}
 
-echo "::endgroup::"
+  download_verify_extract tk8.6.13-src.tar.gz
+  cd tk*/unix
+  CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --disable-shared --enable-aqua --prefix=${DEPSDIR}
+  make -j${NPROC}
+  make install
+  cd ..
+  install_license ./license.terms
+
+  echo "::endgroup::"
+fi
+
 ###########
 # OpenSSL #
 ###########
@@ -264,6 +268,16 @@ echo "::endgroup::"
 echo "::group::Build"
 cd ${BUILDDIR}
 
+additionalparams=()
+if [[ "${DISTRIBUTION}" == "tkinter" ]]; then
+  additionalparams+=(
+    -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tk.h \
+    -DTK_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtk8.6.a \
+    -DTCL_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tcl.h \
+    -DTCL_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtcl8.6.a
+  )
+fi
+
 mkdir python-build
 mkdir python-install
 cd python-build
@@ -307,10 +321,7 @@ cmake \
   -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.a \
   -DNDBM_TAG=NDBM \
   -DNDBM_USE=NDBM \
-  -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tk.h \
-  -DTK_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtk8.6.a \
-  -DTCL_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tcl.h \
-  -DTCL_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtcl8.6.a \
+  "${additionalparams[@]}" \
   ../portable-python-cmake-buildsystem
 make -j${NPROC}
 make install
@@ -354,8 +365,8 @@ cd ${BUILDDIR}
 
 python3 -m pip install pyclean
 python3 -m pyclean -v python-install
-mv python-install python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
-tar -czf ${WORKDIR}/python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
-zip ${WORKDIR}/python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.zip $(tar tf ${WORKDIR}/python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz)
+mv python-install python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
+tar -czf ${WORKDIR}/python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
+zip ${WORKDIR}/python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.zip $(tar tf ${WORKDIR}/python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz)
 
 echo "::endgroup::"

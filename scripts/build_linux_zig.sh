@@ -385,86 +385,90 @@ make install
 install_license
 
 echo "::endgroup::"
-#######
-# X11 #
-#######
-#echo "::group::X11"
-#cd ${BUILDDIR}
 
-function build_x11_lib_core() {
-  echo "::group::$1"
+if [[ "${DISTRIBUTION}" == "tkinter" ]]; then
+  #######
+  # X11 #
+  #######
+  #echo "::group::X11"
+  #cd ${BUILDDIR}
+
+  function build_x11_lib_core() {
+    echo "::group::$1"
+    cd ${BUILDDIR}
+
+    pkg=$1
+    ext_flags="$2"
+    file=$pkg.tar.gz
+    download_verify_extract $file
+    cd $pkg
+    autoreconf -vfi
+    ./configure $ext_flags --host=${CHOST} --prefix=${DEPSDIR}
+    make -j4
+    make install
+
+    echo "::endgroup::"
+  }
+
+  function build_x11_lib () {
+    build_x11_lib_core "$1" "$2"
+    install_license
+  }
+
+  build_x11_lib_core xorgproto-2023.2
+  build_x11_lib xproto-7.0.31
+  build_x11_lib xextproto-7.3.0
+  build_x11_lib kbproto-1.0.7
+  build_x11_lib inputproto-2.3.2
+  build_x11_lib renderproto-0.11.1
+  build_x11_lib scrnsaverproto-1.2.2
+  build_x11_lib xcb-proto-1.16.0
+  build_x11_lib libpthread-stubs-0.5
+  build_x11_lib xtrans-1.5.0
+  build_x11_lib libXau-1.0.11
+  build_x11_lib libxcb-1.16
+  build_x11_lib libXdmcp-1.1.2
+  build_x11_lib libX11-1.8.7 --enable-malloc0returnsnull
+  build_x11_lib libXext-1.3.5 --enable-malloc0returnsnull
+  build_x11_lib libICE-1.0.7
+  build_x11_lib libSM-1.2.2
+  build_x11_lib libXrender-0.9.11 --enable-malloc0returnsnull
+  build_x11_lib libXft-2.3.8
+  build_x11_lib libXScrnSaver-1.2.4 --enable-malloc0returnsnull
+
+  #echo "::endgroup::"
+  #######
+  # tcl #
+  #######
+  echo "::group::tcl"
   cd ${BUILDDIR}
 
-  pkg=$1
-  ext_flags="$2"
-  file=$pkg.tar.gz
-  download_verify_extract $file
-  cd $pkg
-  autoreconf -vfi
-  ./configure $ext_flags --host=${CHOST} --prefix=${DEPSDIR}
+  download_verify_extract tcl8.6.13-src.tar.gz
+  cd tcl*/unix
+  LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
   make -j4
   make install
+  cd ..
+  install_license ./license.terms
 
   echo "::endgroup::"
-}
+  ######
+  # tk #
+  ######
+  echo "::group::tk"
+  cd ${BUILDDIR}
 
-function build_x11_lib () {
-  build_x11_lib_core "$1" "$2"
-  install_license
-}
+  download_verify_extract tk8.6.13-src.tar.gz
+  cd tk*/unix
+  LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
+  make -j4
+  make install
+  cd ..
+  install_license ./license.terms
 
-build_x11_lib_core xorgproto-2023.2
-build_x11_lib xproto-7.0.31
-build_x11_lib xextproto-7.3.0
-build_x11_lib kbproto-1.0.7
-build_x11_lib inputproto-2.3.2
-build_x11_lib renderproto-0.11.1
-build_x11_lib scrnsaverproto-1.2.2
-build_x11_lib xcb-proto-1.16.0
-build_x11_lib libpthread-stubs-0.5
-build_x11_lib xtrans-1.5.0
-build_x11_lib libXau-1.0.11
-build_x11_lib libxcb-1.16
-build_x11_lib libXdmcp-1.1.2
-build_x11_lib libX11-1.8.7 --enable-malloc0returnsnull
-build_x11_lib libXext-1.3.5 --enable-malloc0returnsnull
-build_x11_lib libICE-1.0.7
-build_x11_lib libSM-1.2.2
-build_x11_lib libXrender-0.9.11 --enable-malloc0returnsnull
-build_x11_lib libXft-2.3.8
-build_x11_lib libXScrnSaver-1.2.4 --enable-malloc0returnsnull
+  echo "::endgroup::"
+fi
 
-#echo "::endgroup::"
-#######
-# tcl #
-#######
-echo "::group::tcl"
-cd ${BUILDDIR}
-
-download_verify_extract tcl8.6.13-src.tar.gz
-cd tcl*/unix
-LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
-make -j4
-make install
-cd ..
-install_license ./license.terms
-
-echo "::endgroup::"
-######
-# tk #
-######
-echo "::group::tk"
-cd ${BUILDDIR}
-
-download_verify_extract tk8.6.13-src.tar.gz
-cd tk*/unix
-LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
-make -j4
-make install
-cd ..
-install_license ./license.terms
-
-echo "::endgroup::"
 #############
 # mpdecimal #
 #############
@@ -491,6 +495,17 @@ additionalparams=()
 if [[ "${ARCH}" == "arm" ]]; then
   additionalparams+=(-DUSE_SYSTEM_LIBMPDEC=ON)
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${DEPSDIR}/lib
+fi
+
+if [[ "${DISTRIBUTION}" == "tkinter" ]]; then
+  additionalparams+=(
+    -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tk.h \
+    -DTK_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtk8.6.a \
+    -DTCL_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tcl.h \
+    -DTCL_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtcl8.6.a \
+    -DX11_INCLUDE_DIR:PATH=${DEPSDIR}/include/X11 \
+    -DX11_LIBRARIES="${DEPSDIR}/lib/libXau.a;${DEPSDIR}/lib/libXdmcp.a;${DEPSDIR}/lib/libX11.a;${DEPSDIR}/lib/libXext.a;${DEPSDIR}/lib/libICE.a;${DEPSDIR}/lib/libSM.a;${DEPSDIR}/lib/libXrender.a;${DEPSDIR}/lib/libXft.a;${DEPSDIR}/lib/libXss.a;${DEPSDIR}/lib/libxcb.a"
+  )
 fi
 
 wget --no-verbose -O portable-python-cmake-buildsystem.tar.gz https://github.com/bjia56/portable-python-cmake-buildsystem/tarball/${CMAKE_BUILDSYSTEM_BRANCH}
@@ -538,19 +553,16 @@ LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
   -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.a \
   -DNDBM_TAG=NDBM \
   -DNDBM_USE=NDBM \
-  -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tk.h \
-  -DTK_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtk8.6.a \
-  -DTCL_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tcl.h \
-  -DTCL_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtcl8.6.a \
-  -DX11_INCLUDE_DIR:PATH=${DEPSDIR}/include/X11 \
-  -DX11_LIBRARIES="${DEPSDIR}/lib/libXau.a;${DEPSDIR}/lib/libXdmcp.a;${DEPSDIR}/lib/libX11.a;${DEPSDIR}/lib/libXext.a;${DEPSDIR}/lib/libICE.a;${DEPSDIR}/lib/libSM.a;${DEPSDIR}/lib/libXrender.a;${DEPSDIR}/lib/libXft.a;${DEPSDIR}/lib/libXss.a;${DEPSDIR}/lib/libxcb.a" \
   ../portable-python-cmake-buildsystem
 make -j4
 make install
 
 cd ${BUILDDIR}
-cp -r ${DEPSDIR}/lib/tcl8.6 ./python-install/lib
-cp -r ${DEPSDIR}/lib/tk8.6 ./python-install/lib
+
+if [[ "${DISTRIBUTION}" == "tkinter" ]]; then
+  cp -r ${DEPSDIR}/lib/tcl8.6 ./python-install/lib
+  cp -r ${DEPSDIR}/lib/tk8.6 ./python-install/lib
+fi
 cp -r ${LICENSEDIR} ./python-install
 
 echo "::endgroup::"
@@ -600,8 +612,8 @@ cd ${BUILDDIR}
 
 python3 -m pip install pyclean
 python3 -m pyclean -v python-install
-mv python-install python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
-tar -czf ${WORKDIR}/python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
-zip ${WORKDIR}/python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.zip $(tar tf ${WORKDIR}/python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz)
+mv python-install python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
+tar -czf ${WORKDIR}/python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
+zip ${WORKDIR}/python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.zip $(tar tf ${WORKDIR}/python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz)
 
 echo "::endgroup::"
