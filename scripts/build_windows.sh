@@ -174,9 +174,9 @@ cmake \
   -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/bzip2/lib/libbz2.lib \
   -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/libffi/include \
   -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/libffi/lib/libffi-8.lib \
-  -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/tcltk/include/tk.h \
+  -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/tcltk/include \
   -DTK_LIBRARY:FILEPATH=${DEPSDIR}/tcltk/lib/tk86t.lib \
-  -DTCL_INCLUDE_PATH:FILEPATH=${DEPSDIR}/tcltk/include/tcl.h \
+  -DTCL_INCLUDE_PATH:FILEPATH=${DEPSDIR}/tcltk/include \
   -DTCL_LIBRARY:FILEPATH=${DEPSDIR}/tcltk/lib/tcl86t.lib \
   ../portable-python-cmake-buildsystem
 cmake --build . --config ${BUILD_TYPE} -- /property:Configuration=${BUILD_TYPE}
