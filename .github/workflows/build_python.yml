@@ -166,7 +166,7 @@ jobs:
         shell: bash
         run: |
           set -ex
-          ./scripts/build_windows.sh x86_64 ${{ inputs.python_version }} ${{ inputs.distribution }}
+          ./scripts/build_windows.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }}
 
       - name: Interactive debugging
         uses: fawazahmed0/action-debug@v2
@@ -175,14 +175,14 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: python-windows-x86_64-${{ inputs.distribution }}-${{ inputs.python_version }}
+          name: python-windows-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         if: ${{ always() && inputs.debug }}
         with:
-          name: build-python-windows-x86_64-${{ inputs.distribution }}-${{ inputs.python_version }}
+          name: build-python-windows-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./*python*.tar.gz
 
   test_windows:
