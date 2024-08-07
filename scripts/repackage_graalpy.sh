@@ -93,7 +93,11 @@ function repackage_graal () {
   echo "::endgroup::"
 }
 
-repackage_graal
-repackage_graal jvm
-repackage_graal community
-repackage_graal community-jvm
+if [[ "${PLATFORM}" == "linux" ]]; then
+  repackage_graal "${DISTRIBUTION}"
+else
+  repackage_graal
+  repackage_graal jvm
+  repackage_graal community
+  repackage_graal community-jvm
+fi
