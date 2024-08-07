@@ -58,7 +58,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: graalpy-linux-${ matrix.distribution }}-${{ matrix.arch }}-${{ inputs.graalpy_version }}
+          name: graalpy-linux-${{ matrix.distribution }}-${{ matrix.arch }}-${{ inputs.graalpy_version }}
           path: ./graalpy*.zip
 
   build_windows:
