@@ -21,6 +21,18 @@ if [[ "${PLATFORM}" != "windows" ]]; then
   source venv/bin/activate
 fi
 
+if [[ "${PLATFORM}" == "linux" ]]; then
+  docker pull "${DOCKER_IMAGE}"
+  function maybe_docker () {
+    docker run -v .:/ws --workdir /ws "${DOCKER_IMAGE}" "$@"
+    sudo chown -R $(id -u):$(id -g) .
+  }
+else
+  function maybe_docker () {
+    "$@"
+  }
+fi
+
 python3 -m pip install pyclean
 WORKDIR=$(pwd)
 
@@ -58,24 +70,12 @@ function repackage_graal () {
   cd ${EXTRACTED_FILENAME}
   if [[ "${DISTRIBUTION}" == *"jvm"* ]]; then
     if [[ "${DISTRIBUTION}" == *"community"* ]]; then
-      if [[ "${PLATFORM}" == "linux" ]]; then
-        docker run -v .:/ws --workdir /ws --user $(id -u):$(id -g) "${DOCKER_IMAGE}" ./libexec/graalpy-polyglot-get js-community
-      else
-        ./libexec/graalpy-polyglot-get js-community
-      fi
+      maybe_docker ./libexec/graalpy-polyglot-get js-community
     else
-      if [[ "${PLATFORM}" == "linux" ]]; then
-        docker run -v .:/ws --workdir /ws --user $(id -u):$(id -g) "${DOCKER_IMAGE}" ./libexec/graalpy-polyglot-get js
-      else
-        ./libexec/graalpy-polyglot-get js
-      fi
+      maybe_docker ./libexec/graalpy-polyglot-get js
     fi
   fi
-  if [[ "${PLATFORM}" == "linux" ]]; then
-    docker run -v .:/ws --workdir /ws --user $(id -u):$(id -g) "${DOCKER_IMAGE}" ./bin/python -m ensurepip
-  else
-    ./bin/python -m ensurepip
-  fi
+  maybe_docker ./bin/python -m ensurepip
 
   cd ${WORKDIR}
   if [[ "${EXTRACTED_FILENAME}" != "${UPLOAD_FILENAME}" ]]; then
