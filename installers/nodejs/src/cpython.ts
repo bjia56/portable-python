@@ -54,7 +54,8 @@ export default class CPythonInstaller implements IInstaller {
         if (this.parent.distribution === "cosmo") {
             return `python-${this.parent.version}-cosmo-unknown`;
         }
-        return `python-${this.parent.version}-${DL_PLATFORM}-${DL_ARCH}`;
+        const distribution = this.parent.distribution === "auto" ? "headless" : this.parent.distribution;
+        return `python-${distribution}-${this.parent.version}-${DL_PLATFORM}-${DL_ARCH}`;
     }
 
     validateOptions(): void {
@@ -62,7 +63,7 @@ export default class CPythonInstaller implements IInstaller {
             throw Error("expected cpython implementation");
         }
 
-        if (!["auto", "cosmo"].includes(this.options.distribution)) {
+        if (!["auto", "cosmo", "headless", "full"].includes(this.options.distribution)) {
             throw Error("invalid distribution");
         }
     }
