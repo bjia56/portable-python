@@ -33,7 +33,7 @@ function repackage_pypy () {
       DL_LINK=https://downloads.python.org/pypy/pypy${DISTRIBUTION}-v${PYPY_VERSION}-aarch64.tar.bz2
       DL_FILENAME=pypy${DISTRIBUTION}-v${PYPY_VERSION}-aarch64
     fi
-  elif [[ "${PLATFORM}" == "macos" ]]; then
+  elif [[ "${PLATFORM}" == "darwin" ]]; then
     if [[ "${ARCH}" == "x86_64" ]]; then
       DL_LINK=https://downloads.python.org/pypy/pypy${DISTRIBUTION}-v${PYPY_VERSION}-macos_x86_64.tar.bz2
       DL_FILENAME=pypy${DISTRIBUTION}-v${PYPY_VERSION}-macos_x86_64
