@@ -113,7 +113,6 @@ function community_jvm () {
 export -f repackage_graal plain jvm community community_jvm
 
 if [[ "${PLATFORM}" == "linux" ]]; then
-  export PARALLEL_SHELL=/bin/bash
   parallel ::: plain jvm community community_jvm
 else
   plain
