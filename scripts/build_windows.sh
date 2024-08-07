@@ -118,7 +118,7 @@ mkdir ${DEPSDIR}/libffi
 cp -r amd64/include ${DEPSDIR}/libffi/include
 mkdir ${DEPSDIR}/libffi/lib
 cp amd64/libffi* ${DEPSDIR}/libffi/lib/
-install_license
+install_license LICENSE libffi-3.4.4
 
 echo "::endgroup::"
 #########
