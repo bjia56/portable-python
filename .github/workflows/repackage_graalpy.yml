@@ -24,13 +24,14 @@ env:
 
 jobs:
   build_linux:
-    name: Linux ${{ inputs.graalpy_version }} ${{ matrix.arch }}
+    name: Linux ${{ inputs.graalpy_version }} ${{ matrix.distribution }} ${{ matrix.arch }}
     if: ${{ contains(inputs.platforms, 'linux') }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         arch: [x86_64, aarch64]
+        distribution: [standard, jvm, community, community-jvm]
         exclude:
           - arch: ${{ !contains(inputs.platforms, 'linux-x86_64') && 'x86_64' || '' }}
           - arch: ${{ !contains(inputs.platforms, 'linux-aarch64') && 'aarch64' || '' }}
@@ -51,12 +52,13 @@ jobs:
       - name: Repackage
         run: |
           export DOCKER_IMAGE="${{ steps.parse_image.outputs.image }}"
+          export MATRIX_DISTRIBUTION="${{ matrix.distribution }}"
           ./scripts/repackage_graalpy.sh ${{ matrix.arch }} ${{ inputs.graalpy_version }} linux
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: graalpy-linux-${{ matrix.arch }}-${{ inputs.graalpy_version }}
+          name: graalpy-linux-${{ matrix.distribution }}-${{ matrix.arch }}-${{ inputs.graalpy_version }}
           path: ./graalpy*.zip
 
   build_windows:
