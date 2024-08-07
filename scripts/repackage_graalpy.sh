@@ -2,18 +2,18 @@
 
 set -e
 
-export ARCH=$1
-export GRAALPY_VERSION=$2
-export PLATFORM=$3
+ARCH=$1
+GRAALPY_VERSION=$2
+PLATFORM=$3
 
-export DL_ARCH=${ARCH}
+DL_ARCH=${ARCH}
 if [[ "${ARCH}" == "x86_64" ]]; then
-  export DL_ARCH=amd64
+  DL_ARCH=amd64
 fi
 
-export DL_PLATFORM="${PLATFORM}"
+DL_PLATFORM="${PLATFORM}"
 if [[ "${PLATFORM}" == "darwin" ]]; then
-  export DL_PLATFORM=macos
+  DL_PLATFORM=macos
 fi
 
 if [[ "${PLATFORM}" != "windows" ]]; then
@@ -34,15 +34,11 @@ else
 fi
 
 python3 -m pip install pyclean
-export WORKDIR=$(pwd)
+WORKDIR=$(pwd)
 
 function repackage_graal () {
   DISTRIBUTION=$1
   echo "::group::GraalPy ${DISTRIBUTION}"
-
-  cd ${WORKDIR}
-  mkdir -p workdir-graalpy${DISTRIBUTION}
-  cd workdir-graalpy${DISTRIBUTION}
 
   DISTRO_MODIFIER="-"
   if [[ "${DISTRIBUTION}" == *"community"* ]]; then
@@ -81,7 +77,7 @@ function repackage_graal () {
   fi
   maybe_docker ./bin/python -m ensurepip
 
-  cd ${WORKDIR}/workdir-graalpy${DISTRIBUTION}
+  cd ${WORKDIR}
   if [[ "${EXTRACTED_FILENAME}" != "${UPLOAD_FILENAME}" ]]; then
     mv ${EXTRACTED_FILENAME} ${UPLOAD_FILENAME}
   fi
@@ -97,29 +93,7 @@ function repackage_graal () {
   echo "::endgroup::"
 }
 
-function plain () {
-  repackage_graal
-}
-
-function jvm () {
-  repackage_graal jvm
-}
-
-function community () {
-  repackage_graal community
-}
-
-function community_jvm () {
-  repackage_graal community-jvm
-}
-
-export -f maybe_docker repackage_graal plain jvm community community_jvm
-
-if [[ "${PLATFORM}" == "linux" ]]; then
-  parallel ::: plain jvm community community_jvm
-else
-  plain
-  jvm
-  community
-  community_jvm
-fi
+repackage_graal
+repackage_graal jvm
+repackage_graal community
+repackage_graal community-jvm
