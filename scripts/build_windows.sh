@@ -122,7 +122,7 @@ install_license LICENSE libffi-3.4.4
 
 echo "::endgroup::"
 
-if [[ "${DISTRIBUTION}" == "tkinter" ]]; then
+if [[ "${DISTRIBUTION}" != "headless" ]]; then
   #########
   # tcltk #
   #########
@@ -151,7 +151,7 @@ echo "::group::Build"
 cd ${BUILDDIR}
 
 additionalparams=()
-if [[ "${DISTRIBUTION}" == "tkinter" ]]; then
+if [[ "${DISTRIBUTION}" != "headless" ]]; then
   additionalparams+=(
     -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/tcltk/include \
     -DTK_LIBRARY:FILEPATH=${DEPSDIR}/tcltk/lib/tk86t.lib \
@@ -201,7 +201,7 @@ cp ${DEPSDIR}/openssl/bin/*.dll python-install/bin
 # Need to bundle libffi with the executable
 cp ${DEPSDIR}/libffi/lib/*.dll python-install/bin
 
-if [[ "${DISTRIBUTION}" == "tkinter" ]]; then
+if [[ "${DISTRIBUTION}" != "headless" ]]; then
   # Need to bundle tcl/tk with the executable
   cp ${DEPSDIR}/tcltk/bin/*.dll python-install/bin
   cp -r ${DEPSDIR}/tcltk/lib/tcl8.6 python-install/lib

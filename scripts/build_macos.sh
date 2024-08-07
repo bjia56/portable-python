@@ -53,7 +53,7 @@ install_license
 
 echo "::endgroup::"
 
-if [[ "${DISTRIBUTION}" == "tkinter" ]]; then
+if [[ "${DISTRIBUTION}" != "headless" ]]; then
   #######
   # tcl #
   #######
@@ -269,7 +269,7 @@ echo "::group::Build"
 cd ${BUILDDIR}
 
 additionalparams=()
-if [[ "${DISTRIBUTION}" == "tkinter" ]]; then
+if [[ "${DISTRIBUTION}" != "headless" ]]; then
   additionalparams+=(
     -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include \
     -DTK_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtk8.6.a \

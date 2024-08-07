@@ -64,7 +64,7 @@ jobs:
       fail-fast: false
       matrix:
         arch: [x86_64, i386, aarch64, arm, riscv64]
-        distribution: [standard, tkinter]
+        distribution: [standard, headless]
         exclude:
           - arch: ${{ !contains(inputs.platforms, 'linux-x86_64') && 'x86_64' || '' }}
           - arch: ${{ !contains(inputs.platforms, 'linux-i386') && 'i386' || '' }}
@@ -143,7 +143,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        distribution: [standard, tkinter]
+        distribution: [standard, headless]
 
     steps:
       - name: Set git to use LF
@@ -192,7 +192,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        distribution: [standard, tkinter]
+        distribution: [standard, headless]
 
     steps:
       - name: Set git to use LF
@@ -230,7 +230,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        distribution: [standard, tkinter]
+        distribution: [standard, headless]
 
     steps:
       - name: Checkout
@@ -269,7 +269,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ macos-12, macos-14 ]
-        distribution: [standard, tkinter]
+        distribution: [standard, headless]
         include:
           - os: macos-12
             arch: x86_64
@@ -310,7 +310,7 @@ jobs:
       fail-fast: false
       matrix:
         release: [13, 14]
-        distribution: [standard, tkinter]
+        distribution: [standard, headless]
         exclude:
           - release: ${{ !contains(inputs.platforms, 'freebsd13-x86_64') && '13' || '' }}
           - release: ${{ !contains(inputs.platforms, 'freebsd14-x86_64') && '14' || '' }}
@@ -362,7 +362,7 @@ jobs:
       fail-fast: false
       matrix:
         release: [13, 14]
-        distribution: [standard, tkinter]
+        distribution: [standard, headless]
         exclude:
           - release: ${{ !contains(inputs.platforms, 'freebsd13-x86_64') && '13' || '' }}
           - release: ${{ !contains(inputs.platforms, 'freebsd14-x86_64') && '14' || '' }}

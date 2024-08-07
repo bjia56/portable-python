@@ -386,7 +386,7 @@ install_license
 
 echo "::endgroup::"
 
-if [[ "${DISTRIBUTION}" == "tkinter" ]]; then
+if [[ "${DISTRIBUTION}" != "headless" ]]; then
   #######
   # X11 #
   #######
@@ -497,7 +497,7 @@ if [[ "${ARCH}" == "arm" ]]; then
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${DEPSDIR}/lib
 fi
 
-if [[ "${DISTRIBUTION}" == "tkinter" ]]; then
+if [[ "${DISTRIBUTION}" != "headless" ]]; then
   additionalparams+=(
     -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include \
     -DTK_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtk8.6.a \
@@ -559,7 +559,7 @@ make install
 
 cd ${BUILDDIR}
 
-if [[ "${DISTRIBUTION}" == "tkinter" ]]; then
+if [[ "${DISTRIBUTION}" != "headless" ]]; then
   cp -r ${DEPSDIR}/lib/tcl8.6 ./python-install/lib
   cp -r ${DEPSDIR}/lib/tk8.6 ./python-install/lib
 fi
