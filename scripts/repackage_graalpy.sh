@@ -1,35 +1,31 @@
 #!/bin/bash
 
-export ARCH=$1
-export GRAALPY_VERSION=$2
-export PLATFORM=$3
+ARCH=$1
+GRAALPY_VERSION=$2
+PLATFORM=$3
 
-export DL_ARCH=${ARCH}
+DL_ARCH=${ARCH}
 if [[ "${ARCH}" == "x86_64" ]]; then
-  export DL_ARCH=amd64
+  DL_ARCH=amd64
 fi
 
 if [[ "${PLATFORM}" == "linux" ]]; then
   echo "::group::Install tools"
-  apt update && apt -y install zip python3-pip curl parallel
+  apt update && apt -y install zip python3-pip curl
   echo "::endgroup::"
 fi
 
-export DL_PLATFORM="${PLATFORM}"
+DL_PLATFORM="${PLATFORM}"
 if [[ "${PLATFORM}" == "darwin" ]]; then
-  export DL_PLATFORM=macos
+  DL_PLATFORM=macos
 fi
 
 python3 -m pip install pyclean
-export WORKDIR=$(pwd)
+WORKDIR=$(pwd)
 
 function repackage_graal () {
   DISTRIBUTION=$1
   echo "::group::GraalPy ${DISTRIBUTION}"
-
-  cd ${WORKDIR}
-  mkdir -p workdir-graalpy${DISTRIBUTION}
-  cd workdir-graalpy${DISTRIBUTION}
 
   DISTRO_MODIFIER="-"
   if [[ "${DISTRIBUTION}" == *"community"* ]]; then
@@ -80,7 +76,7 @@ function repackage_graal () {
     ./bin/python -m ensurepip
   fi
 
-  cd ${WORKDIR}/workdir-graalpy${DISTRIBUTION}
+  cd ${WORKDIR}
   mv ${EXTRACTED_FILENAME} ${UPLOAD_FILENAME}
 
   python3 -m pyclean -v ${UPLOAD_FILENAME}
@@ -94,29 +90,7 @@ function repackage_graal () {
   echo "::endgroup::"
 }
 
-function plain () {
-  repackage_graal
-}
-
-function jvm () {
-  repackage_graal jvm
-}
-
-function community () {
-  repackage_graal community
-}
-
-function community_jvm () {
-  repackage_graal community-jvm
-}
-
-export -f repackage_graal plain jvm community community_jvm
-
-if [[ "${PLATFORM}" == "linux" ]]; then
-  parallel ::: plain jvm community community_jvm
-else
-  plain
-  jvm
-  community
-  community_jvm
-fi
+repackage_graal
+repackage_graal jvm
+repackage_graal community
+repackage_graal community-jvm
