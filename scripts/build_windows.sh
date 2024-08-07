@@ -122,6 +122,25 @@ install_license
 
 echo "::endgroup::"
 #########
+# tcltk #
+#########
+echo "::group::tcltk"
+cd ${BUILDDIR}
+
+curl -L https://github.com/python/cpython-bin-deps/archive/refs/tags/tcltk-8.6.14.0.tar.gz --output cpython-bin-deps-tcltk-8.6.14.0.tar.gz
+tar -xf cpython-bin-deps-tcltk-8.6.14.0.tar.gz
+cd cpython-bin-deps-tcltk-8.6.14.0
+mkdir ${DEPSDIR}/tcltk
+cp -r amd64/include ${DEPSDIR}/tcltk/include
+mkdir ${DEPSDIR}/tcltk/lib
+cp -r amd64/lib/* ${DEPSDIR}/tcltk/lib/
+mkdir ${DEPSDIR}/tcltk/bin
+cp amd64/bin/*.dll ${DEPSDIR}/tcltk/bin
+install_license amd64/tcllicense.terms tcl-8.6.14.0
+install_license amd64/tklicense.terms tk-8.6.14.0
+
+echo "::endgroup::"
+#########
 # Build #
 #########
 echo "::group::Build"
@@ -155,6 +174,10 @@ cmake \
   -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/bzip2/lib/libbz2.lib \
   -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/libffi/include \
   -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/libffi/lib/libffi-8.lib \
+  -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/tcltk/include/tk.h \
+  -DTK_LIBRARY:FILEPATH=${DEPSDIR}/tcltk/lib/tk86t.lib \
+  -DTCL_INCLUDE_PATH:FILEPATH=${DEPSDIR}/tcltk/include/tcl.h \
+  -DTCL_LIBRARY:FILEPATH=${DEPSDIR}/tcltk/lib/tcl86t.lib \
   ../portable-python-cmake-buildsystem
 cmake --build . --config ${BUILD_TYPE} -- /property:Configuration=${BUILD_TYPE}
 cmake --build . --target INSTALL -- /property:Configuration=${BUILD_TYPE}
