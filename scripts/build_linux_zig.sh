@@ -499,9 +499,9 @@ fi
 
 if [[ "${DISTRIBUTION}" == "tkinter" ]]; then
   additionalparams+=(
-    -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tk.h \
+    -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include \
     -DTK_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtk8.6.a \
-    -DTCL_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tcl.h \
+    -DTCL_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include \
     -DTCL_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtcl8.6.a \
     -DX11_INCLUDE_DIR:PATH=${DEPSDIR}/include/X11 \
     -DX11_LIBRARIES="${DEPSDIR}/lib/libXau.a;${DEPSDIR}/lib/libXdmcp.a;${DEPSDIR}/lib/libX11.a;${DEPSDIR}/lib/libXext.a;${DEPSDIR}/lib/libICE.a;${DEPSDIR}/lib/libSM.a;${DEPSDIR}/lib/libXrender.a;${DEPSDIR}/lib/libXft.a;${DEPSDIR}/lib/libXss.a;${DEPSDIR}/lib/libxcb.a"
@@ -543,12 +543,12 @@ LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
   -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libbz2.a \
   -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/include \
   -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.a \
-  -DREADLINE_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/readline/readline.h \
+  -DREADLINE_INCLUDE_PATH:PATH=${DEPSDIR}/include \
   -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.a \
   -DUUID_LIBRARY:FILEPATH=${DEPSDIR}/lib/libuuid.a \
   -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.a \
   -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.a \
-  -DGDBM_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/gdbm.h \
+  -DGDBM_INCLUDE_PATH:PATH=${DEPSDIR}/include \
   -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.a \
   -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.a \
   -DNDBM_TAG=NDBM \
