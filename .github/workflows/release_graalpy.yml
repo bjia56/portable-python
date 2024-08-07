@@ -72,7 +72,19 @@ jobs:
       - name: Upload files
         uses: softprops/action-gh-release@v2
         with:
-          files: /tmp/graalpy/graalpy*.zip
+          files: /tmp/graalpy/graalpy*linux*.zip
+          tag_name: ${{ env.SELECTED_TAG }}
+
+      - name: Upload files
+        uses: softprops/action-gh-release@v2
+        with:
+          files: /tmp/graalpy/graalpy*darwin*.zip
+          tag_name: ${{ env.SELECTED_TAG }}
+
+      - name: Upload files
+        uses: softprops/action-gh-release@v2
+        with:
+          files: /tmp/graalpy/graalpy*windows*.zip
           tag_name: ${{ env.SELECTED_TAG }}
 
     outputs:

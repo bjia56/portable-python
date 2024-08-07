@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 ARCH=$1
 GRAALPY_VERSION=$2
 PLATFORM=$3
@@ -9,12 +11,29 @@ if [[ "${ARCH}" == "x86_64" ]]; then
   DL_ARCH=amd64
 fi
 
-if [[ "${PLATFORM}" == "linux" ]]; then
-  echo "::group::Install tools"
-  apt update && apt -y install zip python3-pip curl
-  echo "::endgroup::"
+DL_PLATFORM="${PLATFORM}"
+if [[ "${PLATFORM}" == "darwin" ]]; then
+  DL_PLATFORM=macos
 fi
 
+if [[ "${PLATFORM}" != "windows" ]]; then
+  python3 -m venv venv
+  source venv/bin/activate
+fi
+
+if [[ "${PLATFORM}" == "linux" ]]; then
+  docker pull "${DOCKER_IMAGE}"
+  function maybe_docker () {
+    docker run -v .:/ws --workdir /ws "${DOCKER_IMAGE}" "$@"
+    sudo chown -R $(id -u):$(id -g) .
+  }
+else
+  function maybe_docker () {
+    "$@"
+  }
+fi
+
+python3 -m pip install pyclean
 WORKDIR=$(pwd)
 
 function repackage_graal () {
@@ -30,11 +49,11 @@ function repackage_graal () {
     DISTRO_MODIFIER="${DISTRO_MODIFIER}jvm-"
   fi
 
-  DL_FILENAME=graalpy${DISTRO_MODIFIER}${GRAALPY_VERSION}-${PLATFORM}-${DL_ARCH}
+  DL_FILENAME=graalpy${DISTRO_MODIFIER}${GRAALPY_VERSION}-${DL_PLATFORM}-${DL_ARCH}
   if [[ "${DISTRIBUTION}" == *"community"* ]]; then
-    EXTRACTED_FILENAME=graalpy-community-${GRAALPY_VERSION}-${PLATFORM}-${DL_ARCH}
+    EXTRACTED_FILENAME=graalpy-community-${GRAALPY_VERSION}-${DL_PLATFORM}-${DL_ARCH}
   else
-    EXTRACTED_FILENAME=graalpy-${GRAALPY_VERSION}-${PLATFORM}-${DL_ARCH}
+    EXTRACTED_FILENAME=graalpy-${GRAALPY_VERSION}-${DL_PLATFORM}-${DL_ARCH}
   fi
   UPLOAD_FILENAME=graalpy${DISTRO_MODIFIER}${GRAALPY_VERSION}-${PLATFORM}-${ARCH}
 
@@ -51,17 +70,18 @@ function repackage_graal () {
   cd ${EXTRACTED_FILENAME}
   if [[ "${DISTRIBUTION}" == *"jvm"* ]]; then
     if [[ "${DISTRIBUTION}" == *"community"* ]]; then
-      ./libexec/graalpy-polyglot-get js-community
+      maybe_docker ./libexec/graalpy-polyglot-get js-community
     else
-      ./libexec/graalpy-polyglot-get js
+      maybe_docker ./libexec/graalpy-polyglot-get js
     fi
   fi
-  ./bin/python -m ensurepip
+  maybe_docker ./bin/python -m ensurepip
 
   cd ${WORKDIR}
-  mv ${EXTRACTED_FILENAME} ${UPLOAD_FILENAME}
+  if [[ "${EXTRACTED_FILENAME}" != "${UPLOAD_FILENAME}" ]]; then
+    mv ${EXTRACTED_FILENAME} ${UPLOAD_FILENAME}
+  fi
 
-  python3 -m pip install pyclean
   python3 -m pyclean -v ${UPLOAD_FILENAME}
   tar -czf ${WORKDIR}/${UPLOAD_FILENAME}.tar.gz ${UPLOAD_FILENAME}
   if [[ "${PLATFORM}" == "windows" ]]; then
