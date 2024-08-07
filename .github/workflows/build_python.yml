@@ -396,7 +396,7 @@ jobs:
             cat > /tmp/test.sh <<EOF
               unzip python/python-${{ matrix.distribution }}-${{ inputs.python_version }}-freebsd${{ matrix.release }}-x86_64.zip
 
-              cd python-${{ inputs.python_version }}-freebsd${{ matrix.release }}-x86_64
+              cd python-${{ matrix.distribution }}-${{ inputs.python_version }}-freebsd${{ matrix.release }}-x86_64
               chmod +x ./bin/python
               ./bin/python --version
               ./bin/python -m sysconfig
