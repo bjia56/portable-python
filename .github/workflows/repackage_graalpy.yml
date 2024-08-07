@@ -24,14 +24,14 @@ env:
 
 jobs:
   build_linux:
-    name: Linux ${{ inputs.graalpy_version }} ${{ matrix.arch }}
+    name: Linux ${{ inputs.graalpy_version }} ${{ matrix.distribution }} ${{ matrix.arch }}
     if: ${{ contains(inputs.platforms, 'linux') }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         arch: [x86_64, aarch64]
-        distribution: ["", jvm, community, community-jvm]
+        distribution: [standard, jvm, community, community-jvm]
         exclude:
           - arch: ${{ !contains(inputs.platforms, 'linux-x86_64') && 'x86_64' || '' }}
           - arch: ${{ !contains(inputs.platforms, 'linux-aarch64') && 'aarch64' || '' }}

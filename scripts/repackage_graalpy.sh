@@ -94,7 +94,11 @@ function repackage_graal () {
 }
 
 if [[ "${PLATFORM}" == "linux" ]]; then
-  repackage_graal "${DISTRIBUTION}"
+  if [[ "${MATRIX_DISTRIBUTION}" == "standard" ]]; then
+    repackage_graal
+  else
+    repackage_graal "${MATRIX_DISTRIBUTION}"
+  fi
 else
   repackage_graal
   repackage_graal jvm
