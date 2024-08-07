@@ -190,6 +190,11 @@ cp ${DEPSDIR}/openssl/bin/*.dll python-install/bin
 # Need to bundle libffi with the executable
 cp ${DEPSDIR}/libffi/lib/*.dll python-install/bin
 
+# Need to bundle tcl/tk with the executable
+cp ${DEPSDIR}/tcltk/bin/*.dll python-install/bin
+cp -r ${DEPSDIR}/tcltk/lib/tcl8.6 python-install/lib
+cp -r ${DEPSDIR}/tcltk/lib/tk8.6 python-install/lib
+
 # Need to bundle vcredist
 #cp /c/WINDOWS/SYSTEM32/VCRUNTIME140.dll python-install/bin
 
