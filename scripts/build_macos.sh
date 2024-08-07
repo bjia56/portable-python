@@ -297,19 +297,19 @@ cmake \
   -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libbz2.a \
   -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/include \
   -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.a \
-  -DREADLINE_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/readline/readline.h \
+  -DREADLINE_INCLUDE_PATH:PATH=${DEPSDIR}/include \
   -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.a \
   -DUUID_LIBRARY:FILEPATH=${DEPSDIR}/lib/libuuid.a \
   -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.a \
   -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.a \
-  -DGDBM_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/gdbm.h \
+  -DGDBM_INCLUDE_PATH:PATH=${DEPSDIR}/include \
   -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.a \
   -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.a \
   -DNDBM_TAG=NDBM \
   -DNDBM_USE=NDBM \
-  -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tk.h \
+  -DTK_INCLUDE_PATH:PATH=${DEPSDIR}/include \
   -DTK_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtk8.6.a \
-  -DTCL_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tcl.h \
+  -DTCL_INCLUDE_PATH:PATH=${DEPSDIR}/include \
   -DTCL_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtcl8.6.a \
   ../portable-python-cmake-buildsystem
 make -j${NPROC}
