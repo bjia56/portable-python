@@ -74,6 +74,10 @@
       "versionBuilds": {
         "24.0.2": "graalpy-v24.0.2-beta.0"
       }
+    },
+    "pypy": {
+      "versions": [],
+      "versionBuilds": {}
     }
   }
 }
