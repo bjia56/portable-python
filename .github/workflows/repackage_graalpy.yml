@@ -50,7 +50,7 @@ jobs:
 
       - name: Repackage
         run: |
-          export DOCKER_IMAGE=${{ steps.parse_image.outputs.image }}
+          export DOCKER_IMAGE="${{ steps.parse_image.outputs.image }}"
           ./scripts/repackage_graalpy.sh ${{ matrix.arch }} ${{ inputs.graalpy_version }} linux
 
       - name: Upload artifacts

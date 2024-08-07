@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 ARCH=$1
 GRAALPY_VERSION=$2
 PLATFORM=$3
@@ -52,20 +54,20 @@ function repackage_graal () {
   if [[ "${DISTRIBUTION}" == *"jvm"* ]]; then
     if [[ "${DISTRIBUTION}" == *"community"* ]]; then
       if [[ "${PLATFORM}" == "linux" ]]; then
-        docker run it -v .:/ws --workdir /ws --user $(id -u):$(id -g) ${DOCKER_IMAGE} ./libexec/graalpy-polyglot-get js-community
+        docker run it -v .:/ws --workdir /ws --user $(id -u):$(id -g) "${DOCKER_IMAGE}" ./libexec/graalpy-polyglot-get js-community
       else
         ./libexec/graalpy-polyglot-get js-community
       fi
     else
       if [[ "${PLATFORM}" == "linux" ]]; then
-        docker run it -v .:/ws --workdir /ws --user $(id -u):$(id -g) ${DOCKER_IMAGE} ./libexec/graalpy-polyglot-get js
+        docker run it -v .:/ws --workdir /ws --user $(id -u):$(id -g) "${DOCKER_IMAGE}" ./libexec/graalpy-polyglot-get js
       else
         ./libexec/graalpy-polyglot-get js
       fi
     fi
   fi
   if [[ "${PLATFORM}" == "linux" ]]; then
-    docker run it -v .:/ws --workdir /ws --user $(id -u):$(id -g) ${DOCKER_IMAGE} ./bin/python -m ensurepip
+    docker run it -v .:/ws --workdir /ws --user $(id -u):$(id -g) "${DOCKER_IMAGE}" ./bin/python -m ensurepip
   else
     ./bin/python -m ensurepip
   fi
