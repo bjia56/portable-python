@@ -2,7 +2,7 @@ import { platform, arch, release } from "os";
 import { chmod, symlink, rename } from "fs/promises";
 import { join } from "path";
 
-import { IInstaller, IPortablePython, IPortablePythonOptions } from './types';
+import { IInstaller, IPortablePython } from './types';
 
 const DL_PLATFORM = (() => {
     if (platform() == "win32") {
@@ -34,17 +34,17 @@ const DL_ARCH = (() => {
 })();
 
 export default class CPythonInstaller implements IInstaller {
-    constructor(private parent: IPortablePython, private options: IPortablePythonOptions) {}
+    constructor(private parent: IPortablePython) {}
 
     get relativeExecutablePath(): string {
         return join(this.pythonDistributionName, "bin", "python" + (
-            this.options.distribution === "cosmo" ? ".com" :
+            this.parent.distribution === "cosmo" ? ".com" :
             (platform() === "win32" ? ".exe" : "")
         ));
     }
 
     get relativePipPath(): string {
-        if (this.options.distribution != "cosmo" && platform() === "win32") {
+        if (this.parent.distribution != "cosmo" && platform() === "win32") {
             return join(this.pythonDistributionName, "Scripts", `pip${this.parent.major}.exe`);
         }
         return join(this.pythonDistributionName, "bin", `pip${this.parent.major}`);
@@ -59,11 +59,11 @@ export default class CPythonInstaller implements IInstaller {
     }
 
     validateOptions(): void {
-        if (this.options.implementation !== "cpython") {
+        if (this.parent.implementation !== "cpython") {
             throw Error("expected cpython implementation");
         }
 
-        if (!["auto", "cosmo", "headless", "full"].includes(this.options.distribution)) {
+        if (!["auto", "cosmo", "headless", "full"].includes(this.parent.distribution)) {
             throw Error("invalid distribution");
         }
     }
@@ -74,7 +74,7 @@ export default class CPythonInstaller implements IInstaller {
         }
 
         await chmod(this.parent.executablePath, 0o777);
-        if (this.options.distribution != "cosmo" && platform() != "win32") {
+        if (this.parent.distribution != "cosmo" && platform() != "win32") {
             // node can't create symlinks over existing files, so we create symlinks with temp names,
             // then rename to overwrite existing files
             await symlink("python", `${this.parent.executablePath}${this.parent.major}_`, "file");

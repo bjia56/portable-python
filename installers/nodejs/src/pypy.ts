@@ -2,7 +2,7 @@ import { platform, arch } from "os";
 import { chmod, symlink, rename } from "fs/promises";
 import { join } from "path";
 
-import { IInstaller, IPortablePython, IPortablePythonOptions } from './types';
+import { IInstaller, IPortablePython } from './types';
 
 const DL_PLATFORM = (() => {
     if (platform() == "win32") {
@@ -21,14 +21,28 @@ const DL_ARCH = (() => {
     return arch();
 })();
 
-export default class GraalPyInstaller implements IInstaller {
-    private pythonMajor: number = 3;
-    private pythonMinor: number = 10;
-
+export default class PyPyInstaller implements IInstaller {
     constructor(private parent: IPortablePython) {}
 
+    get pythonMajor(): string {
+        if (this.parent.distribution === "auto") {
+            return "3";
+        }
+        return this.parent.distribution.split(".")[0];
+    }
+
+    get pythonMinor(): string {
+        if (this.parent.distribution === "auto") {
+            return "10";
+        }
+        return this.parent.distribution.split(".")[1];
+    }
+
     get relativeExecutablePath(): string {
-        return join(this.pythonDistributionName, "bin", "python" + (platform() === "win32" ? ".exe" : ""));
+        if (platform() === "win32") {
+            return join(this.pythonDistributionName, "python.exe");
+        }
+        return join(this.pythonDistributionName, "bin", "python");
     }
 
     get relativePipPath(): string {
@@ -39,18 +53,15 @@ export default class GraalPyInstaller implements IInstaller {
     }
 
     get pythonDistributionName(): string {
-        if (this.parent.distribution === "auto" || this.parent.distribution === "standard") {
-            return `graalpy-${this.parent.version}-${DL_PLATFORM}-${DL_ARCH}`;
-        }
-        return `graalpy-${this.parent.distribution}-${this.parent.version}-${DL_PLATFORM}-${DL_ARCH}`;
+        return `pypy${this.pythonMajor}.${this.pythonMinor}-${this.parent.version}-${DL_PLATFORM}-${DL_ARCH}`;
     }
 
     validateOptions(): void {
-        if (this.parent.implementation !== "graalpy") {
-            throw Error("expected graalpy implementation");
+        if (this.parent.implementation !== "pypy") {
+            throw Error("expected pypy implementation");
         }
 
-        if (!["auto", "standard", "community", "jvm", "community-jvm"].includes(this.parent.distribution)) {
+        if (!["auto", "3.9", "3.10"].includes(this.parent.distribution)) {
             throw Error("invalid distribution");
         }
     }

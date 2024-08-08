@@ -77,6 +77,11 @@ function repackage_graal () {
   fi
   maybe_docker ./bin/python -m ensurepip
 
+  if [[ "${PLATFORM}" != "windows" ]]; then
+    python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip3
+    python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip3.10
+  fi
+
   cd ${WORKDIR}
   if [[ "${EXTRACTED_FILENAME}" != "${UPLOAD_FILENAME}" ]]; then
     mv ${EXTRACTED_FILENAME} ${UPLOAD_FILENAME}
