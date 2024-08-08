@@ -82,10 +82,12 @@
       const groups = [];
       for (const version in groupedReleases) {
         const optionGroup = document.createElement('optgroup');
-        if (version.startsWith("3")) {
+        if (version.startsWith("3.")) {
           optionGroup.label = "CPython " + version;
-        } else {
+        } else if (version.startsWith("24.")) {
           optionGroup.label = "GraalPy " + version;
+        } else {
+          optionGroup.label = "PyPy " + version;
         }
         groupedReleases[version].forEach(release => {
           const option = document.createElement('option');
