@@ -21,11 +21,7 @@ fi
 
 if [[ -z "$tags" ]]; then
     if [[ "$print_latest" != "true" ]]; then
-        if [[ "$legacy" == "true" ]]; then
-            echo "v$release_version-$suffix.0"
-        else
-            echo "$prefix-v$release_version-$suffix.0"
-        fi
+        echo "$prefix-v$release_version-$suffix.0"
     fi
     exit 0
 fi
