@@ -39,7 +39,10 @@ export default class GraalPyInstaller implements IInstaller {
     }
 
     get pythonDistributionName(): string {
-        return `graalpy-community-jvm-${this.parent.version}-${DL_PLATFORM}-${DL_ARCH}`;
+        if (this.parent.distribution === "auto" || this.parent.distribution === "standard") {
+            return `graalpy-${this.parent.version}-${DL_PLATFORM}-${DL_ARCH}`;
+        }
+        return `graalpy-${this.parent.distribution}-${this.parent.version}-${DL_PLATFORM}-${DL_ARCH}`;
     }
 
     validateOptions(): void {
@@ -47,7 +50,7 @@ export default class GraalPyInstaller implements IInstaller {
             throw Error("expected graalpy implementation");
         }
 
-        if (this.parent.distribution !== "auto") {
+        if (!["auto", "standard", "community", "jvm", "community-jvm"].includes(this.parent.distribution)) {
             throw Error("invalid distribution");
         }
     }
