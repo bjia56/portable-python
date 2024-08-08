@@ -10,10 +10,12 @@ import { IInstaller, IPortablePython, IPortablePythonOptions } from "./types";
 import { getVersionBuilds, pickVersion } from "./versions";
 import CPythonInstaller from "./cpython";
 import GraalPyInstaller from "./graalpy";
+import PyPyInstaller from "./pypy";
 
-const INSTALLERS = new Map<string, new (parent: IPortablePython, options: IPortablePythonOptions) => IInstaller>([
+const INSTALLERS = new Map<string, new (parent: IPortablePython) => IInstaller>([
     ["cpython", CPythonInstaller],
     ["graalpy", GraalPyInstaller],
+    ["pypy", PyPyInstaller],
 ]);
 
 async function download(url: string, dest: string) {
@@ -46,10 +48,7 @@ export class PortablePython implements IPortablePython {
         }
 
         const ctor = INSTALLERS.get(this.implementation)!;
-        this._installer = new ctor(this, {
-            implementation: this.implementation,
-            distribution: this.distribution,
-        });
+        this._installer = new ctor(this);
         this._installer.validateOptions();
 
         if (installDir) {
