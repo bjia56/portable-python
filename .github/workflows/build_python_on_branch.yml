@@ -48,3 +48,14 @@ jobs:
     with:
       graalpy_version: ${{ matrix.graalpy_version }}
       platforms: "linux-x86_64,linux-aarch64,macos,windows"
+
+  pypy:
+    name: PyPy ${{ matrix.pypy_version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        pypy_version: [ 7.3.16 ]
+    uses: ./.github/workflows/repackage_pypy.yml
+    with:
+      pypy_version: ${{ matrix.pypy_version }}
+      platforms: "linux-x86_64,linux-aarch64,macos,windows"

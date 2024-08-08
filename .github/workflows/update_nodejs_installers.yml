@@ -60,7 +60,7 @@ jobs:
 
       - name: Update and publish installers
         run: |
-          python ./scripts/update_installer.py ${{ inputs.version }} ${{ inputs.release_tag }} ${{ inputs.implementation}}
+          python ./scripts/update_installer.py ${{ inputs.version }} ${{ inputs.release_tag }} ${{ inputs.implementation }}
 
           cd ./installers/nodejs
           npm i
