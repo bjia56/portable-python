@@ -1,9 +1,9 @@
-name: Build and publish CPython
+name: Build and publish PyPy
 
 on:
   workflow_dispatch:
     inputs:
-      python_version:
+      pypy_version:
         required: true
         type: string
       beta:
@@ -12,7 +12,7 @@ on:
         default: false
   workflow_call:
     inputs:
-      python_version:
+      pypy_version:
         required: true
         type: string
       beta:
@@ -22,14 +22,14 @@ on:
 
 jobs:
   build:
-    name: Build CPython ${{ inputs.python_version }}
-    uses: ./.github/workflows/build_python.yml
+    name: Build PyPy ${{ inputs.pypy_version }}
+    uses: ./.github/workflows/repackage_pypy.yml
     with:
-      python_version: ${{ inputs.python_version }}
-      platforms: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,macos,windows,cosmo,freebsd13-x86_64,freebsd14-x86_64"
+      pypy_version: ${{ inputs.pypy_version }}
+      platforms: "linux-x86_64,linux-aarch64,macos,windows"
 
   publish:
-    name: Publish CPython ${{ inputs.python_version }}
+    name: Publish PyPy ${{ inputs.pypy_version }}
     needs: build
     runs-on: ubuntu-latest
     permissions:
@@ -44,18 +44,18 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          pattern: python-*
-          path: /tmp/python/
+          pattern: pypy-*
+          path: /tmp/pypy/
           merge-multiple: true
 
       - name: Get latest
         run: |
-          echo "LATEST_TAG=$(./scripts/pick_semver.sh ${{ inputs.python_version }} ${{ inputs.beta }} cpython true)" >> $GITHUB_ENV
+          echo "LATEST_TAG=$(./scripts/pick_semver.sh ${{ inputs.pypy_version }} ${{ inputs.beta }} pypy true)" >> $GITHUB_ENV
 
       - name: Pick tag
         id: pick_tag
         run: |
-          SELECTED_TAG=$(./scripts/pick_semver.sh ${{ inputs.python_version }} ${{ inputs.beta }} cpython)
+          SELECTED_TAG=$(./scripts/pick_semver.sh ${{ inputs.pypy_version }} ${{ inputs.beta }} pypy)
           echo "SELECTED_TAG=$SELECTED_TAG" >> $GITHUB_ENV
           echo "::set-output name=release_tag::$SELECTED_TAG"
 
@@ -64,7 +64,7 @@ jobs:
           gh release create ${{ env.SELECTED_TAG }} \
             --title ${{ env.SELECTED_TAG }} \
             --target ${{ github.sha }} \
-            ${{ env.LATEST_TAG && format('--generate-notes --notes-start-tag {0}', env.LATEST_TAG) || format('--notes "Python {0}"', inputs.python_version) }} \
+            ${{ env.LATEST_TAG && format('--generate-notes --notes-start-tag {0}', env.LATEST_TAG) || format('--notes "PyPy {0}"', inputs.pypy_version) }} \
             ${{ inputs.beta && '--prerelease' || '' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -72,7 +72,7 @@ jobs:
       - name: Upload files
         uses: softprops/action-gh-release@v2
         with:
-          files: /tmp/python/python*.zip
+          files: /tmp/pypy/pypy*.zip
           tag_name: ${{ env.SELECTED_TAG }}
 
     outputs:
@@ -85,8 +85,8 @@ jobs:
       contents: write
     uses: ./.github/workflows/update_nodejs_installers.yml
     with:
-      version: ${{ inputs.python_version }}
+      version: ${{ inputs.pypy_version }}
       release_tag: ${{ needs.publish.outputs.release_tag }}
       beta: ${{ inputs.beta }}
-      implementation: cpython
+      implementation: pypy
     secrets: inherit

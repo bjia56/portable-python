@@ -1,54 +1,22 @@
-import { createWriteStream, existsSync, rm, rmSync, mkdirSync, chmodSync, symlinkSync, renameSync } from "fs";
+import { createWriteStream, existsSync } from "fs";
+import { mkdir, rm } from "fs/promises";
 import { join, dirname } from "path";
-import { platform, arch, release } from "os";
 import { Readable } from 'stream';
 import { finished } from 'stream/promises';
 import { ReadableStream } from 'stream/web';
 import AdmZip from "adm-zip";
 
-const packageJson = require("../package.json");
+import { IInstaller, IPortablePython, IPortablePythonOptions } from "./types";
+import { getVersionBuilds, pickVersion } from "./versions";
+import CPythonInstaller from "./cpython";
+import GraalPyInstaller from "./graalpy";
+import PyPyInstaller from "./pypy";
 
-const DL_PLATFORM = (() => {
-    if (platform() == "win32") {
-        return "windows";
-    }
-    if (platform() == "freebsd") {
-        const releaseName = release();
-        const releaseMajor = parseInt(releaseName.split(".")[0]);
-        return `freebsd${releaseMajor}`;
-    }
-    return platform();
-})();
-
-const DL_ARCH = (() => {
-    if (DL_PLATFORM == "darwin") {
-        return "universal2";
-    }
-
-    switch (arch()) {
-    case "ia32":
-        return "i386";
-    case "x64":
-        return "x86_64";
-    case "arm64":
-        return "aarch64";
-    }
-
-    return arch();
-})();
-
-const VERSIONS = packageJson.portablePython.versions;
-const VERSION_BUILDS = packageJson.portablePython.versionBuilds;
-
-function pickVersion(version: string) {
-    for (let i = 0; i < VERSIONS.length; ++i) {
-        // TODO: This doesn't handle semver correctly, e.g. 3.8.17 will match 3.8.1
-        if (VERSIONS[i].startsWith(version)) {
-            return VERSIONS[i];
-        }
-    }
-    return null;
-}
+const INSTALLERS = new Map<string, new (parent: IPortablePython) => IInstaller>([
+    ["cpython", CPythonInstaller],
+    ["graalpy", GraalPyInstaller],
+    ["pypy", PyPyInstaller],
+]);
 
 async function download(url: string, dest: string) {
     const res = await fetch(url);
@@ -56,28 +24,38 @@ async function download(url: string, dest: string) {
     await finished(Readable.fromWeb(res.body as ReadableStream).pipe(file));
 }
 
-export class PortablePython {
-    _version: string
+export class PortablePython implements IPortablePython {
+    private _version: string
+    private _installer: IInstaller
+    implementation: string = "cpython"
     distribution: string = "auto"
     installDir = dirname(__dirname);
 
-    constructor(version: string, installDir: string | null = null, options: any = {}) {
+    constructor(version: string, installDir: string | null = null, options: IPortablePythonOptions = {}) {
         if (!version) {
             throw Error("version must not be empty");
         }
 
+        if (options.implementation) {
+            this.implementation = options.implementation;
+        }
         if (options.distribution) {
             this.distribution = options.distribution;
         }
-        if (!["auto", "cosmo"].includes(this.distribution)) {
-            throw Error("invalid distribution");
+
+        if (!INSTALLERS.has(this.implementation)) {
+            throw Error("invalid implementation");
         }
+
+        const ctor = INSTALLERS.get(this.implementation)!;
+        this._installer = new ctor(this);
+        this._installer.validateOptions();
 
         if (installDir) {
             this.installDir = installDir;
         }
 
-        this._version = pickVersion(version);
+        this._version = pickVersion(this.implementation, version);
         if (!this._version) {
             throw Error(`unknown version: ${version}`);
         }
@@ -90,20 +68,14 @@ export class PortablePython {
      * Contains the path to the Python executable.
      */
     get executablePath() {
-        return join(this.installDir, this.pythonDistributionName, "bin", "python" + (
-            this.distribution === "cosmo" ? ".com" :
-            (platform() === "win32" ? ".exe" : "")
-        ));
+        return join(this.installDir, this._installer.relativeExecutablePath);
     }
 
     /**
      * Contains the path to the bundled pip executable.
      */
     get pipPath() {
-        if (this.distribution != "cosmo" && platform() === "win32") {
-            return join(this.installDir, this.pythonDistributionName, "Scripts", `pip${this.major}.exe`);
-        }
-        return join(this.installDir, this.pythonDistributionName, "bin", `pip${this.major}`);
+        return join(this.installDir, this._installer.relativePipPath);
     }
 
     /**
@@ -138,17 +110,14 @@ export class PortablePython {
      * Contains the release tag that will be downloaded.
      */
     get releaseTag() {
-        return VERSION_BUILDS[this.version] as string;
+        return getVersionBuilds(this.implementation)[this.version] as string;
     }
 
     /**
      * Contains the full name of the Python distribution.
      */
     get pythonDistributionName() {
-        if (this.distribution === "cosmo") {
-            return `python-${this.version}-cosmo-unknown`;
-        }
-        return `python-${this.version}-${DL_PLATFORM}-${DL_ARCH}`;
+        return this._installer.pythonDistributionName;
     }
 
     /**
@@ -176,32 +145,12 @@ export class PortablePython {
             return;
         }
 
-        const postProcess = () => {
-            if (!this.isInstalled()) {
-                throw Error("something went wrong and the installation failed");
-            }
-
-            chmodSync(this.executablePath, 0o777);
-            if (this.distribution != "cosmo" && platform() != "win32") {
-                // node can't create symlinks over existing files, so we create symlinks with temp names,
-                // then rename to overwrite existing files
-                symlinkSync("python", `${this.executablePath}${this.major}_`, "file");
-                renameSync(`${this.executablePath}${this.major}_`, `${this.executablePath}${this.major}`);
-                symlinkSync("python", `${this.executablePath}${this.major}.${this.minor}_`, "file");
-                renameSync(`${this.executablePath}${this.major}.${this.minor}_`, `${this.executablePath}${this.major}.${this.minor}`);
-
-                // ensure the pip script is executable
-                chmodSync(this.pipPath, 0o777);
-                chmodSync(`${this.pipPath}.${this.minor}`, 0o777);
-            }
-        }
-
-        mkdirSync(this.installDir, { recursive: true });
+        await mkdir(this.installDir, { recursive: true });
 
         if (zipFile) {
             const zip = new AdmZip(zipFile);
             zip.extractAllTo(this.installDir, true)
-            postProcess();
+            await this._installer.postInstall()
             return;
         }
 
@@ -214,8 +163,8 @@ export class PortablePython {
         const zip = new AdmZip(downloadPath);
         zip.extractAllTo(installDir, true)
 
-        rmSync(downloadPath);
-        postProcess();
+        await rm(downloadPath);
+        await this._installer.postInstall();
     }
 
     /**
@@ -225,13 +174,7 @@ export class PortablePython {
         if (!this.isInstalled()) {
             return;
         }
-        await new Promise<void>((resolve, reject) => rm(this.extractPath, { force: true, recursive: true }, (e) => {
-            if (e) {
-                reject(e);
-            } else {
-                resolve();
-            }
-        }));
+        await rm(this.extractPath, { force: true, recursive: true });
     }
 
 }

@@ -1,4 +1,4 @@
-name: Build Python
+name: Build CPython
 
 on:
   workflow_dispatch:
@@ -57,13 +57,14 @@ env:
 
 jobs:
   build_linux:
-    name: Linux ${{ inputs.python_version }} ${{ matrix.arch }}
+    name: Linux ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }}
     if: ${{ contains(inputs.platforms, 'linux') }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         arch: [x86_64, i386, aarch64, arm, riscv64, s390x]
+        distribution: [full, headless]
         exclude:
           - arch: ${{ !contains(inputs.platforms, 'linux-x86_64') && 'x86_64' || '' }}
           - arch: ${{ !contains(inputs.platforms, 'linux-i386') && 'i386' || '' }}
@@ -89,7 +90,7 @@ jobs:
 
       - name: Build
         run: |
-          ./scripts/build_linux_zig.sh ${{ matrix.arch }} ${{ inputs.python_version }}
+          ./scripts/build_linux_zig.sh ${{ matrix.arch }} ${{ inputs.python_version }} ${{ matrix.distribution }}
 
       - name: Interactive debugging
         if: ${{ always() && inputs.debug_interactive }}
@@ -98,14 +99,14 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: python-linux-${{ matrix.arch }}-${{ inputs.python_version }}
+          name: python-linux-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
         if: ${{ always()  && inputs.debug }}
         uses: actions/upload-artifact@v4
         with:
-          name: build-python-linux-${{ matrix.arch }}-${{ inputs.python_version }}
+          name: build-python-linux-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./*python*.tar.gz
 
       - name: Test python in clean environment
@@ -124,7 +125,7 @@ jobs:
             cp /work/python*.zip .
             unzip ./python*.zip
 
-            cd python-${{ inputs.python_version }}-linux-${{ matrix.arch }}
+            cd python-${{ matrix.distribution }}-${{ inputs.python_version }}-linux-${{ matrix.arch }}
             chmod +x ./bin/python
             ldd -v -r ./bin/python
             ./bin/python --version
@@ -137,9 +138,13 @@ jobs:
             fi
 
   build_windows:
-    name: Windows ${{ inputs.python_version }} x86_64 (build)
+    name: Windows ${{ inputs.python_version }} x86_64 ${{ matrix.distribution }} (build)
     if: ${{ contains(inputs.platforms, 'windows') }}
     runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        distribution: [full, headless]
 
     steps:
       - name: Set git to use LF
@@ -162,7 +167,7 @@ jobs:
         shell: bash
         run: |
           set -ex
-          ./scripts/build_windows.sh x86_64 ${{ inputs.python_version }}
+          ./scripts/build_windows.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }}
 
       - name: Interactive debugging
         uses: fawazahmed0/action-debug@v2
@@ -171,20 +176,24 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: python-windows-x86_64-${{ inputs.python_version }}
+          name: python-windows-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         if: ${{ always() && inputs.debug }}
         with:
-          name: build-python-windows-x86_64-${{ inputs.python_version }}
+          name: build-python-windows-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./*python*.tar.gz
 
   test_windows:
-    name: Windows ${{ inputs.python_version }} x86_64 (test)
+    name: Windows ${{ inputs.python_version }} x86_64 ${{ matrix.distribution }} (test)
     needs: build_windows
     runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        distribution: [full, headless]
 
     steps:
       - name: Set git to use LF
@@ -198,15 +207,15 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: python-windows-x86_64-${{ inputs.python_version }}
+          name: python-windows-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./python/
 
       - name: Test python in clean environment
         shell: bash
         run: |
-          7z.exe x python/python-${{ inputs.python_version }}-windows-x86_64.zip
+          7z.exe x python/python-${{ matrix.distribution }}-${{ inputs.python_version }}-windows-x86_64.zip
 
-          cd python-${{ inputs.python_version }}-windows-x86_64
+          cd python-${{ matrix.distribution }}-${{ inputs.python_version }}-windows-x86_64
           ./bin/python --version
           ./bin/python -m sysconfig
           ./bin/python ../scripts/test.py
@@ -216,9 +225,13 @@ jobs:
           fi
 
   build_macos:
-    name: MacOS ${{ inputs.python_version }} universal2 (build)
+    name: MacOS ${{ inputs.python_version }} universal2 ${{ matrix.distribution }} (build)
     if: ${{ contains(inputs.platforms, 'macos') }}
     runs-on: macos-12
+    strategy:
+      fail-fast: false
+      matrix:
+        distribution: [full, headless]
 
     steps:
       - name: Checkout
@@ -230,7 +243,7 @@ jobs:
       - name: Build
         run: |
           set -ex
-          ./scripts/build_macos.sh universal2 ${{ inputs.python_version }}
+          ./scripts/build_macos.sh universal2 ${{ inputs.python_version }} ${{ matrix.distribution }}
 
       - name: Interactive debugging
         uses: fawazahmed0/action-debug@v2
@@ -239,24 +252,25 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: python-darwin-universal2-${{ inputs.python_version }}
+          name: python-darwin-universal2-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         if: ${{ always() && inputs.debug }}
         with:
-          name: build-python-darwin-universal2-${{ inputs.python_version }}
+          name: build-python-darwin-universal2-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./*python*.tar.gz
 
   test_macos:
-    name: MacOS ${{ inputs.python_version }} ${{ matrix.arch }} (test)
+    name: MacOS ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (test)
     needs: build_macos
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ macos-12, macos-14 ]
+        distribution: [full, headless]
         include:
           - os: macos-12
             arch: x86_64
@@ -270,15 +284,15 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: python-darwin-universal2-${{ inputs.python_version }}
+          name: python-darwin-universal2-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./python/
 
       - name: Test python in clean environment
         shell: bash
         run: |
-          unzip python/python-${{ inputs.python_version }}-darwin-universal2.zip
+          unzip python/python-${{ matrix.distribution }}-${{ inputs.python_version }}-darwin-universal2.zip
 
-          cd python-${{ inputs.python_version }}-darwin-universal2
+          cd python-${{ matrix.distribution }}-${{ inputs.python_version }}-darwin-universal2
           chmod +x ./bin/python
           ./bin/python --version
           ./bin/python -m sysconfig
@@ -290,13 +304,14 @@ jobs:
           fi
 
   build_freebsd:
-    name: FreeBSD ${{ matrix.release }} ${{ inputs.python_version }} x86_64 (build)
+    name: FreeBSD ${{ matrix.release }} ${{ inputs.python_version }} x86_64 ${{ matrix.distribution }} (build)
     if: ${{ contains(inputs.platforms, 'freebsd') }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         release: [13, 14]
+        distribution: [full, headless]
         exclude:
           - release: ${{ !contains(inputs.platforms, 'freebsd13-x86_64') && '13' || '' }}
           - release: ${{ !contains(inputs.platforms, 'freebsd14-x86_64') && '14' || '' }}
@@ -321,7 +336,7 @@ jobs:
             pkg install -y cmake bash wget patch git zip python3 autoconf automake libtool gettext bison pkgconf gmake gperf patchelf
           run: |
             export PLATFORM=freebsd${{ matrix.release }}
-            bash ./scripts/build_freebsd.sh x86_64 ${{ inputs.python_version }}
+            bash ./scripts/build_freebsd.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }}
 
       - name: Interactive debugging
         if: ${{ always() && inputs.debug_interactive }}
@@ -330,24 +345,25 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: python-freebsd${{ matrix.release }}-x86_64-${{ inputs.python_version }}
+          name: python-freebsd${{ matrix.release }}-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
         if: ${{ always() && inputs.debug }}
         uses: actions/upload-artifact@v4
         with:
-          name: build-python-freebsd${{ matrix.release }}-x86_64-${{ inputs.python_version }}
+          name: build-python-freebsd${{ matrix.release }}-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./*python*.tar.gz
 
   test_freebsd:
-    name: FreeBSD ${{ matrix.release }} ${{ inputs.python_version }} x86_64 (test)
+    name: FreeBSD ${{ matrix.release }} ${{ inputs.python_version }} x86_64 ${{ matrix.distribution }} (test)
     needs: build_freebsd
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         release: [13, 14]
+        distribution: [full, headless]
         exclude:
           - release: ${{ !contains(inputs.platforms, 'freebsd13-x86_64') && '13' || '' }}
           - release: ${{ !contains(inputs.platforms, 'freebsd14-x86_64') && '14' || '' }}
@@ -365,7 +381,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: python-freebsd${{ matrix.release }}-x86_64-${{ inputs.python_version }}
+          name: python-freebsd${{ matrix.release }}-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./python/
 
       - name: Test in VM
@@ -379,9 +395,9 @@ jobs:
             pkg install -y bash
           run: |
             cat > /tmp/test.sh <<EOF
-              unzip python/python-${{ inputs.python_version }}-freebsd${{ matrix.release }}-x86_64.zip
+              unzip python/python-${{ matrix.distribution }}-${{ inputs.python_version }}-freebsd${{ matrix.release }}-x86_64.zip
 
-              cd python-${{ inputs.python_version }}-freebsd${{ matrix.release }}-x86_64
+              cd python-${{ matrix.distribution }}-${{ inputs.python_version }}-freebsd${{ matrix.release }}-x86_64
               chmod +x ./bin/python
               ./bin/python --version
               ./bin/python -m sysconfig
