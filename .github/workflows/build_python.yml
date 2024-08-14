@@ -57,7 +57,7 @@ env:
 
 jobs:
   build_linux:
-    name: Linux ${{ inputs.python_version }} ${{ matrix.arch }}
+    name: Linux ${{ inputs.pyd6f99${{ matrix.arch }}
     if: ${{ contains(inputs.platforms, 'linux') }}
     runs-on: ubuntu-latest
     strategy:
@@ -82,7 +82,7 @@ jobs:
       - name: Set up zig
         uses: goto-bus-stop/setup-zig@v2
         with:
-          version: 0.14.0-dev.653+91c17979f
+          version: 0.14.0-dev.1052+d6f997259
 
       - name: Checkout
         uses: actions/checkout@v4
