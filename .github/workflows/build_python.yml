@@ -226,7 +226,7 @@ jobs:
   build_macos:
     name: MacOS ${{ inputs.python_version }} universal2 ${{ matrix.distribution }} (build)
     if: ${{ contains(inputs.platforms, 'macos') }}
-    runs-on: macos-12
+    runs-on: macos-13
     strategy:
       fail-fast: false
       matrix:
@@ -268,10 +268,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-12, macos-14 ]
+        os: [ macos-13, macos-14 ]
         distribution: [full, headless]
         include:
-          - os: macos-12
+          - os: macos-13
             arch: x86_64
           - os: macos-14
             arch: arm64
