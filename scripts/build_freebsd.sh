@@ -267,92 +267,106 @@ gmake install
 install_license
 
 echo "::endgroup::"
-#######
-# X11 #
-#######
-#echo "::group::X11"
-#cd ${BUILDDIR}
 
-function build_x11_lib_core() {
-  echo "::group::$1"
+if [[ "${DISTRIBUTION}" != "headless" ]]; then
+  #######
+  # X11 #
+  #######
+
+  function build_x11_lib_core() {
+    echo "::group::$1"
+    cd ${BUILDDIR}
+
+    pkg=$1
+    ext_flags="$2"
+    file=$pkg.tar.gz
+    download_verify_extract $file
+    cd $pkg
+    autoreconf -vfi ${AL_OPTS}
+    ./configure $ext_flags --prefix=${DEPSDIR}
+    gmake -j4
+    gmake install
+
+    echo "::endgroup::"
+  }
+
+  function build_x11_lib () {
+    build_x11_lib_core "$1" "$2"
+    install_license
+  }
+
+  build_x11_lib_core util-macros-1.20.1
+  build_x11_lib_core xorgproto-2023.2
+  build_x11_lib xproto-7.0.31
+  build_x11_lib xextproto-7.3.0
+  build_x11_lib kbproto-1.0.7
+  build_x11_lib inputproto-2.3.2
+  build_x11_lib renderproto-0.11.1
+  build_x11_lib scrnsaverproto-1.2.2
+  build_x11_lib xcb-proto-1.16.0
+  build_x11_lib libpthread-stubs-0.5
+  build_x11_lib xtrans-1.5.0
+  build_x11_lib libXau-1.0.11
+  build_x11_lib libxcb-1.16
+  build_x11_lib libXdmcp-1.1.2
+  build_x11_lib libX11-1.8.7
+  build_x11_lib libXext-1.3.5
+  build_x11_lib libICE-1.0.7
+  build_x11_lib libSM-1.2.2
+  build_x11_lib libXrender-0.9.11
+  build_x11_lib libXft-2.3.8
+  build_x11_lib libXScrnSaver-1.2.4
+
+  #echo "::endgroup::"
+  #######
+  # tcl #
+  #######
+  echo "::group::tcl"
   cd ${BUILDDIR}
 
-  pkg=$1
-  ext_flags="$2"
-  file=$pkg.tar.gz
-  download_verify_extract $file
-  cd $pkg
-  autoreconf -vfi ${AL_OPTS}
-  ./configure $ext_flags --prefix=${DEPSDIR}
+  download_verify_extract tcl8.6.13-src.tar.gz
+  cd tcl*/unix
+  ./configure --prefix=${DEPSDIR}
   gmake -j4
   gmake install
+  cd ..
+  install_license ./license.terms
 
   echo "::endgroup::"
-}
+  ######
+  # tk #
+  ######
+  echo "::group::tk"
+  cd ${BUILDDIR}
 
-function build_x11_lib () {
-  build_x11_lib_core "$1" "$2"
-  install_license
-}
+  download_verify_extract tk8.6.13-src.tar.gz
+  cd tk*/unix
+  ./configure --prefix=${DEPSDIR}
+  gmake -j4
+  gmake install
+  cd ..
+  install_license ./license.terms
 
-build_x11_lib_core util-macros-1.20.1
-build_x11_lib_core xorgproto-2023.2
-build_x11_lib xproto-7.0.31
-build_x11_lib xextproto-7.3.0
-build_x11_lib kbproto-1.0.7
-build_x11_lib inputproto-2.3.2
-build_x11_lib renderproto-0.11.1
-build_x11_lib scrnsaverproto-1.2.2
-build_x11_lib xcb-proto-1.16.0
-build_x11_lib libpthread-stubs-0.5
-build_x11_lib xtrans-1.5.0
-build_x11_lib libXau-1.0.11
-build_x11_lib libxcb-1.16
-build_x11_lib libXdmcp-1.1.2
-build_x11_lib libX11-1.8.7
-build_x11_lib libXext-1.3.5
-build_x11_lib libICE-1.0.7
-build_x11_lib libSM-1.2.2
-build_x11_lib libXrender-0.9.11
-build_x11_lib libXft-2.3.8
-build_x11_lib libXScrnSaver-1.2.4
+  echo "::endgroup::"
+fi
 
-#echo "::endgroup::"
-#######
-# tcl #
-#######
-echo "::group::tcl"
-cd ${BUILDDIR}
-
-download_verify_extract tcl8.6.13-src.tar.gz
-cd tcl*/unix
-./configure --prefix=${DEPSDIR}
-gmake -j4
-gmake install
-cd ..
-install_license ./license.terms
-
-echo "::endgroup::"
-######
-# tk #
-######
-echo "::group::tk"
-cd ${BUILDDIR}
-
-download_verify_extract tk8.6.13-src.tar.gz
-cd tk*/unix
-./configure --prefix=${DEPSDIR}
-gmake -j4
-gmake install
-cd ..
-install_license ./license.terms
-
-echo "::endgroup::"
 ##########
 # Python #
 ##########
 echo "::group::Python"
 cd ${BUILDDIR}
+
+additionalparams=()
+if [[ "${DISTRIBUTION}" != "headless" ]]; then
+  additionalparams+=(
+    -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include \
+    -DTK_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtk8.6.so \
+    -DTCL_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include \
+    -DTCL_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtcl8.6.so \
+    -DX11_INCLUDE_DIR:PATH=${DEPSDIR}/include/X11 \
+    -DX11_LIBRARIES="${DEPSDIR}/lib/libXau.so;${DEPSDIR}/lib/libXdmcp.so;${DEPSDIR}/lib/libX11.so;${DEPSDIR}/lib/libXext.so;${DEPSDIR}/lib/libICE.so;${DEPSDIR}/lib/libSM.so;${DEPSDIR}/lib/libXrender.so;${DEPSDIR}/lib/libXft.so;${DEPSDIR}/lib/libXss.so;${DEPSDIR}/lib/libxcb.so"
+  )
+fi
 
 ldconfig -i -m -v ${DEPSDIR}/lib
 
@@ -388,21 +402,16 @@ cmake \
   -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libbz2.a \
   -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/include \
   -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.so \
-  -DREADLINE_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/readline/readline.h \
+  -DREADLINE_INCLUDE_PATH:PATH=${DEPSDIR}/include \
   -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.so \
   -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.so \
   -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.so \
-  -DGDBM_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/gdbm.h \
+  -DGDBM_INCLUDE_PATH:PATH=${DEPSDIR}/include \
   -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.so \
   -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.so \
   -DNDBM_TAG=NDBM \
   -DNDBM_USE=NDBM \
-  -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tk.h \
-  -DTK_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtk8.6.so \
-  -DTCL_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include/tcl.h \
-  -DTCL_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtcl8.6.so \
-  -DX11_INCLUDE_DIR:PATH=${DEPSDIR}/include/X11 \
-  -DX11_LIBRARIES="${DEPSDIR}/lib/libXau.so;${DEPSDIR}/lib/libXdmcp.so;${DEPSDIR}/lib/libX11.so;${DEPSDIR}/lib/libXext.so;${DEPSDIR}/lib/libICE.so;${DEPSDIR}/lib/libSM.so;${DEPSDIR}/lib/libXrender.so;${DEPSDIR}/lib/libXft.so;${DEPSDIR}/lib/libXss.so;${DEPSDIR}/lib/libxcb.so" \
+  "${additionalparams[@]}" \
   ../portable-python-cmake-buildsystem
 make -j4
 make install
@@ -467,8 +476,8 @@ cd ${BUILDDIR}
 python3 -m ensurepip
 python3 -m pip install pyclean
 python3 -m pyclean -v python-install
-mv python-install python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
-tar -czf ${WORKDIR}/python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
-zip ${WORKDIR}/python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.zip $(tar tf ${WORKDIR}/python-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz)
+mv python-install python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
+tar -czf ${WORKDIR}/python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
+zip ${WORKDIR}/python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.zip $(tar tf ${WORKDIR}/python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz)
 
 echo "::endgroup::"

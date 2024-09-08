@@ -1,4 +1,8 @@
 # portable-python
+[![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/bjia56/portable-python/total)](https://bjia56.github.io/portable-python/)
+[![NPM Version](https://img.shields.io/npm/v/%40bjia56%2Fportable-python)](https://www.npmjs.com/package/@bjia56/portable-python)
+
+
 This project provides self-contained (hence, "portable") Python distributions to a variety of target platforms and architectures. These Python distributions can be downloaded and extracted to anywhere on the filesystem, making installation trivially easy and configurable.
 
 ## Usage
@@ -39,14 +43,14 @@ Currently, Python 3.9, 3.10, 3.11, and 3.12 are built for the following targets:
 - Linux x86_64, i386, aarch64, arm <sup id="a1">[1](#f1)</sup>, riscv64
 - Windows x86_64
 - MacOS x86_64, arm64 <sup id="a2">[2](#f2)</sup>
-
-Python 3.8 builds are available, but will no longer be actively updated.
+- FreeBSD 13, 14 x86_64
+- Cosmopolitan libc <sup id="a3">[3](#f3)</sup>
 
 <sub><b id="f1">1</b> The arm builds target armv6, specifically the configuration of the Raspberry Pi 1. Current arm builds do not work properly on old glibc, but a recent version of Raspbian like Debian bullseye should provide a new enough glibc to work. [↩](#a1)</sub>
 
 <sub><b id="f2">2</b> MacOS distributions are provided as universal2, which will work on both x86_64 and arm64. [↩](#a2)</sub>
 
-Download stats: <a href="https://bjia56.github.io/portable-python/">📊</a>
+<sub><b id="f3">3</b> [Cosmopolitan](https://justine.lol/cosmopolitan/index.html) builds are statically linked and may not support all Python features. [↩](#a3)</sub>
 
 ## Licensing
 

@@ -3,9 +3,9 @@ name: Build Python on branch
 on:
   push:
     branches: ["main"]
-    paths: ["scripts/**", ".github/workflows/**", "zigshim/**", "checksums/**"]
+    paths: ["scripts/**", ".github/cosmocc_version.txt", ".github/workflows/**", "zigshim/**", "checksums/**", "baseline/**"]
   pull_request:
-    paths: ["scripts/**", ".github/workflows/**", "zigshim/**", "checksums/**"]
+    paths: ["scripts/**", ".github/cosmocc_version.txt", ".github/workflows/**", "zigshim/**", "checksums/**", "baseline/**"]
   workflow_dispatch:
     inputs:
       run_tests:
@@ -23,17 +23,39 @@ on:
         default: "portable-python"
 
 jobs:
-  build:
-    name: ${{ matrix.python_version }}
+  cpython:
+    name: CPython ${{ matrix.python_version }}
     strategy:
       fail-fast: false
       matrix:
-        python_version: [ 3.9.19, 3.10.13, 3.11.9, 3.12.3 ]
+        python_version: [ 3.9.20, 3.10.15, 3.11.10, 3.12.6 ]
     uses: ./.github/workflows/build_python.yml
     with:
       python_version: ${{ matrix.python_version }}
       run_tests: ${{ inputs.run_tests || false }}
       debug: ${{ inputs.debug || false }}
       verbose: ${{ inputs.verbose || false }}
-      platforms: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,macos,windows,freebsd13-x86_64,freebsd14-x86_64"
+      platforms: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,macos,windows,cosmo,freebsd13-x86_64,freebsd14-x86_64"
       buildsystem_branch: ${{ inputs.buildsystem_branch || 'portable-python' }}
+
+  graalpy:
+    name: GraalPy ${{ matrix.graalpy_version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        graalpy_version: [ 24.0.1 ]
+    uses: ./.github/workflows/repackage_graalpy.yml
+    with:
+      graalpy_version: ${{ matrix.graalpy_version }}
+      platforms: "linux-x86_64,linux-aarch64,macos,windows"
+
+  pypy:
+    name: PyPy ${{ matrix.pypy_version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        pypy_version: [ 7.3.16 ]
+    uses: ./.github/workflows/repackage_pypy.yml
+    with:
+      pypy_version: ${{ matrix.pypy_version }}
+      platforms: "linux-x86_64,linux-aarch64,macos,windows"

@@ -1,6 +1,7 @@
 import multiprocessing
 import pkgutil
 import sys
+import time
 
 import test_deps
 
@@ -23,17 +24,25 @@ def import_with_timeout(mod_name):
     p = multiprocessing.Process(target=test_deps.import_module, args=(mod_name, q))
     p.start()
 
-    p.join(10)
-    if p.is_alive():
-        p.terminate()
-        p.join()
-        failed(f"Importing {mod_name} timed out after 10 seconds")
-    else:
-        result = q.get()
-        if result:
-            failed(f"Importing {mod_name} failed with exception:\n{result}")
+    start = time.time()
+    while True:
+        # We're not using p.join() here because Cosmopolitan libc doesn't seem to
+        # react to the child process's exit on Windows
+        if p.is_alive():
+            if time.time() - start > 10:
+                p.terminate()
+                p.join()
+                failed(f"Importing {mod_name} timed out after 10 seconds")
+                break
+            else:
+                time.sleep(0.1)
         else:
-            succeeded(f"Importing {mod_name} succeeded")
+            result = q.get()
+            if result:
+                failed(f"Importing {mod_name} failed with exception:\n{result}")
+            else:
+                succeeded(f"Importing {mod_name} succeeded")
+            break
 
 
 if __name__ == "__main__":

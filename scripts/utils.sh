@@ -25,7 +25,7 @@ fi
 
 function download_and_verify () {
   file="$1"
-  curl -s -S -f -L -o $file https://github.com/bjia56/portable-python/releases/download/build-dependencies/$file
+  curl -s -S -f -L -o $file https://github.com/bjia56/build-dependencies/releases/download/portable-python/$file
   verify_checksum $file
 }
 
@@ -40,6 +40,7 @@ function download_verify_extract () {
 
 ARCH=$1
 PYTHON_FULL_VER=$2
+DISTRIBUTION=$3
 PYTHON_VER=$(echo ${PYTHON_FULL_VER} | cut -d "." -f 1-2)
 export PORTABLE_PYTHON_PY_VER=${PYTHON_VER}
 
