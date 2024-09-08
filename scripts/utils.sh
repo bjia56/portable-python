@@ -2,8 +2,7 @@
 
 set -e
 
-CMAKE_BUILDSYSTEM_BRANCH=getrusage
-#${PORTABLE_PYTHON_BUILDSYSTEM_BRANCH}
+CMAKE_BUILDSYSTEM_BRANCH=${PORTABLE_PYTHON_BUILDSYSTEM_BRANCH}
 echo "Selected portable-python-cmake-buildsystem branch: ${CMAKE_BUILDSYSTEM_BRANCH}"
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
