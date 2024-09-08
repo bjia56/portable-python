@@ -105,11 +105,11 @@ else
 fi
 
 # apply some zig patches
-cd $(dirname $(which zig))
-for patchfile in ${WORKDIR}/zigshim/patches/*.patch; do
-  patch -p1 < $patchfile
-done
-cd ${WORKDIR}
+#cd $(dirname $(which zig))
+#for patchfile in ${WORKDIR}/zigshim/patches/*.patch; do
+#  patch -p1 < $patchfile
+#done
+#cd ${WORKDIR}
 
 echo "::endgroup::"
 ########
