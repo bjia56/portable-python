@@ -30,4 +30,14 @@ export interface IPortablePython extends IInstallerProps {
 export interface IPortablePythonOptions {
     implementation?: string;
     distribution?: string;
+
+    /**
+     * Override the version of Python to install. For development use only.
+     */
+    _versionOverride?: string;
+
+    /**
+     * Override the release tag of Python to install. For development use only.
+     */
+    _tagOverride?: string;
 }

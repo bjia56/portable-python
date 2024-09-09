@@ -27,6 +27,7 @@ async function download(url: string, dest: string) {
 export class PortablePython implements IPortablePython {
     private _version: string
     private _installer: IInstaller
+    private _experimentalTag: string
     implementation: string = "cpython"
     distribution: string = "auto"
     installDir = dirname(__dirname);
@@ -55,7 +56,15 @@ export class PortablePython implements IPortablePython {
             this.installDir = installDir;
         }
 
-        this._version = pickVersion(this.implementation, version);
+        if (options._tagOverride) {
+            this._experimentalTag = options._tagOverride;
+        }
+
+        if (options._versionOverride) {
+            this._version = options._versionOverride;
+        } else {
+            this._version = pickVersion(this.implementation, version);
+        }
         if (!this._version) {
             throw Error(`unknown version: ${version}`);
         }
@@ -110,6 +119,9 @@ export class PortablePython implements IPortablePython {
      * Contains the release tag that will be downloaded.
      */
     get releaseTag() {
+        if (this._experimentalTag) {
+            return this._experimentalTag;
+        }
         return getVersionBuilds(this.implementation)[this.version] as string;
     }
 
