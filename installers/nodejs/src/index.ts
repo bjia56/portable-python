@@ -1,5 +1,5 @@
-import { createWriteStream, existsSync } from "fs";
-import { mkdir, rm } from "fs/promises";
+import { createWriteStream, existsSync, readFileSync } from "fs";
+import { mkdir, rm, writeFile } from "fs/promises";
 import { join, dirname } from "path";
 import { Readable } from 'stream';
 import { finished } from 'stream/promises';
@@ -148,6 +148,21 @@ export class PortablePython implements IPortablePython {
     }
 
     /**
+     * Checks if the build tag of the downloaded Python distribution is outdated (i.e.
+     * the tag does not match the specified release tag).
+     * @returns True if the tag is outdated, false otherwise.
+     */
+    isTagOutdated() {
+        const tagPath = join(this.extractPath, "build_tag.txt");
+        if (!existsSync(tagPath)) {
+            return true;
+        }
+
+        const tag = readFileSync(tagPath, "utf-8").trim();
+        return tag !== this.releaseTag;
+    }
+
+    /**
      * Will download the compressed Python installation and extract it to
      * the installation directory.
      * @param [zipFile=null] - Install from an existing zip file on the filesystem, instead of downloading.
@@ -176,6 +191,11 @@ export class PortablePython implements IPortablePython {
         zip.extractAllTo(installDir, true)
 
         await rm(downloadPath);
+
+        // Write the selected build tag to a file for debugging purposes
+        const tagPath = join(this.extractPath, "build_tag.txt");
+        await writeFile(tagPath, this.releaseTag);
+
         await this._installer.postInstall();
     }
 
