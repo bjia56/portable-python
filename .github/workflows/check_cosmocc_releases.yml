@@ -31,7 +31,7 @@ jobs:
           sed -i 's/${{ env.current }}/${{ env.latest }}/g' .github/cosmocc_version.txt
 
       - name: Create PR
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v7
         with:
           committer: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
           author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
