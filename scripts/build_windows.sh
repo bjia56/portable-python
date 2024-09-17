@@ -35,6 +35,7 @@ else
   cp -r amd64/include ${DEPSDIR}/openssl/include
   mkdir ${DEPSDIR}/openssl/lib
   cp amd64/lib* ${DEPSDIR}/openssl/lib/
+  cd amd64
   install_license LICENSE.txt openssl-3.0.15
 fi
 
