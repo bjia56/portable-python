@@ -35,8 +35,15 @@ else
   cp -r amd64/include ${DEPSDIR}/openssl/include
   # cmake apparently wants this here?
   cp ${DEPSDIR}/openssl/include/applink.c ${DEPSDIR}/openssl/include/openssl/applink.c
+
+  # required by cmake
+  mkdir ${DEPSDIR}/openssl/lib
+  cp amd64/lib* ${DEPSDIR}/openssl/lib/
+
+  # for compatibility with old openssl so we don't need to conditionally copy
   mkdir ${DEPSDIR}/openssl/bin
   cp amd64/lib* ${DEPSDIR}/openssl/bin/
+  
   cd amd64
   install_license LICENSE.txt openssl-3.0.15
 fi
