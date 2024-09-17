@@ -52,6 +52,7 @@ LICENSEDIR=${WORKDIR}/licenses
 
 license_files=$(cat <<-END
 LICENSE
+LICENSE.txt
 COPYING
 END
 )
