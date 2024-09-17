@@ -28,7 +28,7 @@ if (( ${PYTHON_MINOR} < 11 )); then
   curl -L https://www.openssl.org/source/license-openssl-ssleay.txt --output LICENSE
   install_license
 else
-  curl -L https://github.com/python/cpython-bin-deps/archive/refs/tags/openssl-bin-3.0. 15.tar.gz --output cpython-bin-deps-openssl-bin-3.0.15.tar.gz
+  curl -L https://github.com/python/cpython-bin-deps/archive/refs/tags/openssl-bin-3.0.15.tar.gz --output cpython-bin-deps-openssl-bin-3.0.15.tar.gz
   tar -xf cpython-bin-deps-openssl-bin-3.0.15.tar.gz
   cd cpython-bin-deps-openssl-bin-3.0.15
   mkdir ${DEPSDIR}/openssl
