@@ -33,6 +33,8 @@ else
   cd cpython-bin-deps-openssl-bin-3.0.15
   mkdir ${DEPSDIR}/openssl
   cp -r amd64/include ${DEPSDIR}/openssl/include
+  # cmake apparently wants this here?
+  cp ${DEPSDIR}/openssl/include/applink.c ${DEPSDIR}/openssl/include/openssl/applink.c
   mkdir ${DEPSDIR}/openssl/lib
   cp amd64/lib* ${DEPSDIR}/openssl/lib/
   cd amd64
