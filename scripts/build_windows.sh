@@ -19,13 +19,24 @@ echo "::endgroup::"
 echo "::group::OpenSSL"
 cd ${BUILDDIR}
 
-curl -L https://github.com/Slicer/Slicer-OpenSSL/releases/download/1.1.1g/OpenSSL_1_1_1g-install-msvc1900-64-Release.tar.gz --output openssl.tar.gz
-tar -xf openssl.tar.gz
-mv OpenSSL_1_1_1g-install-msvc1900-64-Release ${DEPSDIR}/openssl
-mkdir openssl-1.1.1g
-cd openssl-1.1.1g
-curl -L https://www.openssl.org/source/license-openssl-ssleay.txt --output LICENSE
-install_license
+if (( ${PYTHON_MINOR} < 11 )); then
+  curl -L https://github.com/Slicer/Slicer-OpenSSL/releases/download/1.1.1g/OpenSSL_1_1_1g-install-msvc1900-64-Release.tar.gz --output openssl.tar.gz
+  tar -xf openssl.tar.gz
+  mv OpenSSL_1_1_1g-install-msvc1900-64-Release ${DEPSDIR}/openssl
+  mkdir openssl-1.1.1g
+  cd openssl-1.1.1g
+  curl -L https://www.openssl.org/source/license-openssl-ssleay.txt --output LICENSE
+  install_license
+else
+  curl -L https://github.com/python/cpython-bin-deps/archive/refs/tags/openssl-bin-3.0. 15.tar.gz --output cpython-bin-deps-openssl-bin-3.0.15.tar.gz
+  tar -xf cpython-bin-deps-openssl-bin-3.0.15.tar.gz
+  cd cpython-bin-deps-openssl-bin-3.0.15
+  mkdir ${DEPSDIR}/openssl
+  cp -r amd64/include ${DEPSDIR}/openssl/include
+  mkdir ${DEPSDIR}/openssl/lib
+  cp amd64/lib* ${DEPSDIR}/openssl/lib/
+  install_license LICENSE.txt openssl-3.0.15
+fi
 
 echo "::endgroup::"
 #########
