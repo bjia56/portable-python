@@ -126,7 +126,11 @@ echo "::endgroup::"
 echo "::group::OpenSSL"
 cd ${BUILDDIR}
 
-download_verify_extract openssl-1.1.1w.tar.gz
+if (( ${PYTHON_MINOR} < 11 )); then
+  download_verify_extract openssl-1.1.1w.tar.gz
+else
+  download_verify_extract openssl-3.0.15.tar.gz
+fi
 cd openssl*
 if [[ "${ARCH}" == "arm" ]]; then
   ./Configure linux-generic32 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}

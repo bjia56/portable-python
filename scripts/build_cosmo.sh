@@ -51,7 +51,11 @@ echo "::endgroup::"
 echo "::group::OpenSSL"
 cd ${BUILDDIR}
 
-download_verify_extract openssl-1.1.1w.tar.gz
+if (( ${PYTHON_MINOR} < 11 )); then
+  download_verify_extract openssl-1.1.1w.tar.gz
+else
+  download_verify_extract openssl-3.0.15.tar.gz
+fi
 cd openssl*
 ./Configure linux-generic64 no-asm no-shared no-dso no-engine --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 make -j4
