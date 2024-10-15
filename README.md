@@ -15,23 +15,22 @@ To get started, download archives from [GitHub releases](https://github.com/bjia
 
 For example, on Linux via bash:
 ```
-$ wget -q https://github.com/bjia56/portable-python/releases/download/v3.9.17-build.4/python-3.9
-.17-linux-x86_64.zip
-$ unzip -qq python-3.9.17-linux-x86_64.zip
-$ ./python-3.9.17-linux-x86_64/bin/python --version
-Python 3.9.17
+$ wget -q https://github.com/bjia56/portable-python/releases/download/cpython-v3.12.6-build.5/python-headless-3.12.6-linux-x86_64.zip
+$ unzip -qq python-headless-3.12.6-linux-x86_64.zip
+$ ./python-headless-3.12.6-linux-x86_64/bin/python --version
+Python 3.12.6
 ```
 
 Or via the node installer:
 ```
-$ npm i --silent @bjia56/portable-python-3.9
-$ ./node_modules/@bjia56/portable-python-3.9/python-3.9.17-linux-x86_64/bin/python --version
-Python 3.9.17
+$ npm i --silent @bjia56/portable-python-3.12
+$ ./node_modules/@bjia56/portable-python-3.12/python-headless-3.12.6-linux-x86_64/bin/python --version
+Python 3.12.6
 ```
 
 Or via node:
 ```js
-var pythonExe = require("@bjia56/portable-python-3.9");
+var pythonExe = require("@bjia56/portable-python-3.12");
 var child_process = require("child_process");
 console.log(child_process.execSync(`${pythonExe} --version`).toString());
 ```
