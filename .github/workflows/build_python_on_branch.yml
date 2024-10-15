@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python_version: [ 3.9.20, 3.10.15, 3.11.10, 3.12.6 ]
+        python_version: [ 3.9.20, 3.10.15, 3.11.10, 3.12.7 ]
     uses: ./.github/workflows/build_python.yml
     with:
       python_version: ${{ matrix.python_version }}
@@ -43,7 +43,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        graalpy_version: [ 24.1.0 ]
+        graalpy_version: [ 24.1.1 ]
     uses: ./.github/workflows/repackage_graalpy.yml
     with:
       graalpy_version: ${{ matrix.graalpy_version }}
@@ -54,7 +54,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        pypy_version: [ 7.3.16 ]
+        pypy_version: [ 7.3.17 ]
     uses: ./.github/workflows/repackage_pypy.yml
     with:
       pypy_version: ${{ matrix.pypy_version }}
