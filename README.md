@@ -8,7 +8,6 @@ This project provides self-contained (hence, "portable") Python distributions to
 ## Usage
 
 To get started, download archives from [GitHub releases](https://github.com/bjia56/portable-python/releases). Alternatively, use any of the following installers:
-- `npm i @bjia56/portable-python-3.8`
 - `npm i @bjia56/portable-python-3.9`
 - `npm i @bjia56/portable-python-3.10`
 - `npm i @bjia56/portable-python-3.11`
@@ -39,12 +38,16 @@ console.log(child_process.execSync(`${pythonExe} --version`).toString());
 
 ## Available distributions
 
-Currently, Python 3.9, 3.10, 3.11, and 3.12 are built for the following targets:
-- Linux x86_64, i386, aarch64, arm <sup id="a1">[1](#f1)</sup>, riscv64
+Currently, CPython 3.9, 3.10, 3.11, and 3.12 are built for the following targets:
+- Linux x86_64, i386, aarch64, arm <sup id="a1">[1](#f1)</sup>, riscv64 (glibc)
 - Windows x86_64
 - MacOS x86_64, arm64 <sup id="a2">[2](#f2)</sup>
 - FreeBSD 13, 14 x86_64
 - Cosmopolitan libc <sup id="a3">[3](#f3)</sup>
+
+For all CPython distributions except for the Cosmopolitan libc build, there are two available variants: `full` and `headless`. The distinction is that `headless` builds do not include any UI libraries (i.e. `tkinter` and its dependencies), so are better suited for non-graphical server installations.
+
+PyPy and GraalPy distributions are also available as repackaged versions of official upstream releases. Though they are already portable, the distributions have been made available through the node installers for convenience and flexibility.
 
 <sub><b id="f1">1</b> The arm builds target armv6, specifically the configuration of the Raspberry Pi 1. Current arm builds do not work properly on old glibc, but a recent version of Raspbian like Debian bullseye should provide a new enough glibc to work. [↩](#a1)</sub>
 
