@@ -84,4 +84,3 @@ function repackage_pypy () {
 }
 
 repackage_pypy 3.10
-repackage_pypy 3.9
