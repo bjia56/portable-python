@@ -52,7 +52,7 @@ case "$ARCH" in
 esac
 sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja cmake==3.28.4 --break-system-packages
 if [[ "${ARCH}" == "riscv64" ]]; then
-  sudo pip install patchelf==0.15.0.0
+  sudo pip install patchelf==0.15.0.0 --break-system-packages
 fi
 
 export ZIG_FLAGS=""
