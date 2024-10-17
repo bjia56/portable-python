@@ -156,8 +156,15 @@ echo "::endgroup::"
 echo "::group::libffi"
 cd ${BUILDDIR}
 
-download_verify_extract libffi-3.4.6.tar.gz
-cd libffi*
+if [[ "${ARCH}" == "s390x" ]]; then
+  git clone https://github.com/bjia56/libffi.git
+  cd libffi
+  git checkout v3.4.6-tweaks
+  ./autogen.sh
+else
+  download_verify_extract libffi-3.4.6.tar.gz
+  cd libffi*
+fi
 CFLAGS="${CFLAGS} -Wl,--undefined-version" ./configure --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
