@@ -16,7 +16,7 @@ export DEBIAN_FRONTEND=noninteractive
 sudo apt update
 sudo apt -y install \
   wget build-essential pkg-config autoconf git patch \
-  python2 python3 python3-pip clang qemu-user-static \
+  python3 python3-pip clang qemu-user-static \
   gettext bison libtool autopoint gperf ncurses-bin xutils-dev
 case "$ARCH" in
   x86_64)
