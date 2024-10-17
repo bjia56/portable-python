@@ -533,6 +533,11 @@ if [[ "${ARCH}" == "x86_64" && ${PYTHON_MINOR} -ge 11 ]]; then
   opensslparams+=(
     -DOPENSSL_LIBRARIES="${DEPSDIR}/lib64/libssl.a;${DEPSDIR}/lib64/libcrypto.a"
   )
+elif [[ "${ARCH}" == "s390x" && ${PYTHON_MINOR} -ge 11 ]]; then
+  # openssl 3 appears to install to lib64
+  opensslparams+=(
+    -DOPENSSL_LIBRARIES="${DEPSDIR}/lib64/libssl.a;${DEPSDIR}/lib64/libcrypto.a"
+  )
 else
   opensslparams+=(
     -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/libssl.a;${DEPSDIR}/lib/libcrypto.a"
