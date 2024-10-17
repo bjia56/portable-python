@@ -652,7 +652,7 @@ echo "::endgroup::"
 echo "::group::Compress output"
 cd ${BUILDDIR}
 
-python3 -m pip install pyclean
+python3 -m pip install pyclean --break-system-packages
 python3 -m pyclean -v python-install
 mv python-install python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
 tar -czf ${WORKDIR}/python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
