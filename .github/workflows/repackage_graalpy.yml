@@ -97,7 +97,7 @@ jobs:
         arch: [x86_64, aarch64]
         include:
           - arch: x86_64
-            runner: macos-12
+            runner: macos-13
           - arch: aarch64
             runner: macos-14
 

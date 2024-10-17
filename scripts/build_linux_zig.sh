@@ -52,8 +52,8 @@ if [[ "${ARCH}" == "riscv64" ]]; then
 fi
 
 export ZIG_FLAGS=""
-export CFLAGS="-Wno-date-time -I${DEPSDIR}/include"
-export CPPFLAGS="-Wno-date-time -I${DEPSDIR}/include"
+export CFLAGS="-Wno-date-time -fno-sanitize=undefined -I${DEPSDIR}/include"
+export CPPFLAGS="-Wno-date-time -fno-sanitize=undefined -I${DEPSDIR}/include"
 export CXXFLAGS="${CPPFLAGS}"
 export LDFLAGS="-L${DEPSDIR}/lib"
 export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig:${DEPSDIR}/share/pkgconfig"
@@ -132,12 +132,16 @@ echo "::endgroup::"
 echo "::group::OpenSSL"
 cd ${BUILDDIR}
 
-download_verify_extract openssl-1.1.1w.tar.gz
+if (( ${PYTHON_MINOR} < 11 )); then
+  download_verify_extract openssl-1.1.1w.tar.gz
+else
+  download_verify_extract openssl-3.0.15.tar.gz
+fi
 cd openssl*
 if [[ "${ARCH}" == "arm" ]]; then
   ./Configure linux-generic32 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 elif [[ "${ARCH}" == "i386" ]]; then
-  ./Configure linux-x86 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+  CFLAGS="${CFLAGS} -fgnuc-version=0 -D__STDC_NO_ATOMICS__" ./Configure linux-x86 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 elif [[ "${ARCH}" == "riscv64" ]]; then
   CFLAGS="${CFLAGS} -fgnuc-version=0 -D__STDC_NO_ATOMICS__" ./Configure linux-generic64 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 elif [[ "${ARCH}" == "s390x" ]]; then
@@ -523,6 +527,18 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
   )
 fi
 
+opensslparams=(-DOPENSSL_INCLUDE_DIR:PATH=${DEPSDIR}/include)
+if [[ "${ARCH}" == "x86_64" && ${PYTHON_MINOR} -ge 11 ]]; then
+  # openssl 3 appears to install to lib64
+  opensslparams+=(
+    -DOPENSSL_LIBRARIES="${DEPSDIR}/lib64/libssl.a;${DEPSDIR}/lib64/libcrypto.a"
+  )
+else
+  opensslparams+=(
+    -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/libssl.a;${DEPSDIR}/lib/libcrypto.a"
+  )
+fi
+
 wget --no-verbose -O portable-python-cmake-buildsystem.tar.gz https://github.com/bjia56/portable-python-cmake-buildsystem/tarball/${CMAKE_BUILDSYSTEM_BRANCH}
 tar -xf portable-python-cmake-buildsystem.tar.gz
 rm *.tar.gz
@@ -546,8 +562,7 @@ LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
   -DINSTALL_TEST=${INSTALL_TEST} \
   -DINSTALL_MANUAL=OFF \
   "${additionalparams[@]}" \
-  -DOPENSSL_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-  -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/libssl.a;${DEPSDIR}/lib/libcrypto.a" \
+  "${opensslparams[@]}" \
   -DSQLite3_INCLUDE_DIR:PATH=${DEPSDIR}/include \
   -DSQLite3_LIBRARY:FILEPATH=${DEPSDIR}/lib/libsqlite3.a \
   -DZLIB_INCLUDE_DIR:PATH=${DEPSDIR}/include \

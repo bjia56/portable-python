@@ -92,8 +92,13 @@ fi
 echo "::group::OpenSSL"
 cd ${BUILDDIR}
 
-download_verify_extract openssl-1.1.1w.tar.gz
-cd openssl-1.1.1w
+if (( ${PYTHON_MINOR} < 11 )); then
+  download_verify_extract openssl-1.1.1w.tar.gz
+  cd openssl-1.1.1w
+else
+  download_verify_extract openssl-3.0.15.tar.gz
+  cd openssl-3.0.15
+fi
 CC=${WORKDIR}/scripts/cc ./Configure enable-rc5 zlib no-asm no-shared darwin64-x86_64-cc --prefix=${DEPSDIR}
 make -j${NPROC}
 make install_sw

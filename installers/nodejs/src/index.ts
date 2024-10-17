@@ -1,5 +1,5 @@
-import { createWriteStream, existsSync } from "fs";
-import { mkdir, rm } from "fs/promises";
+import { createWriteStream, existsSync, readFileSync } from "fs";
+import { mkdir, rm, writeFile } from "fs/promises";
 import { join, dirname } from "path";
 import { Readable } from 'stream';
 import { finished } from 'stream/promises';
@@ -27,6 +27,7 @@ async function download(url: string, dest: string) {
 export class PortablePython implements IPortablePython {
     private _version: string
     private _installer: IInstaller
+    private _experimentalTag: string
     implementation: string = "cpython"
     distribution: string = "auto"
     installDir = dirname(__dirname);
@@ -55,7 +56,15 @@ export class PortablePython implements IPortablePython {
             this.installDir = installDir;
         }
 
-        this._version = pickVersion(this.implementation, version);
+        if (options._tagOverride) {
+            this._experimentalTag = options._tagOverride;
+        }
+
+        if (options._versionOverride) {
+            this._version = options._versionOverride;
+        } else {
+            this._version = pickVersion(this.implementation, version);
+        }
         if (!this._version) {
             throw Error(`unknown version: ${version}`);
         }
@@ -110,6 +119,9 @@ export class PortablePython implements IPortablePython {
      * Contains the release tag that will be downloaded.
      */
     get releaseTag() {
+        if (this._experimentalTag) {
+            return this._experimentalTag;
+        }
         return getVersionBuilds(this.implementation)[this.version] as string;
     }
 
@@ -133,6 +145,21 @@ export class PortablePython implements IPortablePython {
      */
     isInstalled() {
         return existsSync(this.extractPath);
+    }
+
+    /**
+     * Checks if the build tag of the downloaded Python distribution is outdated (i.e.
+     * the tag does not match the specified release tag).
+     * @returns True if the tag is outdated, false otherwise.
+     */
+    isTagOutdated() {
+        const tagPath = join(this.extractPath, "build_tag.txt");
+        if (!existsSync(tagPath)) {
+            return true;
+        }
+
+        const tag = readFileSync(tagPath, "utf-8").trim();
+        return tag !== this.releaseTag;
     }
 
     /**
@@ -164,6 +191,11 @@ export class PortablePython implements IPortablePython {
         zip.extractAllTo(installDir, true)
 
         await rm(downloadPath);
+
+        // Write the selected build tag to a file for debugging purposes
+        const tagPath = join(this.extractPath, "build_tag.txt");
+        await writeFile(tagPath, this.releaseTag);
+
         await this._installer.postInstall();
     }
 

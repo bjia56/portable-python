@@ -79,7 +79,7 @@ function repackage_graal () {
 
   if [[ "${PLATFORM}" != "windows" ]]; then
     python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip3
-    python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip3.10
+    python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip3.11
   fi
 
   cd ${WORKDIR}
