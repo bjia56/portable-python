@@ -16,8 +16,8 @@ export DEBIAN_FRONTEND=noninteractive
 sudo apt update
 sudo apt -y install \
   wget build-essential pkg-config autoconf git patch \
-  python2 python3 python3-pip clang qemu-user-static \
-  gettext bison libtool autopoint gperf ncurses-bin xutils-dev
+  python3 python3-pip clang qemu-user-static \
+  gettext bison libtool autopoint gperf ncurses-bin xutils-dev xtrans-dev libltdl-dev
 case "$ARCH" in
   x86_64)
     sudo apt -y install libc6-amd64-cross
@@ -35,6 +35,10 @@ case "$ARCH" in
     sudo apt -y install libc6-armhf-cross
     sudo ln -s /usr/arm-linux-gnueabihf/lib/ld-linux-armhf.so.3 /lib/ld-linux-armhf.so.3
     ;;
+  loongarch64)
+    sudo apt -y install libc6-loong64-cross
+    sudo ln -s /usr/loongarch64-linux-gnu/lib/ld-linux-loongarch-lp64d.so.1 /lib64/ld-linux-loongarch-lp64d.so.1
+    ;;
   riscv64)
     sudo apt -y install libc6-riscv64-cross
     sudo ln -s /usr/riscv64-linux-gnu/lib/ld-linux-riscv64-lp64d.so.1 /lib/ld-linux-riscv64-lp64d.so.1
@@ -46,9 +50,9 @@ case "$ARCH" in
     sudo ln -s /usr/s390x-linux-gnu/lib/ld64.so.1 /lib/ld64.so.1
     ;;
 esac
-sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja cmake==3.28.4
+sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja cmake==3.28.4 --break-system-packages
 if [[ "${ARCH}" == "riscv64" ]]; then
-  sudo pip install patchelf==0.15.0.0
+  sudo pip install patchelf==0.15.0.0 --break-system-packages
 fi
 
 export ZIG_FLAGS=""
@@ -96,6 +100,8 @@ else
   if [[ "${ARCH}" == "riscv64" ]]; then
     export ZIG_FLAGS="-target riscv64-linux-gnu.2.27"
     export CFLAGS="-Wl,--undefined-version ${CFLAGS}"
+  elif [[ "${ARCH}" == "loongarch64" ]]; then
+    export ZIG_FLAGS="-target loongarch64-linux-gnu.2.36"
   elif [[ "${ARCH}" == "s390x" ]]; then
     export ZIG_FLAGS="-target s390x-linux-gnu.2.19"
   else
@@ -104,12 +110,7 @@ else
   export CHOST=${ARCH}-linux-gnu
 fi
 
-# apply some zig patches
-#cd $(dirname $(which zig))
-#for patchfile in ${WORKDIR}/zigshim/patches/*.patch; do
-#  patch -p1 < $patchfile
-#done
-#cd ${WORKDIR}
+cd ${WORKDIR}
 
 echo "::endgroup::"
 ########
@@ -144,6 +145,8 @@ elif [[ "${ARCH}" == "i386" ]]; then
   CFLAGS="${CFLAGS} -fgnuc-version=0 -D__STDC_NO_ATOMICS__" ./Configure linux-x86 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 elif [[ "${ARCH}" == "riscv64" ]]; then
   CFLAGS="${CFLAGS} -fgnuc-version=0 -D__STDC_NO_ATOMICS__" ./Configure linux-generic64 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+elif [[ "${ARCH}" == "loongarch64" ]]; then
+  ./Configure linux64-loongarch64 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 elif [[ "${ARCH}" == "s390x" ]]; then
   ./Configure linux64-s390x no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 else
@@ -304,7 +307,7 @@ echo "::endgroup::"
 echo "::group::gdbm"
 cd ${BUILDDIR}
 
-download_verify_extract gdbm-1.23.tar.gz
+download_verify_extract gdbm-1.24.tar.gz
 cd gdbm*
 ./configure --host=${CHOST} --enable-libgdbm-compat --prefix=${DEPSDIR}
 make -j4
@@ -345,7 +348,7 @@ echo "::endgroup::"
 echo "::group::libgcrypt"
 cd ${BUILDDIR}
 
-download_verify_extract libgpg-error-1.47.tar.bz2
+download_verify_extract libgpg-error-1.50.tar.bz2
 cd libgpg-error*
 ./configure --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
@@ -354,7 +357,7 @@ install_license ./COPYING.LIB
 
 cd ${BUILDDIR}
 
-download_verify_extract libgcrypt-1.10.3.tar.bz2
+download_verify_extract libgcrypt-1.11.0.tar.bz2
 cd libgcrypt*
 LDFLAGS="${LDFLAGS} -Wl,--undefined-version" ./configure --disable-asm --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
@@ -398,6 +401,10 @@ cd ${BUILDDIR}
 
 download_verify_extract fontconfig-2.15.0.tar.gz
 cd fontconfig*
+if [[ "${ARCH}" == "loongarch64" ]]; then
+  # remove this once upstream fontconfig updates config.*
+  cp /usr/share/misc/config.* .
+fi
 LDFLAGS="${LDFLAGS} -lxml2" ./configure --host=${CHOST} --enable-static --disable-shared --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
 make -j4
 make install
@@ -645,7 +652,7 @@ echo "::endgroup::"
 echo "::group::Compress output"
 cd ${BUILDDIR}
 
-python3 -m pip install pyclean
+python3 -m pip install pyclean --break-system-packages
 python3 -m pyclean -v python-install
 mv python-install python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
 tar -czf ${WORKDIR}/python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
