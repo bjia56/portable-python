@@ -159,7 +159,7 @@ cd ${BUILDDIR}
 if [[ "${ARCH}" == "s390x" ]]; then
   git clone https://github.com/bjia56/libffi.git
   cd libffi
-  git checkout v3.4.6-tweaks
+  git checkout v3.4.6-s390x
   ./autogen.sh
 else
   download_verify_extract libffi-3.4.6.tar.gz
