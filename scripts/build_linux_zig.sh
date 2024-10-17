@@ -52,8 +52,8 @@ if [[ "${ARCH}" == "riscv64" ]]; then
 fi
 
 export ZIG_FLAGS=""
-export CFLAGS="-I${DEPSDIR}/include"
-export CPPFLAGS="-I${DEPSDIR}/include"
+export CFLAGS="-Wno-date-time -I${DEPSDIR}/include"
+export CPPFLAGS="-Wno-date-time -I${DEPSDIR}/include"
 export CXXFLAGS="${CPPFLAGS}"
 export LDFLAGS="-L${DEPSDIR}/lib"
 export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig:${DEPSDIR}/share/pkgconfig"
