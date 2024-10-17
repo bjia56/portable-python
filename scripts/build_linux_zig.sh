@@ -292,7 +292,7 @@ echo "::endgroup::"
 echo "::group::gdbm"
 cd ${BUILDDIR}
 
-download_verify_extract gdbm-1.23.tar.gz
+download_verify_extract gdbm-1.24.tar.gz
 cd gdbm*
 ./configure --host=${CHOST} --enable-libgdbm-compat --prefix=${DEPSDIR}
 make -j4
