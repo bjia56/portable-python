@@ -386,6 +386,10 @@ cd ${BUILDDIR}
 
 download_verify_extract fontconfig-2.15.0.tar.gz
 cd fontconfig*
+if [[ "${ARCH}" == "loongarch64" ]]; then
+  # remove this once upstream fontconfig updates config.*
+  cp /usr/share/misc/config.* .
+fi
 LDFLAGS="${LDFLAGS} -lxml2" ./configure --host=${CHOST} --enable-static --disable-shared --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
 make -j4
 make install
