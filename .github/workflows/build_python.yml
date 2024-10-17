@@ -543,8 +543,6 @@ jobs:
           envs: 'RUN_TESTS DEBUG_CI VERBOSE_CI PORTABLE_PYTHON_BUILDSYSTEM_BRANCH'
           usesh: true
           copyback: false
-          prepare: |
-            /usr/sbin/pkg_add bash
           run: |
             cat > /tmp/test.sh <<EOF
               unzip python/python-${{ inputs.python_version }}-cosmo-unknown.zip
