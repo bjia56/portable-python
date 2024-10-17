@@ -333,7 +333,7 @@ echo "::endgroup::"
 echo "::group::libgcrypt"
 cd ${BUILDDIR}
 
-download_verify_extract libgpg-error-1.47.tar.bz2
+download_verify_extract libgpg-error-1.50.tar.bz2
 cd libgpg-error*
 ./configure --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
