@@ -139,6 +139,8 @@ elif [[ "${ARCH}" == "i386" ]]; then
   CFLAGS="${CFLAGS} -fgnuc-version=0 -D__STDC_NO_ATOMICS__" ./Configure linux-x86 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 elif [[ "${ARCH}" == "riscv64" ]]; then
   CFLAGS="${CFLAGS} -fgnuc-version=0 -D__STDC_NO_ATOMICS__" ./Configure linux-generic64 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+elif [[ "${ARCH}" == "loongarch64" ]]; then
+  ./Configure linux64-loongarch64 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 else
   ./Configure linux-${ARCH} no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 fi
