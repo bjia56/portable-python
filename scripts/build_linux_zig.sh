@@ -35,6 +35,10 @@ case "$ARCH" in
     sudo apt -y install libc6-armhf-cross
     sudo ln -s /usr/arm-linux-gnueabihf/lib/ld-linux-armhf.so.3 /lib/ld-linux-armhf.so.3
     ;;
+  loongarch64)
+    sudo apt -y install libc6-loong64-cross
+    sudo ln -s /usr/loongarch64-linux-gnu/lib/ld-linux-loongarch-lp64d.so.1 /lib/ld-linux-loongarch-lp64d.so.1
+    ;;
   riscv64)
     sudo apt -y install libc6-riscv64-cross
     sudo ln -s /usr/riscv64-linux-gnu/lib/ld-linux-riscv64-lp64d.so.1 /lib/ld-linux-riscv64-lp64d.so.1
@@ -92,6 +96,8 @@ else
   if [[ "${ARCH}" == "riscv64" ]]; then
     export ZIG_FLAGS="-target riscv64-linux-gnu.2.27"
     export CFLAGS="-Wl,--undefined-version ${CFLAGS}"
+  elif [[ "${ARCH}" == "loongarch64" ]]; then
+    export ZIG_FLAGS="-target loongarch64-linux-gnu.2.36"
   else
     export ZIG_FLAGS="-target ${ARCH}-linux-gnu.2.17"
   fi
