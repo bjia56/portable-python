@@ -37,7 +37,7 @@ case "$ARCH" in
     ;;
   loongarch64)
     sudo apt -y install libc6-loong64-cross
-    sudo ln -s /usr/loongarch64-linux-gnu/lib/ld-linux-loongarch-lp64d.so.1 /lib/ld-linux-loongarch-lp64d.so.1
+    sudo ln -s /usr/loongarch64-linux-gnu/lib/ld-linux-loongarch-lp64d.so.1 /lib64/ld-linux-loongarch-lp64d.so.1
     ;;
   riscv64)
     sudo apt -y install libc6-riscv64-cross
