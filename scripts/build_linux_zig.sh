@@ -17,7 +17,7 @@ sudo apt update
 sudo apt -y install \
   wget build-essential pkg-config autoconf git patch \
   python3 python3-pip clang qemu-user-static \
-  gettext bison libtool autopoint gperf ncurses-bin xutils-dev xtrans-dev
+  gettext bison libtool autopoint gperf ncurses-bin xutils-dev xtrans-dev libltdl-dev
 case "$ARCH" in
   x86_64)
     sudo apt -y install libc6-amd64-cross
