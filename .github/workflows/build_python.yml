@@ -9,7 +9,7 @@ on:
       platforms:
         required: true
         type: string
-        default: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,linux-loongarch64,macos,windows,cosmo,freebsd13-x86_64,freebsd14-x86_64"
+        default: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,linux-loongarch64,linux-s390x,macos,windows,cosmo,freebsd13-x86_64,freebsd14-x86_64"
       buildsystem_branch:
         required: false
         type: string
@@ -52,7 +52,7 @@ env:
   DEBUG_CI: ${{ inputs.debug }}
   VERBOSE_CI: ${{ inputs.verbose }}
   PORTABLE_PYTHON_BUILDSYSTEM_BRANCH: ${{ inputs.buildsystem_branch || 'portable-python' }}
-  image_map: '{"x86_64": "amd64/ubuntu:18.04", "i386": "i386/ubuntu:18.04", "aarch64": "arm64v8/ubuntu:18.04", "arm": "arm32v7/debian:bullseye", "riscv64": "riscv64/debian:sid", "loongarch64": "loongarch64/debian:sid"}'
+  image_map: '{"x86_64": "amd64/ubuntu:18.04", "i386": "i386/ubuntu:18.04", "aarch64": "arm64v8/ubuntu:18.04", "arm": "arm32v7/debian:bullseye", "riscv64": "riscv64/debian:sid", "loongarch64": "loongarch64/debian:sid", "s390x": "s390x/debian:bullseye"}'
   freebsd_release_map: '{"14": "14.0", "13": "13.2"}'
 
 jobs:
@@ -63,7 +63,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [x86_64, i386, aarch64, arm, riscv64, loongarch64]
+        arch: [x86_64, i386, aarch64, arm, riscv64, s390x, loongarch64]
         distribution: [full, headless]
         exclude:
           - arch: ${{ !contains(inputs.platforms, 'linux-x86_64') && 'x86_64' || '' }}
@@ -72,6 +72,7 @@ jobs:
           - arch: ${{ !contains(inputs.platforms, 'linux-arm') && 'arm' || '' }}
           - arch: ${{ !contains(inputs.platforms, 'linux-riscv64') && 'riscv64' || '' }}
           - arch: ${{ !contains(inputs.platforms, 'linux-loongarch64') && 'loongarch64' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'linux-s390x') && 's390x' || '' }}
 
     steps:
       - name: Parse image
@@ -543,8 +544,6 @@ jobs:
           envs: 'RUN_TESTS DEBUG_CI VERBOSE_CI PORTABLE_PYTHON_BUILDSYSTEM_BRANCH'
           usesh: true
           copyback: false
-          prepare: |
-            /usr/sbin/pkg_add bash
           run: |
             cat > /tmp/test.sh <<EOF
               unzip python/python-${{ inputs.python_version }}-cosmo-unknown.zip
