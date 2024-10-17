@@ -41,6 +41,10 @@ case "$ARCH" in
     # workaround since the Zig compiler always targets ld-linux-riscv64-lp64.so.1
     sudo ln -s /usr/riscv64-linux-gnu/lib/ld-linux-riscv64-lp64d.so.1 /lib/ld-linux-riscv64-lp64.so.1
     ;;
+  s390x)
+    sudo apt -y install libc6-s390x-cross
+    sudo ln -s /usr/s390x-linux-gnu/lib/ld64.so.1 /lib/ld64.so.1
+    ;;
 esac
 sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja cmake==3.28.4
 if [[ "${ARCH}" == "riscv64" ]]; then
@@ -48,8 +52,8 @@ if [[ "${ARCH}" == "riscv64" ]]; then
 fi
 
 export ZIG_FLAGS=""
-export CFLAGS="-fno-sanitize=undefined -I${DEPSDIR}/include"
-export CPPFLAGS="-fno-sanitize=undefined -I${DEPSDIR}/include"
+export CFLAGS="-Wno-date-time -fno-sanitize=undefined -I${DEPSDIR}/include"
+export CPPFLAGS="-Wno-date-time -fno-sanitize=undefined -I${DEPSDIR}/include"
 export CXXFLAGS="${CPPFLAGS}"
 export LDFLAGS="-L${DEPSDIR}/lib"
 export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig:${DEPSDIR}/share/pkgconfig"
@@ -92,6 +96,8 @@ else
   if [[ "${ARCH}" == "riscv64" ]]; then
     export ZIG_FLAGS="-target riscv64-linux-gnu.2.27"
     export CFLAGS="-Wl,--undefined-version ${CFLAGS}"
+  elif [[ "${ARCH}" == "s390x" ]]; then
+    export ZIG_FLAGS="-target s390x-linux-gnu.2.19"
   else
     export ZIG_FLAGS="-target ${ARCH}-linux-gnu.2.17"
   fi
@@ -99,11 +105,11 @@ else
 fi
 
 # apply some zig patches
-cd $(dirname $(which zig))
-for patchfile in ${WORKDIR}/zigshim/patches/*.patch; do
-  patch -p1 < $patchfile
-done
-cd ${WORKDIR}
+#cd $(dirname $(which zig))
+#for patchfile in ${WORKDIR}/zigshim/patches/*.patch; do
+#  patch -p1 < $patchfile
+#done
+#cd ${WORKDIR}
 
 echo "::endgroup::"
 ########
@@ -138,6 +144,8 @@ elif [[ "${ARCH}" == "i386" ]]; then
   CFLAGS="${CFLAGS} -fgnuc-version=0 -D__STDC_NO_ATOMICS__" ./Configure linux-x86 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 elif [[ "${ARCH}" == "riscv64" ]]; then
   CFLAGS="${CFLAGS} -fgnuc-version=0 -D__STDC_NO_ATOMICS__" ./Configure linux-generic64 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+elif [[ "${ARCH}" == "s390x" ]]; then
+  ./Configure linux64-s390x no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 else
   ./Configure linux-${ARCH} no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 fi
@@ -152,8 +160,15 @@ echo "::endgroup::"
 echo "::group::libffi"
 cd ${BUILDDIR}
 
-download_verify_extract libffi-3.4.6.tar.gz
-cd libffi*
+if [[ "${ARCH}" == "s390x" ]]; then
+  git clone https://github.com/bjia56/libffi.git
+  cd libffi
+  git checkout v3.4.6-s390x
+  ./autogen.sh
+else
+  download_verify_extract libffi-3.4.6.tar.gz
+  cd libffi*
+fi
 CFLAGS="${CFLAGS} -Wl,--undefined-version" ./configure --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
@@ -464,7 +479,7 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
 
   download_verify_extract tk8.6.13-src.tar.gz
   cd tk*/unix
-  LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
+  LDFLAGS="${LDFLAGS} -lxml2 -lxcb -lXau" ./configure --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
   make -j4
   make install
   cd ..
@@ -514,6 +529,11 @@ fi
 
 opensslparams=(-DOPENSSL_INCLUDE_DIR:PATH=${DEPSDIR}/include)
 if [[ "${ARCH}" == "x86_64" && ${PYTHON_MINOR} -ge 11 ]]; then
+  # openssl 3 appears to install to lib64
+  opensslparams+=(
+    -DOPENSSL_LIBRARIES="${DEPSDIR}/lib64/libssl.a;${DEPSDIR}/lib64/libcrypto.a"
+  )
+elif [[ "${ARCH}" == "s390x" && ${PYTHON_MINOR} -ge 11 ]]; then
   # openssl 3 appears to install to lib64
   opensslparams+=(
     -DOPENSSL_LIBRARIES="${DEPSDIR}/lib64/libssl.a;${DEPSDIR}/lib64/libcrypto.a"
