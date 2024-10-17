@@ -342,7 +342,7 @@ install_license ./COPYING.LIB
 
 cd ${BUILDDIR}
 
-download_verify_extract libgcrypt-1.10.3.tar.bz2
+download_verify_extract libgcrypt-1.11.0.tar.bz2
 cd libgcrypt*
 LDFLAGS="${LDFLAGS} -Wl,--undefined-version" ./configure --disable-asm --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
