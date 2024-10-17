@@ -28,6 +28,8 @@ const DL_ARCH = (() => {
         return "x86_64";
     case "arm64":
         return "aarch64";
+    case "loong64":
+        return "loongarch64";
     }
 
     return arch();
