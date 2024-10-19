@@ -26,7 +26,7 @@ jobs:
     uses: ./.github/workflows/build_python.yml
     with:
       python_version: ${{ inputs.python_version }}
-      platforms: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,macos,windows,cosmo,freebsd13-x86_64,freebsd14-x86_64"
+      platforms: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,linux-s390x,linux-loongarch64,macos,windows,cosmo,freebsd13-x86_64,freebsd14-x86_64"
 
   publish:
     name: Publish CPython ${{ inputs.python_version }}
