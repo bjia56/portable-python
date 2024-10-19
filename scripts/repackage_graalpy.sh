@@ -22,9 +22,9 @@ if [[ "${PLATFORM}" != "windows" ]]; then
 fi
 
 if [[ "${PLATFORM}" == "linux" ]]; then
-  docker pull --platform "${DOCKER_PLATFORM} "${DOCKER_IMAGE}"
+  docker pull --platform "${DOCKER_PLATFORM}" "${DOCKER_IMAGE}"
   function maybe_docker () {
-    docker run --platform "${DOCKER_PLATFORM} -v .:/ws --workdir /ws "${DOCKER_IMAGE}" "$@"
+    docker run --platform "${DOCKER_PLATFORM}" -v .:/ws --workdir /ws "${DOCKER_IMAGE}" "$@"
     sudo chown -R $(id -u):$(id -g) .
   }
 else
