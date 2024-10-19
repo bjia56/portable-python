@@ -21,6 +21,7 @@ on:
 
 env:
   image_map: '{"x86_64": "amd64/ubuntu:20.04", "aarch64": "arm64v8/ubuntu:20.04"}'
+  platform_map: '{"x86_64": "linux/amd64", "aarch64": "linux/arm64/v8"}'
 
 jobs:
   build_linux:
@@ -43,6 +44,12 @@ jobs:
           IMAGE=$(echo ${{ toJSON(env.image_map) }} | jq -r '.["${{ matrix.arch }}"]')
           echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
 
+      - name: Parse platform
+        id: parse_platform
+        run: |
+          PLATFORM=$(echo ${{ toJSON(env.platform_map) }} | jq -r '.["${{ matrix.arch }}"]')
+          echo "platform=$PLATFORM" >> "$GITHUB_OUTPUT"
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -52,6 +59,7 @@ jobs:
       - name: Repackage
         run: |
           export DOCKER_IMAGE="${{ steps.parse_image.outputs.image }}"
+          export DOCKER_PLATFORM="${{ steps.parse_platform.outputs.platform }}"
           export MATRIX_DISTRIBUTION="${{ matrix.distribution }}"
           ./scripts/repackage_graalpy.sh ${{ matrix.arch }} ${{ inputs.graalpy_version }} linux
 
