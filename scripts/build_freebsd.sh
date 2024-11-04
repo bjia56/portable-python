@@ -3,8 +3,8 @@
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 source ${SCRIPT_DIR}/utils.sh
 
-export CFLAGS="-I${DEPSDIR}/include"
-export CPPFLAGS="-I${DEPSDIR}/include"
+export CFLAGS="-I${DEPSDIR}/include -fPIC"
+export CPPFLAGS="-I${DEPSDIR}/include -fPIC"
 export CXXFLAGS="${CPPFLAGS}"
 export LDFLAGS="-L${DEPSDIR}/lib"
 export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig:${DEPSDIR}/share/pkgconfig"
