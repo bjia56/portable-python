@@ -238,8 +238,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install coreutils
-        run: brew install coreutils gpatch autoconf automake libtool
+      - name: Install tools
+        run: |
+          brew install coreutils gpatch autoconf automake libtool
+          # use gpatch's "patch" executable
+          echo "/usr/local/opt/gpatch/libexec/gnubin" >> $GITHUB_PATH
 
       - name: Build
         run: |
