@@ -53,6 +53,7 @@ env:
   VERBOSE_CI: ${{ inputs.verbose }}
   PORTABLE_PYTHON_BUILDSYSTEM_BRANCH: ${{ inputs.buildsystem_branch || 'portable-python' }}
   image_map: '{"x86_64": "amd64/ubuntu:18.04", "i386": "i386/ubuntu:18.04", "aarch64": "arm64v8/ubuntu:18.04", "arm": "arm32v7/debian:bullseye", "riscv64": "riscv64/debian:sid", "loongarch64": "loongarch64/debian:sid", "s390x": "s390x/debian:bullseye"}'
+  platform_map: '{"x86_64": "linux/amd64", "i386": "linux/386", "aarch64": "linux/arm64/v8", "arm": "linux/arm/v7", "riscv64": "linux/riscv64", "loongarch64": "linux/loong64", "s390x": "linux/s390x"}'
   freebsd_release_map: '{"15": "15.0", "14": "14.0", "13": "13.2"}'
 
 jobs:
@@ -80,6 +81,12 @@ jobs:
         run: |
           IMAGE=$(echo ${{ toJSON(env.image_map) }} | jq -r '.["${{ matrix.arch }}"]')
           echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+
+      - name: Parse platform
+        id: parse_platform
+        run: |
+          PLATFORM=$(echo ${{ toJSON(env.platform_map) }} | jq -r '.["${{ matrix.arch }}"]')
+          echo "platform=$PLATFORM" >> "$GITHUB_OUTPUT"
 
       - name: Set up zig
         uses: mlugg/setup-zig@v1
@@ -114,7 +121,7 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: ${{ steps.parse_image.outputs.image }}
-          options: -v ${{ github.workspace }}:/work --workdir /tmp
+          options: --platform ${{ steps.parse_platform.outputs.platform }} -v ${{ github.workspace }}:/work --workdir /tmp
           shell: bash
           run: |
             set -e
