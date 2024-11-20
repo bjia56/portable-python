@@ -141,7 +141,7 @@ download_verify_extract xz-5.4.5.tar.gz
 cd xz*
 mkdir build
 cd build
-cmake -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DBUILD_SHARED_LIBS=ON ..
+cmake -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DBUILD_SHARED_LIBS=OFF ..
 make -j4
 make install
 cd ..
@@ -345,7 +345,7 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
 
   download_verify_extract tk8.6.13-src.tar.gz
   cd tk*/unix
-  ./configure --enable-static --disable-shared --prefix=${DEPSDIR}
+  LDFLAGS="${LDFLAGS} -lxml2 -lxcb -lXau" ./configure --enable-static --disable-shared --prefix=${DEPSDIR}
   gmake -j4
   gmake install
   cd ..
