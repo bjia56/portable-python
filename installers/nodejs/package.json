@@ -1,6 +1,6 @@
 {
   "name": "@bjia56/portable-python",
-  "version": "0.1.98",
+  "version": "0.1.99",
   "description": "Portable Python",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -72,7 +72,7 @@
         "3.12.3": "v3.12.3-build.3",
         "3.12.4": "cpython-v3.12.4-build.2",
         "3.12.5": "v3.12.5-build.0",
-        "3.9.20": "cpython-v3.9.20-build.0",
+        "3.9.20": "cpython-v3.9.20-beta.0",
         "3.10.15": "cpython-v3.10.15-beta.0",
         "3.11.10": "cpython-v3.11.10-beta.0",
         "3.12.6": "cpython-v3.12.6-build.5",
