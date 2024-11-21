@@ -265,7 +265,7 @@ cd ${BUILDDIR}
 
 download_verify_extract fontconfig-2.15.0.tar.gz
 cd fontconfig*
-./configure --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
+./configure MAKE="gmake" --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license
