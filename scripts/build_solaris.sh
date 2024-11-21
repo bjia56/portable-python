@@ -125,8 +125,8 @@ cd commontk-bzip2*
 mkdir build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
-make -j4
-make install
+gmake -j4
+gmake install
 cd ..
 install_license ./LICENSE bzip2-1.0.8
 
@@ -142,8 +142,8 @@ cd xz*
 mkdir build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DBUILD_SHARED_LIBS=ON ..
-make -j4
-make install
+gmake -j4
+gmake install
 cd ..
 install_license
 
@@ -159,8 +159,8 @@ cd brotli*
 mkdir build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
-make -j4
-make install
+gmake -j4
+gmake install
 cd ..
 install_license
 
@@ -417,8 +417,8 @@ cmake \
   -DNDBM_USE=NDBM \
   "${additionalparams[@]}" \
   ../portable-python-cmake-buildsystem
-make -j4
-make install
+gmake -j4
+gmake install
 
 cd ${BUILDDIR}
 patchelf \
