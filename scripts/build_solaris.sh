@@ -237,7 +237,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libxslt-1.1.39.tar.xz
 cd libxslt*
-CFLAGS="${CFLAGS} -I${DEPSDIR}/include/libxml2" ./configure --with-libxml-prefix=${DEPSDIR} --without-python --prefix=${DEPSDIR}
+CFLAGS="${CFLAGS} -I${DEPSDIR}/include/libxml2" LDFLAGS="${LDFLAGS} -Wl,-z,gnu-version-script-compat" ./configure --with-libxml-prefix=${DEPSDIR} --without-python --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license
