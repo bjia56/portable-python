@@ -7,7 +7,7 @@ echo "Selected portable-python-cmake-buildsystem branch: ${CMAKE_BUILDSYSTEM_BRA
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 
-if [[ "${PLATFORM}" == "freebsd"* ]]; then
+if [[ "${PLATFORM}" == "freebsd"* || "${PLATFORM}" == "solaris"* ]]; then
   function verify_checksum () {
     file="$1"
     filename=$(basename $file)
