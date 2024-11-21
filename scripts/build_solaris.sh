@@ -37,7 +37,7 @@ else
   download_verify_extract openssl-3.0.15.tar.gz
 fi
 cd openssl*
-./Configure BSD-${ARCH} --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+./Configure solaris64-x86_64-gcc --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 gmake -j4
 gmake install_sw
 install_license
