@@ -28,14 +28,25 @@ function download_and_verify () {
   verify_checksum $file
 }
 
-function download_verify_extract () {
-  #set -x
-  file="$1"
-  download_and_verify $file
-  tar -xf $file
-  rm $file
-  #set +x
-}
+if [[ "${PLATFORM}" == "solaris"* ]]; then
+  function download_verify_extract () {
+    #set -x
+    file="$1"
+    download_and_verify $file
+    gtar -xf $file
+    rm $file
+    #set +x
+  }
+else
+  function download_verify_extract () {
+    #set -x
+    file="$1"
+    download_and_verify $file
+    tar -xf $file
+    rm $file
+    #set +x
+  }
+fi
 
 ARCH=$1
 PYTHON_FULL_VER=$2
