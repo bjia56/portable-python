@@ -453,7 +453,7 @@ jobs:
           usesh: true
           release: ${{ steps.parse_release.outputs.release }}
           prepare: |
-            pkg install -y cmake bash wget patch git zip python3 autoconf automake libtool gettext bison pkgconf gmake gperf patchelf
+            pkg install --accept cmake git autoconf automake libtool bison gperf
           run: |
             export PLATFORM=solaris${{ matrix.release }}
             bash ./scripts/build_solaris.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }}
@@ -510,8 +510,6 @@ jobs:
           usesh: true
           copyback: false
           release: ${{ steps.parse_release.outputs.release }}
-          prepare: |
-            pkg install -y bash
           run: |
             cat > /tmp/test.sh <<EOF
               unzip python/python-${{ matrix.distribution }}-${{ inputs.python_version }}-solaris${{ matrix.release }}-x86_64.zip
