@@ -372,10 +372,8 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
   )
 fi
 
-ldconfig -i -m -v ${DEPSDIR}/lib
-
 wget --no-verbose -O portable-python-cmake-buildsystem.tar.gz https://github.com/bjia56/portable-python-cmake-buildsystem/tarball/${CMAKE_BUILDSYSTEM_BRANCH}
-tar -xf portable-python-cmake-buildsystem.tar.gz
+gtar -xf portable-python-cmake-buildsystem.tar.gz
 rm *.tar.gz
 mv *portable-python-cmake-buildsystem* portable-python-cmake-buildsystem
 mkdir python-build
