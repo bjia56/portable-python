@@ -51,7 +51,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libffi-3.4.6.tar.gz
 cd libffi*
-./configure --prefix=${DEPSDIR}
+./configure MAKE=gmake --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license
