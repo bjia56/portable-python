@@ -173,7 +173,7 @@ cd ${BUILDDIR}
 
 download_verify_extract gdbm-1.23.tar.gz
 cd gdbm*
-./configure --enable-libgdbm-compat --disable-shared --prefix=${DEPSDIR}
+./configure --enable-libgdbm-compat --disable-shared --with-pic --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license
