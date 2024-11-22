@@ -379,7 +379,8 @@ mv *portable-python-cmake-buildsystem* portable-python-cmake-buildsystem
 mkdir python-build
 mkdir python-install
 cd python-build
-cmake \
+# https://stackoverflow.com/a/52240320
+CFLAGS="${CFLAGS} -D_XOPEN_SOURCE=500 -D__EXTENSIONS__" LDFLAGS="${LDFLAGS} -lsocket -lnsl" cmake \
   "${cmake_verbose_flags[@]}" \
   -DCMAKE_IGNORE_PATH=/usr/include \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
