@@ -11,6 +11,22 @@ export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig:${DEPSDIR}/share/pkgconfig"
 export AL_OPTS="-I/usr/local/share/aclocal -I${DEPSDIR}/share/aclocal"
 mkdir -p ${DEPSDIR}/share/aclocal
 
+# for new autoconf
+export PATH="/usr/local/bin:${PATH}"
+
+############
+# autoconf #
+############
+echo "::group::autoconf"
+cd ${BUILDDIR}
+
+wget https://ftp.gnu.org/gnu/autoconf/autoconf-2.70.tar.gz
+gtar xf autoconf-2.70.tar.gz
+cd autoconf*
+./configure
+gmake -j4
+gmake install
+
 ########
 # zlib #
 ########
