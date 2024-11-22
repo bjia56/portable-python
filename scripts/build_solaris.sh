@@ -19,7 +19,7 @@ cd ${BUILDDIR}
 
 download_verify_extract zlib-1.3.1.tar.gz
 cd zlib*
-./configure --prefix=${DEPSDIR} --static
+./configure --prefix=${DEPSDIR} --static --with-pic
 gmake -j4
 gmake install
 install_license
@@ -51,7 +51,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libffi-3.4.6.tar.gz
 cd libffi*
-./configure MAKE=gmake --disable-shared --prefix=${DEPSDIR}
+./configure MAKE=gmake --disable-shared --with-pic --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license
@@ -65,7 +65,7 @@ cd ${BUILDDIR}
 
 download_verify_extract sqlite-autoconf-3450000.tar.gz
 cd sqlite*
-./configure --disable-shared --prefix=${DEPSDIR}
+./configure --disable-shared --with-pic --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 
@@ -78,7 +78,7 @@ cd ${BUILDDIR}
 
 download_verify_extract expat-2.6.2.tar.gz
 cd expat*
-./configure --disable-shared --prefix=${DEPSDIR}
+./configure --disable-shared --with-pic --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license
@@ -92,7 +92,7 @@ cd ${BUILDDIR}
 
 download_verify_extract ncurses-6.4.tar.gz
 cd ncurses*
-./configure --with-normal --without-shared --without-progs --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
+./configure --with-normal --without-shared --without-progs --enable-overwrite --disable-stripping --with-pic --prefix=${DEPSDIR}
 gmake -j4
 gmake install.libs
 install_license
@@ -106,7 +106,7 @@ cd ${BUILDDIR}
 
 download_verify_extract readline-8.2.tar.gz
 cd readline*
-./configure --with-curses --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
+./configure --with-curses --disable-shared --host=${CHOST} --with-pic --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license
@@ -187,7 +187,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libxml2-2.12.4.tar.xz
 cd libxml2*
-./configure --without-python --enable-static --disable-shared --prefix=${DEPSDIR}
+./configure --without-python --enable-static --disable-shared --with-pic --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license ./Copyright
@@ -201,7 +201,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libpng-1.6.41.tar.gz
 cd libpng*
-./configure --with-zlib-prefix=${DEPSDIR} --enable-static --disable-shared --disable-tools --prefix=${DEPSDIR}
+./configure --with-zlib-prefix=${DEPSDIR} --enable-static --disable-shared --disable-tools --with-pic --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 
@@ -214,7 +214,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libgpg-error-1.47.tar.bz2
 cd libgpg-error*
-./configure --enable-static --disable-shared --prefix=${DEPSDIR}
+./configure --enable-static --disable-shared --with-pic --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license ./COPYING.LIB
@@ -223,7 +223,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libgcrypt-1.10.3.tar.bz2
 cd libgcrypt*
-./configure --enable-static --disable-shared --disable-asm --prefix=${DEPSDIR}
+./configure --enable-static --disable-shared --disable-asm --with-pic --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license ./COPYING.LIB
@@ -237,7 +237,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libxslt-1.1.39.tar.xz
 cd libxslt*
-CFLAGS="${CFLAGS} -I${DEPSDIR}/include/libxml2" LDFLAGS="${LDFLAGS} -Wl,-z,gnu-version-script-compat" ./configure --enable-static --disable-shared --with-libxml-prefix=${DEPSDIR} --without-python --prefix=${DEPSDIR}
+CFLAGS="${CFLAGS} -I${DEPSDIR}/include/libxml2" LDFLAGS="${LDFLAGS} -Wl,-z,gnu-version-script-compat" ./configure --enable-static --disable-shared --with-libxml-prefix=${DEPSDIR} --without-python --with-pic --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license
@@ -251,7 +251,7 @@ cd ${BUILDDIR}
 
 download_verify_extract freetype-2.13.2.tar.gz
 cd freetype*
-./configure --enable-static --disable-shared --prefix=${DEPSDIR}
+./configure --enable-static --disable-shared --with-pic --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license ./docs/FTL.TXT
@@ -265,7 +265,7 @@ cd ${BUILDDIR}
 
 download_verify_extract fontconfig-2.15.0.tar.gz
 cd fontconfig*
-./configure MAKE="gmake" --enable-libxml2 --disable-cache-build --enable-static --disable-shared --prefix=${DEPSDIR}
+./configure MAKE="gmake" --enable-libxml2 --disable-cache-build --enable-static --disable-shared --with-pic --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license
@@ -287,7 +287,7 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
     download_verify_extract $file
     cd $pkg
     autoreconf -vfi ${AL_OPTS}
-    ./configure --enable-static --disable-shared $ext_flags --prefix=${DEPSDIR}
+    ./configure --enable-static --disable-shared --with-pic $ext_flags --prefix=${DEPSDIR}
     gmake -j4
     gmake install
 
@@ -330,7 +330,7 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
 
   download_verify_extract tcl8.6.13-src.tar.gz
   cd tcl*/unix
-  ./configure --enable-static --disable-shared --prefix=${DEPSDIR}
+  ./configure --enable-static --disable-shared --with-pic --prefix=${DEPSDIR}
   gmake -j4
   gmake install
   cd ..
@@ -345,7 +345,7 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
 
   download_verify_extract tk8.6.13-src.tar.gz
   cd tk*/unix
-  LDFLAGS="${LDFLAGS} -lxml2 -lxcb -lXau" ./configure --enable-static --disable-shared --prefix=${DEPSDIR}
+  LDFLAGS="${LDFLAGS} -lxml2 -lxcb -lXau" ./configure --enable-static --disable-shared --with-pic --prefix=${DEPSDIR}
   gmake -j4
   gmake install
   cd ..
