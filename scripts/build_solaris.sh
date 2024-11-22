@@ -35,7 +35,7 @@ cd ${BUILDDIR}
 
 download_verify_extract zlib-1.3.1.tar.gz
 cd zlib*
-./configure --prefix=${DEPSDIR} --static --with-pic
+./configure --prefix=${DEPSDIR} --static
 gmake -j4
 gmake install
 install_license
