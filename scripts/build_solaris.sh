@@ -19,7 +19,7 @@ cd ${BUILDDIR}
 
 download_verify_extract zlib-1.3.1.tar.gz
 cd zlib*
-./configure --prefix=${DEPSDIR}
+./configure --prefix=${DEPSDIR} --static
 gmake -j4
 gmake install
 install_license
@@ -37,7 +37,7 @@ else
   download_verify_extract openssl-3.0.15.tar.gz
 fi
 cd openssl*
-./Configure solaris64-x86_64-gcc --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+./Configure solaris64-x86_64-gcc no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 gmake -j4
 gmake install_sw
 install_license
@@ -51,7 +51,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libffi-3.4.6.tar.gz
 cd libffi*
-./configure MAKE=gmake --prefix=${DEPSDIR}
+./configure MAKE=gmake --disable-shared --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license
@@ -65,7 +65,7 @@ cd ${BUILDDIR}
 
 download_verify_extract sqlite-autoconf-3450000.tar.gz
 cd sqlite*
-./configure --enable-shared --prefix=${DEPSDIR}
+./configure --disable-shared --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 
@@ -78,7 +78,7 @@ cd ${BUILDDIR}
 
 download_verify_extract expat-2.6.2.tar.gz
 cd expat*
-./configure --prefix=${DEPSDIR}
+./configure --disable-shared --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license
@@ -92,7 +92,7 @@ cd ${BUILDDIR}
 
 download_verify_extract ncurses-6.4.tar.gz
 cd ncurses*
-./configure --with-normal --with-shared --without-progs --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
+./configure --with-normal --without-shared --without-progs --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
 gmake -j4
 gmake install.libs
 install_license
@@ -106,7 +106,7 @@ cd ${BUILDDIR}
 
 download_verify_extract readline-8.2.tar.gz
 cd readline*
-./configure --with-curses --host=${CHOST} --prefix=${DEPSDIR}
+./configure --with-curses --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license
@@ -141,7 +141,7 @@ download_verify_extract xz-5.4.5.tar.gz
 cd xz*
 mkdir build
 cd build
-cmake -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DBUILD_SHARED_LIBS=ON ..
+cmake -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DBUILD_SHARED_LIBS=OFF ..
 gmake -j4
 gmake install
 cd ..
@@ -173,7 +173,7 @@ cd ${BUILDDIR}
 
 download_verify_extract gdbm-1.23.tar.gz
 cd gdbm*
-./configure --enable-libgdbm-compat --prefix=${DEPSDIR}
+./configure --enable-libgdbm-compat --disable-shared --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license
@@ -187,7 +187,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libxml2-2.12.4.tar.xz
 cd libxml2*
-./configure --without-python --prefix=${DEPSDIR}
+./configure --without-python --enable-static --disable-shared --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license ./Copyright
@@ -201,7 +201,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libpng-1.6.41.tar.gz
 cd libpng*
-./configure --with-zlib-prefix=${DEPSDIR} --disable-tools --prefix=${DEPSDIR}
+./configure --with-zlib-prefix=${DEPSDIR} --enable-static --disable-shared --disable-tools --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 
@@ -214,7 +214,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libgpg-error-1.47.tar.bz2
 cd libgpg-error*
-./configure --prefix=${DEPSDIR}
+./configure --enable-static --disable-shared --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license ./COPYING.LIB
@@ -223,7 +223,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libgcrypt-1.10.3.tar.bz2
 cd libgcrypt*
-./configure --disable-asm --prefix=${DEPSDIR}
+./configure --enable-static --disable-shared --disable-asm --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license ./COPYING.LIB
@@ -237,7 +237,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libxslt-1.1.39.tar.xz
 cd libxslt*
-CFLAGS="${CFLAGS} -I${DEPSDIR}/include/libxml2" LDFLAGS="${LDFLAGS} -Wl,-z,gnu-version-script-compat" ./configure --with-libxml-prefix=${DEPSDIR} --without-python --prefix=${DEPSDIR}
+CFLAGS="${CFLAGS} -I${DEPSDIR}/include/libxml2" LDFLAGS="${LDFLAGS} -Wl,-z,gnu-version-script-compat" ./configure --enable-static --disable-shared --with-libxml-prefix=${DEPSDIR} --without-python --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license
@@ -251,7 +251,7 @@ cd ${BUILDDIR}
 
 download_verify_extract freetype-2.13.2.tar.gz
 cd freetype*
-./configure --prefix=${DEPSDIR}
+./configure --enable-static --disable-shared --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license ./docs/FTL.TXT
@@ -265,7 +265,7 @@ cd ${BUILDDIR}
 
 download_verify_extract fontconfig-2.15.0.tar.gz
 cd fontconfig*
-./configure MAKE="gmake" --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
+./configure MAKE="gmake" --enable-libxml2 --disable-cache-build --enable-static --disable-shared --prefix=${DEPSDIR}
 gmake -j4
 gmake install
 install_license
@@ -287,7 +287,7 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
     download_verify_extract $file
     cd $pkg
     autoreconf -vfi ${AL_OPTS}
-    ./configure $ext_flags --prefix=${DEPSDIR}
+    ./configure --enable-static --disable-shared $ext_flags --prefix=${DEPSDIR}
     gmake -j4
     gmake install
 
@@ -330,7 +330,7 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
 
   download_verify_extract tcl8.6.13-src.tar.gz
   cd tcl*/unix
-  ./configure --prefix=${DEPSDIR}
+  ./configure --enable-static --disable-shared --prefix=${DEPSDIR}
   gmake -j4
   gmake install
   cd ..
@@ -345,7 +345,7 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
 
   download_verify_extract tk8.6.13-src.tar.gz
   cd tk*/unix
-  ./configure --prefix=${DEPSDIR}
+  LDFLAGS="${LDFLAGS} -lxml2 -lxcb -lXau" ./configure --enable-static --disable-shared --prefix=${DEPSDIR}
   gmake -j4
   gmake install
   cd ..
@@ -364,11 +364,11 @@ additionalparams=()
 if [[ "${DISTRIBUTION}" != "headless" ]]; then
   additionalparams+=(
     -DTK_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include \
-    -DTK_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtk8.6.so \
+    -DTK_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtk8.6.a \
     -DTCL_INCLUDE_PATH:FILEPATH=${DEPSDIR}/include \
-    -DTCL_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtcl8.6.so \
+    -DTCL_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtcl8.6.a \
     -DX11_INCLUDE_DIR:PATH=${DEPSDIR}/include/X11 \
-    -DX11_LIBRARIES="${DEPSDIR}/lib/libXau.so;${DEPSDIR}/lib/libXdmcp.so;${DEPSDIR}/lib/libX11.so;${DEPSDIR}/lib/libXext.so;${DEPSDIR}/lib/libICE.so;${DEPSDIR}/lib/libSM.so;${DEPSDIR}/lib/libXrender.so;${DEPSDIR}/lib/libXft.so;${DEPSDIR}/lib/libXss.so;${DEPSDIR}/lib/libxcb.so"
+    -DX11_LIBRARIES="${DEPSDIR}/lib/libXau.a;${DEPSDIR}/lib/libXdmcp.a;${DEPSDIR}/lib/libX11.a;${DEPSDIR}/lib/libXext.a;${DEPSDIR}/lib/libICE.a;${DEPSDIR}/lib/libSM.a;${DEPSDIR}/lib/libXrender.a;${DEPSDIR}/lib/libXft.a;${DEPSDIR}/lib/libXss.a;${DEPSDIR}/lib/libxcb.a"
   )
 fi
 
@@ -394,24 +394,24 @@ CFLAGS="${CFLAGS} -D_XOPEN_SOURCE=500 -D__EXTENSIONS__" LDFLAGS="${LDFLAGS} -lso
   -DINSTALL_TEST=${INSTALL_TEST} \
   -DINSTALL_MANUAL=OFF \
   -DOPENSSL_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-  -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/libssl.so;${DEPSDIR}/lib/libcrypto.so" \
+  -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/libssl.a;${DEPSDIR}/lib/libcrypto.a" \
   -DSQLite3_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-  -DSQLite3_LIBRARY:FILEPATH=${DEPSDIR}/lib/libsqlite3.so \
+  -DSQLite3_LIBRARY:FILEPATH=${DEPSDIR}/lib/libsqlite3.a \
   -DZLIB_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-  -DZLIB_LIBRARY:FILEPATH=${DEPSDIR}/lib/libz.so \
+  -DZLIB_LIBRARY:FILEPATH=${DEPSDIR}/lib/libz.a \
   -DLZMA_INCLUDE_PATH:PATH=${DEPSDIR}/include \
-  -DLZMA_LIBRARY:FILEPATH=${DEPSDIR}/lib/liblzma.so \
+  -DLZMA_LIBRARY:FILEPATH=${DEPSDIR}/lib/liblzma.a \
   -DBZIP2_INCLUDE_DIR:PATH=${DEPSDIR}/include \
   -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libbz2.a \
   -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-  -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.so \
+  -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.a \
   -DREADLINE_INCLUDE_PATH:PATH=${DEPSDIR}/include \
-  -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.so \
-  -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.so \
-  -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.so \
+  -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.a \
+  -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.a \
+  -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.a \
   -DGDBM_INCLUDE_PATH:PATH=${DEPSDIR}/include \
-  -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.so \
-  -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.so \
+  -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.a \
+  -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.a \
   -DNDBM_TAG=NDBM \
   -DNDBM_USE=NDBM \
   "${additionalparams[@]}" \
@@ -420,15 +420,6 @@ gmake -j4
 gmake install
 
 cd ${BUILDDIR}
-patchelf \
-  --add-needed libfontconfig.so.1 \
-  --add-needed libfreetype.so.6 \
-  --add-needed libxml2.so.2 \
-  --add-needed libpng16.so.16 \
-  --add-needed libbrotlidec.so.1 \
-  --add-needed libbrotlicommon.so.1 \
-  ./python-install/bin/python
-cp ${DEPSDIR}/lib/lib*.so* ./python-install/lib
 cp -r ${LICENSEDIR} ./python-install
 
 echo "::endgroup::"
