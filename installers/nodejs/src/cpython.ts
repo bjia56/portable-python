@@ -1,4 +1,4 @@
-import { platform, arch, release } from "os";
+import { platform, arch, release, version } from "os";
 import { chmod, symlink, rename } from "fs/promises";
 import { join } from "path";
 
@@ -12,6 +12,11 @@ const DL_PLATFORM = (() => {
         const releaseName = release();
         const releaseMajor = parseInt(releaseName.split(".")[0]);
         return `freebsd${releaseMajor}`;
+    }
+    if (platform() == "sunos") {
+        const versionString = version();
+        const versionMajor = parseInt(versionString.split(".")[0]);
+        return `solaris${versionMajor}`;
     }
     return platform();
 })();
