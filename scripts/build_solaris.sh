@@ -22,7 +22,7 @@ cd ${BUILDDIR}
 
 wget https://ftp.gnu.org/gnu/autoconf/autoconf-2.70.tar.gz
 gtar xf autoconf-2.70.tar.gz
-cd autoconf*
+cd autoconf-2.70
 ./configure
 gmake -j4
 gmake install
