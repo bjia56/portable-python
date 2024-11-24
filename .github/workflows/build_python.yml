@@ -453,7 +453,7 @@ jobs:
           usesh: true
           release: ${{ steps.parse_release.outputs.release }}
           prepare: |
-            pkg install --accept cmake git autoconf automake libtool bison gperf gcc pkg-config readelf
+            pkg install --accept cmake git autoconf automake libtool bison gperf gcc pkg-config
           run: |
             export PLATFORM=solaris${{ matrix.release }}
             bash ./scripts/build_solaris.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }}

@@ -449,10 +449,10 @@ cd ${BUILDDIR}
 
 cd python-install
 echo "python dependencies"
-readelf -d ./bin/python
+greadelf -d ./bin/python
 echo
 echo "libpython dependencies"
-readelf -d ./lib/libpython${PYTHON_VER}.so
+greadelf -d ./lib/libpython${PYTHON_VER}.so
 
 echo "::endgroup::"
 ###############
