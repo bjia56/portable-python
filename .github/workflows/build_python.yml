@@ -425,16 +425,19 @@ jobs:
             bash -e /tmp/test.sh
 
   build_solaris:
-    name: Solaris ${{ matrix.release }} ${{ inputs.python_version }} x86_64 ${{ matrix.distribution }} (build)
+    name: Solaris ${{ matrix.release }} ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (build)
     if: ${{ contains(inputs.platforms, 'solaris') }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         release: [11]
+        arch: [x86_64, i386]
         distribution: [full, headless]
         exclude:
-          - release: ${{ !contains(inputs.platforms, 'solaris11-x86_64') && '11' || '' }}
+          - release: ${{ (!contains(inputs.platforms, 'solaris11-x86_64') && !contains(inputs.platforms, 'solaris11-i386')) && '11' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'solaris11-x86_64') && 'x86_64' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'solaris11-i386') && 'i386' || '' }}
 
     steps:
       - name: Parse release
@@ -456,7 +459,7 @@ jobs:
             pkg install --accept cmake git autoconf automake libtool bison gperf gcc pkg-config
           run: |
             export PLATFORM=solaris${{ matrix.release }}
-            bash ./scripts/build_solaris.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }}
+            bash ./scripts/build_solaris.sh ${{ matrix.arch }} ${{ inputs.python_version }} ${{ matrix.distribution }}
 
       - name: Interactive debugging
         if: ${{ always() && inputs.debug_interactive }}
@@ -465,27 +468,30 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: python-solaris${{ matrix.release }}-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
+          name: python-solaris${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
         if: ${{ always() && inputs.debug }}
         uses: actions/upload-artifact@v4
         with:
-          name: build-python-solaris${{ matrix.release }}-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
+          name: build-python-solaris${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./*python*.tar.gz
 
   test_solaris:
-    name: Solaris ${{ matrix.release }} ${{ inputs.python_version }} x86_64 ${{ matrix.distribution }} (test)
+    name: Solaris ${{ matrix.release }} ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (test)
     needs: build_solaris
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         release: [11]
+        arch: [x86_64, i386]
         distribution: [full, headless]
         exclude:
-          - release: ${{ !contains(inputs.platforms, 'solaris11-x86_64') && '11' || '' }}
+          - release: ${{ (!contains(inputs.platforms, 'solaris11-x86_64') && !contains(inputs.platforms, 'solaris11-i386')) && '11' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'solaris11-x86_64') && 'x86_64' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'solaris11-i386') && 'i386' || '' }}
 
     steps:
       - name: Parse release
@@ -500,7 +506,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: python-solaris${{ matrix.release }}-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
+          name: python-solaris${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./python/
 
       - name: Test in VM
@@ -512,9 +518,9 @@ jobs:
           release: ${{ steps.parse_release.outputs.release }}
           run: |
             cat > /tmp/test.sh <<EOF
-              unzip python/python-${{ matrix.distribution }}-${{ inputs.python_version }}-solaris${{ matrix.release }}-x86_64.zip
+              unzip python/python-${{ matrix.distribution }}-${{ inputs.python_version }}-solaris${{ matrix.release }}-${{ matrix.arch }}.zip
 
-              cd python-${{ matrix.distribution }}-${{ inputs.python_version }}-solaris${{ matrix.release }}-x86_64
+              cd python-${{ matrix.distribution }}-${{ inputs.python_version }}-solaris${{ matrix.release }}-${{ matrix.arch }}
               chmod +x ./bin/python
               ./bin/python --version
               ./bin/python -m sysconfig
