@@ -379,7 +379,7 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
   download_verify_extract tk8.6.13-src.tar.gz
   cd tk*/unix
   LDFLAGS="${LDFLAGS} -lX11 -lxml2 -lxcb -lXau" ./configure --enable-static --disable-shared --prefix=${DEPSDIR}
-  gmake -j4
+  gmake -j4 X11_LIB_SWITCHES="-lX11 -lxcb -lXau"
   gmake install
   cd ..
   install_license ./license.terms
