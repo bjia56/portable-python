@@ -18,12 +18,6 @@ export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig:${DEPSDIR}/share/pkgconfig"
 export AL_OPTS="-I/usr/local/share/aclocal -I${DEPSDIR}/share/aclocal"
 mkdir -p ${DEPSDIR}/share/aclocal
 
-if [[ "${ARCH}" == "i386" ]]; then
-  export CFLAGS="${CFLAGS} -m32"
-  export CPPFLAGS="${CPPFLAGS} -m32"
-  export CXXFLAGS="${CXXFLAGS} -m32"
-fi
-
 # for new autoconf
 export PATH="/usr/local/bin:${PATH}"
 
