@@ -27,9 +27,6 @@ fi
 # for new autoconf
 export PATH="/usr/local/bin:${PATH}"
 
-# override X
-rm -rf /usr/X11
-
 ############
 # autoconf #
 ############
