@@ -405,6 +405,18 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
   )
 fi
 
+opensslparams=(-DOPENSSL_INCLUDE_DIR:PATH=${DEPSDIR}/include)
+if [[ "${ARCH}" == "x86_64" && ${PYTHON_MINOR} -ge 11 ]]; then
+  # openssl 3 appears to install to lib/64
+  opensslparams+=(
+    -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/64/libssl.a;${DEPSDIR}/lib/64/libcrypto.a"
+  )
+else
+  opensslparams+=(
+    -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/libssl.a;${DEPSDIR}/lib/libcrypto.a"
+  )
+fi
+
 wget --no-verbose -O portable-python-cmake-buildsystem.tar.gz https://github.com/bjia56/portable-python-cmake-buildsystem/tarball/${CMAKE_BUILDSYSTEM_BRANCH}
 gtar -xf portable-python-cmake-buildsystem.tar.gz
 rm *.tar.gz
@@ -427,7 +439,7 @@ CFLAGS="${CFLAGS} -D_XOPEN_SOURCE=500 -D__EXTENSIONS__" LDFLAGS="${LDFLAGS} -lso
   -DINSTALL_TEST=${INSTALL_TEST} \
   -DINSTALL_MANUAL=OFF \
   -DOPENSSL_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-  -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/libssl.a;${DEPSDIR}/lib/libcrypto.a" \
+  "${opensslparams[@]}" \
   -DSQLite3_INCLUDE_DIR:PATH=${DEPSDIR}/include \
   -DSQLite3_LIBRARY:FILEPATH=${DEPSDIR}/lib/libsqlite3.a \
   -DZLIB_INCLUDE_DIR:PATH=${DEPSDIR}/include \
