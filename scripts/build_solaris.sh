@@ -66,7 +66,11 @@ else
   download_verify_extract openssl-3.0.15.tar.gz
 fi
 cd openssl*
-./Configure solaris64-x86_64-gcc no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+if [[ "${ARCH}" == "i386" ]]; then
+  ./Configure solaris-x86-gcc no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+else
+  ./Configure solaris64-x86_64-gcc no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+fi
 gmake -j4
 gmake install_sw
 install_license
