@@ -5,6 +5,11 @@ source ${SCRIPT_DIR}/utils.sh
 
 export CC=gcc
 export CXX=g++
+export LD=gld
+export AR=gar
+export AS=gas
+export RANLIB=granlib
+export NM=gnm
 export CFLAGS="-I${DEPSDIR}/include -fPIC"
 export CPPFLAGS="-I${DEPSDIR}/include -fPIC"
 export CXXFLAGS="${CPPFLAGS}"
