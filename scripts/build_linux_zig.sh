@@ -106,8 +106,8 @@ else
     export CFLAGS="-Wl,--undefined-version ${CFLAGS}"
   elif [[ "${ARCH}" == "loongarch64" ]]; then
     export ZIG_FLAGS="-target loongarch64-linux-gnu.2.36"
-  elif [[ "${ARCH}" == "s390x" ]]; then
-    export ZIG_FLAGS="-target s390x-linux-gnu.2.19"
+  elif [[ "${ARCH}" == "s390x" || "${ARCH}" == "powerpc64le" ]]; then
+    export ZIG_FLAGS="-target ${ARCH}-linux-gnu.2.19"
   else
     export ZIG_FLAGS="-target ${ARCH}-linux-gnu.2.17"
   fi
