@@ -85,7 +85,7 @@ jobs:
       - name: Set up zig
         uses: goto-bus-stop/setup-zig@v2
         with:
-          version: 0.14.0-dev.2262+dceab4502
+          version: 0.14.0-dev.2287+70ad7dcd4
 
       - name: Checkout
         uses: actions/checkout@v4
