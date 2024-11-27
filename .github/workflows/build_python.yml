@@ -9,7 +9,7 @@ on:
       platforms:
         required: true
         type: string
-        default: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,linux-loongarch64,linux-s390x,linux-powerpc64le,macos,windows,cosmo,freebsd13-x86_64,freebsd14-x86_64"
+        default: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,linux-loongarch64,linux-s390x,linux-powerpc64le,macos,windows,cosmo,freebsd13-x86_64,freebsd14-x86_64,freebsd15-x86_64,solaris11-x86_64"
       buildsystem_branch:
         required: false
         type: string
@@ -53,7 +53,9 @@ env:
   VERBOSE_CI: ${{ inputs.verbose }}
   PORTABLE_PYTHON_BUILDSYSTEM_BRANCH: ${{ inputs.buildsystem_branch || 'portable-python' }}
   image_map: '{"x86_64": "amd64/ubuntu:18.04", "i386": "i386/ubuntu:18.04", "aarch64": "arm64v8/ubuntu:18.04", "arm": "arm32v7/debian:bullseye", "riscv64": "riscv64/debian:sid", "loongarch64": "loongarch64/debian:sid", "s390x": "s390x/debian:bullseye", "powerpc64le": "ppc64le/ubuntu:18.04"}'
-  freebsd_release_map: '{"14": "14.0", "13": "13.2"}'
+  platform_map: '{"x86_64": "linux/amd64", "i386": "linux/386", "aarch64": "linux/arm64/v8", "arm": "linux/arm/v7", "riscv64": "linux/riscv64", "loongarch64": "linux/loong64", "s390x": "linux/s390x", "powerpc64le": "linux/ppc64le"}'
+  freebsd_release_map: '{"15": "15.0", "14": "14.0", "13": "13.2"}'
+  solaris_release_map: '{"11": "11.4"}'
 
 jobs:
   build_linux:
@@ -82,8 +84,14 @@ jobs:
           IMAGE=$(echo ${{ toJSON(env.image_map) }} | jq -r '.["${{ matrix.arch }}"]')
           echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
 
+      - name: Parse platform
+        id: parse_platform
+        run: |
+          PLATFORM=$(echo ${{ toJSON(env.platform_map) }} | jq -r '.["${{ matrix.arch }}"]')
+          echo "platform=$PLATFORM" >> "$GITHUB_OUTPUT"
+
       - name: Set up zig
-        uses: goto-bus-stop/setup-zig@v2
+        uses: mlugg/setup-zig@v1
         with:
           version: 0.14.0-dev.2287+70ad7dcd4
 
@@ -115,7 +123,7 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: ${{ steps.parse_image.outputs.image }}
-          options: -v ${{ github.workspace }}:/work --workdir /tmp
+          options: --platform ${{ steps.parse_platform.outputs.platform }} -v ${{ github.workspace }}:/work --workdir /tmp
           shell: bash
           run: |
             set -e
@@ -239,8 +247,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install coreutils
-        run: brew install coreutils gpatch autoconf automake libtool
+      - name: Install tools
+        run: |
+          brew install coreutils gpatch autoconf automake libtool
+          # use gpatch's "patch" executable
+          echo "/usr/local/opt/gpatch/libexec/gnubin" >> $GITHUB_PATH
 
       - name: Build
         run: |
@@ -312,11 +323,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        release: [13, 14]
+        release: [13, 14, 15]
         distribution: [full, headless]
         exclude:
           - release: ${{ !contains(inputs.platforms, 'freebsd13-x86_64') && '13' || '' }}
           - release: ${{ !contains(inputs.platforms, 'freebsd14-x86_64') && '14' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd15-x86_64') && '15' || '' }}
 
     steps:
       - name: Parse release
@@ -364,11 +376,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        release: [13, 14]
+        release: [13, 14, 15]
         distribution: [full, headless]
         exclude:
           - release: ${{ !contains(inputs.platforms, 'freebsd13-x86_64') && '13' || '' }}
           - release: ${{ !contains(inputs.platforms, 'freebsd14-x86_64') && '14' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd15-x86_64') && '15' || '' }}
 
     steps:
       - name: Parse release
@@ -400,6 +413,110 @@ jobs:
               unzip python/python-${{ matrix.distribution }}-${{ inputs.python_version }}-freebsd${{ matrix.release }}-x86_64.zip
 
               cd python-${{ matrix.distribution }}-${{ inputs.python_version }}-freebsd${{ matrix.release }}-x86_64
+              chmod +x ./bin/python
+              ./bin/python --version
+              ./bin/python -m sysconfig
+              ./bin/python ${{ github.workspace }}/scripts/test.py
+              ./bin/pip3
+
+              if [[ "${{ inputs.run_tests }}" == "true" ]]; then
+                ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
+              fi
+            EOF
+            bash -e /tmp/test.sh
+
+  build_solaris:
+    name: Solaris ${{ matrix.release }} ${{ inputs.python_version }} x86_64 ${{ matrix.distribution }} (build)
+    if: ${{ contains(inputs.platforms, 'solaris') }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        release: [11]
+        distribution: [full, headless]
+        exclude:
+          - release: ${{ !contains(inputs.platforms, 'solaris11-x86_64') && '11' || '' }}
+
+    steps:
+      - name: Parse release
+        id: parse_release
+        run: |
+          RELEASE=$(echo ${{ toJSON(env.solaris_release_map) }} | jq -r '.["${{ matrix.release }}"]')
+          echo "release=$RELEASE" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build in VM
+        uses: vmactions/solaris-vm@v1
+        with:
+          envs: 'RUN_TESTS DEBUG_CI VERBOSE_CI PORTABLE_PYTHON_BUILDSYSTEM_BRANCH'
+          usesh: true
+          release: ${{ steps.parse_release.outputs.release }}
+          prepare: |
+            pkg install --accept cmake git autoconf automake libtool bison gperf gcc pkg-config python-39
+            ln -sf /usr/bin/python3.9 /usr/bin/python3
+          run: |
+            export PLATFORM=solaris${{ matrix.release }}
+            bash ./scripts/build_solaris.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }}
+
+      - name: Interactive debugging
+        if: ${{ always() && inputs.debug_interactive }}
+        uses: fawazahmed0/action-debug@v2
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-solaris${{ matrix.release }}-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
+          path: ./python*.zip
+
+      - name: Upload artifacts
+        if: ${{ always() && inputs.debug }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-python-solaris${{ matrix.release }}-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
+          path: ./*python*.tar.gz
+
+  test_solaris:
+    name: Solaris ${{ matrix.release }} ${{ inputs.python_version }} x86_64 ${{ matrix.distribution }} (test)
+    needs: build_solaris
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        release: [11]
+        distribution: [full, headless]
+        exclude:
+          - release: ${{ !contains(inputs.platforms, 'solaris11-x86_64') && '11' || '' }}
+
+    steps:
+      - name: Parse release
+        id: parse_release
+        run: |
+          RELEASE=$(echo ${{ toJSON(env.solaris_release_map) }} | jq -r '.["${{ matrix.release }}"]')
+          echo "release=$RELEASE" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: python-solaris${{ matrix.release }}-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
+          path: ./python/
+
+      - name: Test in VM
+        uses: vmactions/solaris-vm@v1
+        with:
+          envs: 'RUN_TESTS DEBUG_CI VERBOSE_CI PORTABLE_PYTHON_BUILDSYSTEM_BRANCH'
+          usesh: true
+          copyback: false
+          release: ${{ steps.parse_release.outputs.release }}
+          run: |
+            cat > /tmp/test.sh <<EOF
+              unzip python/python-${{ matrix.distribution }}-${{ inputs.python_version }}-solaris${{ matrix.release }}-x86_64.zip
+
+              cd python-${{ matrix.distribution }}-${{ inputs.python_version }}-solaris${{ matrix.release }}-x86_64
               chmod +x ./bin/python
               ./bin/python --version
               ./bin/python -m sysconfig
