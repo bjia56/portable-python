@@ -39,4 +39,5 @@ jobs:
           title: '[🤖] Bump Cosmopolitan to ${{ env.latest }}'
           body: Automatically generated PR - Bumping Cosmopolitan from ${{ env.current }} to ${{ env.latest }}
           branch: bump-cosmocc
+          token: ${{ secrets.PR_PAT }}
           delete-branch: true
