@@ -153,6 +153,8 @@ elif [[ "${ARCH}" == "loongarch64" ]]; then
   ./Configure linux64-loongarch64 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 elif [[ "${ARCH}" == "s390x" ]]; then
   ./Configure linux64-s390x no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+elif [[ "${ARCH}" == "powerpc64le" ]]; then
+  ./Configure linux-ppc64le no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 else
   ./Configure linux-${ARCH} no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 fi
