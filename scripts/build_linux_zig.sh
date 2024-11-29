@@ -49,6 +49,10 @@ case "$ARCH" in
     sudo apt -y install libc6-s390x-cross
     sudo ln -s /usr/s390x-linux-gnu/lib/ld64.so.1 /lib/ld64.so.1
     ;;
+  mips64el)
+    sudo apt -y install libc6-mips64el-cross
+    sudo ln -s /usr/mips64el-linux-gnuabi64/lib64/ld.so.1 /lib/ld.so.1
+    ;;
 esac
 sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja cmake==3.28.4 --break-system-packages
 if [[ "${ARCH}" == "riscv64" ]]; then
@@ -104,6 +108,8 @@ else
     export ZIG_FLAGS="-target loongarch64-linux-gnu.2.36"
   elif [[ "${ARCH}" == "s390x" ]]; then
     export ZIG_FLAGS="-target s390x-linux-gnu.2.19"
+  elif [[ "${ARCH}" == "mips64el" ]]; then
+    export ZIG_FLAGS="-target mips64el-linux-gnuabi64.2.19"
   else
     export ZIG_FLAGS="-target ${ARCH}-linux-gnu.2.17"
   fi
@@ -143,7 +149,7 @@ if [[ "${ARCH}" == "arm" ]]; then
   ./Configure linux-generic32 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 elif [[ "${ARCH}" == "i386" ]]; then
   CFLAGS="${CFLAGS} -fgnuc-version=0 -D__STDC_NO_ATOMICS__" ./Configure linux-x86 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
-elif [[ "${ARCH}" == "riscv64" ]]; then
+elif [[ "${ARCH}" == "riscv64" || "${ARCH}" == "mips64el" ]]; then
   CFLAGS="${CFLAGS} -fgnuc-version=0 -D__STDC_NO_ATOMICS__" ./Configure linux-generic64 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 elif [[ "${ARCH}" == "loongarch64" ]]; then
   ./Configure linux64-loongarch64 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
