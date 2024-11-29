@@ -178,7 +178,7 @@ else
   download_verify_extract libffi-3.4.6.tar.gz
   cd libffi*
 fi
-CFLAGS="${CFLAGS} -Wl,--undefined-version" ./configure --host=${CHOST} --prefix=${DEPSDIR}
+CFLAGS="${CFLAGS} -Wl,--undefined-version -fPIC" ./configure --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
 install_license
