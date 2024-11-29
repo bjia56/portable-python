@@ -66,6 +66,12 @@ export CXXFLAGS="${CPPFLAGS}"
 export LDFLAGS="-L${DEPSDIR}/lib"
 export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig:${DEPSDIR}/share/pkgconfig"
 
+if [[ "${ARCH}" == "mips64el" ]]; then
+  export CFLAGS="${CFLAGS} -fPIC"
+  export CPPFLAGS="${CPPFLAGS} -fPIC"
+  export CXXFLAGS="${CXXFLAGS} -fPIC"
+fi
+
 if [[ "${ARCH}" == "arm" ]]; then
   # Python's sysconfig module will retain references to these compiler values, which cause
   # problems when sysconfig is used to pick a compiler during binary extension builds.
