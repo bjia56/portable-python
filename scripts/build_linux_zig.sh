@@ -51,7 +51,7 @@ case "$ARCH" in
     ;;
   mips64el)
     sudo apt -y install libc6-mips64el-cross
-    sudo ln -s /usr/mips64el-linux-gnuabi64/lib64/ld.so.1 /lib/ld.so.1
+    sudo ln -s /usr/mips64el-linux-gnuabi64/lib64/ld.so.1 /lib64/ld.so.1
     ;;
 esac
 sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja cmake==3.28.4 --break-system-packages
