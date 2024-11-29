@@ -1,4 +1,4 @@
 #!/bin/bash
 # this interpreter shim is used by cmake to run platform
 # detection programs
-LD_LIBRARY_PATH=/usr/s390x-linux-gnu/lib qemu-mips64el-static "$@"
+LD_LIBRARY_PATH=/usr/mips64el-linux-gnuabi64/lib qemu-mips64el-static "$@"
