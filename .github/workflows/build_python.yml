@@ -104,7 +104,7 @@ jobs:
 
       - name: Interactive debugging
         if: ${{ always() && inputs.debug_interactive }}
-        uses: fawazahmed0/action-debug@v2
+        uses: fawazahmed0/action-debug-vscode@v3
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -180,7 +180,7 @@ jobs:
           ./scripts/build_windows.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }}
 
       - name: Interactive debugging
-        uses: fawazahmed0/action-debug@v2
+        uses: fawazahmed0/action-debug-vscode@v3
         if: ${{ always() && inputs.debug_interactive }}
 
       - name: Upload artifacts
@@ -259,7 +259,7 @@ jobs:
           ./scripts/build_macos.sh universal2 ${{ inputs.python_version }} ${{ matrix.distribution }}
 
       - name: Interactive debugging
-        uses: fawazahmed0/action-debug@v2
+        uses: fawazahmed0/action-debug-vscode@v3
         if: ${{ always() && inputs.debug_interactive }}
 
       - name: Upload artifacts
@@ -354,7 +354,7 @@ jobs:
 
       - name: Interactive debugging
         if: ${{ always() && inputs.debug_interactive }}
-        uses: fawazahmed0/action-debug@v2
+        uses: fawazahmed0/action-debug-vscode@v3
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -462,7 +462,7 @@ jobs:
 
       - name: Interactive debugging
         if: ${{ always() && inputs.debug_interactive }}
-        uses: fawazahmed0/action-debug@v2
+        uses: fawazahmed0/action-debug-vscode@v3
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -554,7 +554,7 @@ jobs:
 
       - name: Interactive debugging
         if: ${{ always() && inputs.debug_interactive }}
-        uses: fawazahmed0/action-debug@v2
+        uses: fawazahmed0/action-debug-vscode@v3
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4

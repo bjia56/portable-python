@@ -1,28 +1,4 @@
 #!/bin/bash
 # this interpreter shim is used by cmake to run platform
 # detection programs
-
-has_lp64d=$(readelf -a $1 | grep "Requesting program interpreter" | grep ld-linux-riscv64-lp64d.so.1)
-if [[ "${has_lp64d}" == "" ]]; then
-    patchelf --set-interpreter /lib/ld-linux-riscv64-lp64d.so.1 $1
-fi
-
-has_lp64=$(readelf -d $1 | grep ld-linux-riscv64-lp64.so.1)
-if [[ "${has_lp64}" != "" ]]; then
-    patchelf --replace-needed ld-linux-riscv64-lp64.so.1 ld-linux-riscv64-lp64d.so.1 $1
-fi
-
-has_libpython=$(readelf -d $1 | grep libpython3)
-if [[ "${has_libpython}" != "" ]]; then
-    # this is the main python interpreter - patch libpython in its sibling directory
-    full_path=$(realpath $1)
-    prefix_dir=$(dirname $(dirname ${full_path}))
-    libpython=${prefix_dir}/lib/libpython${PORTABLE_PYTHON_PY_VER}.so
-
-    libpython_has_lp64=$(readelf -d ${libpython} | grep ld-linux-riscv64-lp64.so.1)
-    if [[ "${libpython_has_lp64}" != "" ]]; then
-        patchelf --replace-needed ld-linux-riscv64-lp64.so.1 ld-linux-riscv64-lp64d.so.1 ${libpython}
-    fi
-fi
-
 LD_LIBRARY_PATH=/usr/riscv64-linux-gnu/lib qemu-riscv64-static "$@"
