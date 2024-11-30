@@ -93,6 +93,16 @@ elif [[ "${ARCH}" == "i386" ]]; then
   export CPPFLAGS="-m32 ${CPPFLAGS}"
   export CXXFLAGS="-m32 ${CXXFLAGS}"
   export LDFLAGS="-m32 ${LDFLAGS}"
+elif [[ "${ARCH}" == "mips64el" ]]; then
+  # See above comment
+  sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/${ARCH}-linux-gnuabi64-gcc-ar
+  sudo cp ${WORKDIR}/zigshim/zig_cc /usr/bin/${ARCH}-linux-gnuabi64-gcc
+  sudo cp ${WORKDIR}/zigshim/zig_cxx /usr/bin/${ARCH}-linux-gnuabi64-g++
+  export AR="${ARCH}-linux-gnuabi64-gcc-ar"
+  export CC="${ARCH}-linux-gnuabi64-gcc"
+  export CXX="${ARCH}-linux-gnuabi64-g++"
+  export CHOST=${ARCH}-linux-gnuabi64
+  export ZIG_FLAGS="-target ${ARCH}-linux-gnuabi64"
 else
   # See above comment
   sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/${ARCH}-linux-gnu-gcc-ar
@@ -108,8 +118,6 @@ else
     export ZIG_FLAGS="-target loongarch64-linux-gnu.2.36"
   elif [[ "${ARCH}" == "s390x" ]]; then
     export ZIG_FLAGS="-target s390x-linux-gnu.2.19"
-  elif [[ "${ARCH}" == "mips64el" ]]; then
-    export ZIG_FLAGS="-target mips64el-linux-gnuabi64"
   else
     export ZIG_FLAGS="-target ${ARCH}-linux-gnu.2.17"
   fi
