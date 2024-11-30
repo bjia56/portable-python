@@ -186,11 +186,7 @@ else
   download_verify_extract libffi-3.4.6.tar.gz
   cd libffi*
 fi
-if [[ "${ARCH}" == "mips64el" ]]; then
-  CFLAGS="${CFLAGS} -Wl,--undefined-version" ./configure --host=${CHOST} --enable-shared --disable-static --prefix=${DEPSDIR}
-else
- CFLAGS="${CFLAGS} -Wl,--undefined-version" ./configure --host=${CHOST} --prefix=${DEPSDIR}
-fi
+CFLAGS="${CFLAGS} -Wl,--undefined-version" ./configure --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
 install_license
@@ -573,7 +569,7 @@ ffiparams=(-DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/include)
 if [[ "${ARCH}" == "mips64el" ]]; then
   # use shared object
   ffiparams+=(
-    -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.so.1
+    -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.so
   )
 else
   ffiparams+=(
@@ -605,6 +601,7 @@ LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
   -DINSTALL_MANUAL=OFF \
   "${additionalparams[@]}" \
   "${opensslparams[@]}" \
+  "${ffiparams[@]}" \
   -DSQLite3_INCLUDE_DIR:PATH=${DEPSDIR}/include \
   -DSQLite3_LIBRARY:FILEPATH=${DEPSDIR}/lib/libsqlite3.a \
   -DZLIB_INCLUDE_DIR:PATH=${DEPSDIR}/include \
@@ -613,8 +610,6 @@ LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
   -DLZMA_LIBRARY:FILEPATH=${DEPSDIR}/lib/liblzma.a \
   -DBZIP2_INCLUDE_DIR:PATH=${DEPSDIR}/include \
   -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libbz2.a \
-  -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-  -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.a \
   -DREADLINE_INCLUDE_PATH:PATH=${DEPSDIR}/include \
   -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.a \
   -DUUID_LIBRARY:FILEPATH=${DEPSDIR}/lib/libuuid.a \
@@ -636,7 +631,7 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
   cp -r ${DEPSDIR}/lib/tk8.6 ./python-install/lib
 fi
 if [[ "${ARCH}" == "mips64el" ]]; then
-  cp ${DEPSDIR}/lib/libffi.so.* ./python-install/lib
+  cp ${DEPSDIR}/lib/libffi.so* ./python-install/lib
 fi
 cp -r ${LICENSEDIR} ./python-install
 
