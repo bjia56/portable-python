@@ -48,10 +48,7 @@ case "$ARCH" in
     sudo ln -s /usr/s390x-linux-gnu/lib/ld64.so.1 /lib/ld64.so.1
     ;;
   mips64el)
-    # install the gcc cross compilation tools so we get gcc's ld
-    # this is for libffi to support being compiled as a shared object
-    # as a workaround for invalid relocations when using libffi static
-    sudo apt -y install libc6-mips64el-cross gcc-mips64el-linux-gnuabi64
+    sudo apt -y install libc6-mips64el-cross
     sudo ln -s /usr/mips64el-linux-gnuabi64/lib64/ld.so.1 /lib64/ld.so.1
     ;;
 esac
@@ -99,7 +96,6 @@ elif [[ "${ARCH}" == "mips64el" ]]; then
   export AR="${ARCH}-linux-gnuabi64-gcc-ar"
   export CC="${ARCH}-linux-gnuabi64-gcc"
   export CXX="${ARCH}-linux-gnuabi64-g++"
-  export LD="${ARCH}-linux-gnuabi64-ld"
   export CHOST=${ARCH}-linux-gnuabi64
   export ZIG_FLAGS="-target ${ARCH}-linux-gnuabi64"
 else
