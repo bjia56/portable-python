@@ -186,7 +186,11 @@ else
   download_verify_extract libffi-3.4.6.tar.gz
   cd libffi*
 fi
-CFLAGS="${CFLAGS} -Wl,--undefined-version" ./configure --host=${CHOST} --prefix=${DEPSDIR}
+if [[ "${ARCH}" == "mips64el" ]]; then
+  CFLAGS="${CFLAGS} -Wl,--undefined-version" ./configure --host=${CHOST} --enable-shared --disable-static --prefix=${DEPSDIR}
+else
+ CFLAGS="${CFLAGS} -Wl,--undefined-version" ./configure --host=${CHOST} --prefix=${DEPSDIR}
+fi
 make -j4
 make install
 install_license
@@ -565,6 +569,18 @@ else
   )
 fi
 
+ffiparams=(-DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/include)
+if [[ "${ARCH}" == "mips64el" ]]; then
+  # use shared object
+  ffiparams+=(
+    -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.so.1
+  )
+else
+  ffiparams+=(
+    -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.a
+  )
+fi
+
 wget --no-verbose -O portable-python-cmake-buildsystem.tar.gz https://github.com/bjia56/portable-python-cmake-buildsystem/tarball/${CMAKE_BUILDSYSTEM_BRANCH}
 tar -xf portable-python-cmake-buildsystem.tar.gz
 rm *.tar.gz
@@ -618,6 +634,9 @@ cd ${BUILDDIR}
 if [[ "${DISTRIBUTION}" != "headless" ]]; then
   cp -r ${DEPSDIR}/lib/tcl8.6 ./python-install/lib
   cp -r ${DEPSDIR}/lib/tk8.6 ./python-install/lib
+fi
+if [[ "${ARCH}" == "mips64el" ]]; then
+  cp ${DEPSDIR}/lib/libffi.so.* ./python-install/lib
 fi
 cp -r ${LICENSEDIR} ./python-install
 
