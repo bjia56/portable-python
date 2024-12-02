@@ -51,7 +51,7 @@ case "$ARCH" in
     ;;
   powerpc64le)
     sudo apt -y install libc6-ppc64el-cross
-    sudo ln -s /usr/powerpc64le-linux-gnu/lib/ld64.so.1 /lib64/ld64.so.2
+    sudo ln -s /usr/powerpc64le-linux-gnu/lib/ld64.so.2 /lib64/ld64.so.2
     ;;
 esac
 sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja cmake==3.28.4 --break-system-packages
