@@ -119,11 +119,12 @@ cd ${WORKDIR}
 if [[ "${ARCH}" == "powerpc64le" ]]; then
   # Compile gcc_qadd, gcc_qmul manually and bundle them as libzigshim.a
   # This is needed because the Zig compiler does not yet support powerpc64le's double double
-  # floating point format.
+  # floating point format. https://github.com/ziglang/zig/issues/22081
   cd ${BUILDDIR}
   ${CC} -c -o gcc_qadd.o ${WORKDIR}/zigshim/gcc_qadd.c
   ${CC} -c -o gcc_qmul.o ${WORKDIR}/zigshim/gcc_qmul.c
   ${AR} rcs libzigshim.a gcc_qadd.o gcc_qmul.o
+  mkdir -p ${DEPSDIR}/lib
   mv libzigshim.a ${DEPSDIR}/lib
   export LDFLAGS="${LDFLAGS} -lzigshim"
 fi
