@@ -47,6 +47,10 @@ case "$ARCH" in
     sudo apt -y install libc6-s390x-cross
     sudo ln -s /usr/s390x-linux-gnu/lib/ld64.so.1 /lib/ld64.so.1
     ;;
+  powerpc64le)
+    sudo apt -y install libc6-ppc64el-cross
+    sudo ln -s /usr/powerpc64le-linux-gnu/lib/ld64.so.2 /lib64/ld64.so.2
+    ;;
 esac
 sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja cmake==3.28.4 --break-system-packages
 
@@ -97,8 +101,8 @@ else
     export CFLAGS="-Wl,--undefined-version ${CFLAGS}"
   elif [[ "${ARCH}" == "loongarch64" ]]; then
     export ZIG_FLAGS="-target loongarch64-linux-gnu.2.36"
-  elif [[ "${ARCH}" == "s390x" ]]; then
-    export ZIG_FLAGS="-target s390x-linux-gnu.2.19"
+  elif [[ "${ARCH}" == "s390x" || "${ARCH}" == "powerpc64le" ]]; then
+    export ZIG_FLAGS="-target ${ARCH}-linux-gnu.2.19"
   else
     export ZIG_FLAGS="-target ${ARCH}-linux-gnu.2.17"
   fi
@@ -106,6 +110,21 @@ else
 fi
 
 cd ${WORKDIR}
+
+if [[ "${ARCH}" == "powerpc64le" ]]; then
+  # Compile the following manually and bundle them as libzigshim.a
+  # This is needed because the Zig compiler does not yet support powerpc64le's double double
+  # floating point format. https://github.com/ziglang/zig/issues/22081
+  cd ${BUILDDIR}
+  ${CC} -c -o gcc_qadd.o ${WORKDIR}/zigshim/gcc_qadd.c
+  ${CC} -c -o gcc_qmul.o ${WORKDIR}/zigshim/gcc_qmul.c
+  ${CC} -c -o gcc_qsub.o ${WORKDIR}/zigshim/gcc_qsub.c
+  ${CC} -c -o gcc_qdiv.o ${WORKDIR}/zigshim/gcc_qdiv.c
+  ${AR} rcs libzigshim.a gcc_qadd.o gcc_qmul.o gcc_qsub.o gcc_qdiv.o
+  mkdir -p ${DEPSDIR}/lib
+  mv libzigshim.a ${DEPSDIR}/lib
+  export LDFLAGS="${LDFLAGS} -lzigshim"
+fi
 
 echo "::endgroup::"
 ########
@@ -144,6 +163,8 @@ elif [[ "${ARCH}" == "loongarch64" ]]; then
   ./Configure linux64-loongarch64 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 elif [[ "${ARCH}" == "s390x" ]]; then
   ./Configure linux64-s390x no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+elif [[ "${ARCH}" == "powerpc64le" ]]; then
+  ./Configure linux-ppc64le no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 else
   ./Configure linux-${ARCH} no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 fi
