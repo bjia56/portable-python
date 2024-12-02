@@ -42,6 +42,7 @@ Currently, CPython 3.9, 3.10, 3.11, and 3.12 are built for the following targets
 - Windows x86_64 <sup id="a2">[2](#f2)</sup>
 - MacOS x86_64, arm64 <sup id="a3">[3](#f3)</sup>
 - FreeBSD 13, 14, 15 x86_64
+- Solaris 11 x86_64
 - Cosmopolitan libc <sup id="a4">[4](#f4)</sup>
 
 For Linux CPython builds, the minimum glibc required is as follows:

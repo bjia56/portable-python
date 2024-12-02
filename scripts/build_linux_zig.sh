@@ -42,8 +42,6 @@ case "$ARCH" in
   riscv64)
     sudo apt -y install libc6-riscv64-cross
     sudo ln -s /usr/riscv64-linux-gnu/lib/ld-linux-riscv64-lp64d.so.1 /lib/ld-linux-riscv64-lp64d.so.1
-    # workaround since the Zig compiler always targets ld-linux-riscv64-lp64.so.1
-    sudo ln -s /usr/riscv64-linux-gnu/lib/ld-linux-riscv64-lp64d.so.1 /lib/ld-linux-riscv64-lp64.so.1
     ;;
   s390x)
     sudo apt -y install libc6-s390x-cross
@@ -55,9 +53,6 @@ case "$ARCH" in
     ;;
 esac
 sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja cmake==3.28.4 --break-system-packages
-if [[ "${ARCH}" == "riscv64" ]]; then
-  sudo pip install patchelf==0.15.0.0 --break-system-packages
-fi
 
 export ZIG_FLAGS=""
 export CFLAGS="-Wno-date-time -fno-sanitize=undefined -I${DEPSDIR}/include"
