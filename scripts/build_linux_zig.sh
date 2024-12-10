@@ -119,6 +119,10 @@ else
   export CHOST=${ARCH}-linux-gnu
 fi
 
+if [[ "${ARCH}" == "mips64el" ]]; then
+  export LDFLAGS="${LDFLAGS} -Wl,-z,notext"
+fi
+
 cd ${WORKDIR}
 
 echo "::endgroup::"
