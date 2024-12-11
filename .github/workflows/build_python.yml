@@ -340,17 +340,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build in VM
+      - name: Start VM
         uses: vmactions/freebsd-vm@v1
         with:
-          envs: 'RUN_TESTS DEBUG_CI VERBOSE_CI PORTABLE_PYTHON_BUILDSYSTEM_BRANCH'
-          usesh: true
+          sync: sshfs
           release: ${{ steps.parse_release.outputs.release }}
           prepare: |
             pkg install -y cmake bash wget patch git zip python3 autoconf automake libtool gettext bison pkgconf gmake gperf patchelf
-          run: |
-            export PLATFORM=freebsd${{ matrix.release }}
-            bash ./scripts/build_freebsd.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }}
+
+      - name: Build in VM
+        shell: freebsd {0}
+        run: |
+          export RUN_TESTS="${RUN_TESTS}"
+          export DEBUG_CI="${DEBUG_CI}"
+          export VERBOSE_CI="${VERBOSE_CI}"
+          export PORTABLE_PYTHON_BUILDSYSTEM_BRANCH="${PORTABLE_PYTHON_BUILDSYSTEM_BRANCH}"
+          export PLATFORM="freebsd${{ matrix.release }}"
+          bash ./scripts/build_freebsd.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }}
 
       - name: Interactive debugging
         if: ${{ always() && inputs.debug_interactive }}
@@ -399,31 +405,32 @@ jobs:
           name: python-freebsd${{ matrix.release }}-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./python/
 
-      - name: Test in VM
+      - name: Start VM
         uses: vmactions/freebsd-vm@v1
         with:
-          envs: 'RUN_TESTS DEBUG_CI VERBOSE_CI PORTABLE_PYTHON_BUILDSYSTEM_BRANCH'
-          usesh: true
-          copyback: false
+          sync: sshfs
           release: ${{ steps.parse_release.outputs.release }}
           prepare: |
             pkg install -y bash
-          run: |
-            cat > /tmp/test.sh <<EOF
-              unzip python/python-${{ matrix.distribution }}-${{ inputs.python_version }}-freebsd${{ matrix.release }}-x86_64.zip
 
-              cd python-${{ matrix.distribution }}-${{ inputs.python_version }}-freebsd${{ matrix.release }}-x86_64
-              chmod +x ./bin/python
-              ./bin/python --version
-              ./bin/python -m sysconfig
-              ./bin/python ${{ github.workspace }}/scripts/test.py
-              ./bin/pip3
+      - name: Test in VM
+        shell: freebsd {0}
+        run: |
+          cat > /tmp/test.sh <<EOF
+            unzip python/python-${{ matrix.distribution }}-${{ inputs.python_version }}-freebsd${{ matrix.release }}-x86_64.zip
 
-              if [[ "${{ inputs.run_tests }}" == "true" ]]; then
-                ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
-              fi
-            EOF
-            bash -e /tmp/test.sh
+            cd python-${{ matrix.distribution }}-${{ inputs.python_version }}-freebsd${{ matrix.release }}-x86_64
+            chmod +x ./bin/python
+            ./bin/python --version
+            ./bin/python -m sysconfig
+            ./bin/python ${{ github.workspace }}/scripts/test.py
+            ./bin/pip3
+
+            if [[ "${{ inputs.run_tests }}" == "true" ]]; then
+              ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
+            fi
+          EOF
+          bash -e /tmp/test.sh
 
   build_solaris:
     name: Solaris ${{ matrix.release }} ${{ inputs.python_version }} x86_64 ${{ matrix.distribution }} (build)
@@ -447,18 +454,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build in VM
+      - name: Start VM
         uses: vmactions/solaris-vm@v1
         with:
-          envs: 'RUN_TESTS DEBUG_CI VERBOSE_CI PORTABLE_PYTHON_BUILDSYSTEM_BRANCH'
-          usesh: true
+          sync: sshfs
           release: ${{ steps.parse_release.outputs.release }}
           prepare: |
             pkg install --accept cmake git autoconf automake libtool bison gperf gcc pkg-config python-39
             ln -sf /usr/bin/python3.9 /usr/bin/python3
-          run: |
-            export PLATFORM=solaris${{ matrix.release }}
-            bash ./scripts/build_solaris.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }}
+
+      - name: Build in VM
+        shell: solaris {0}
+        run: |
+          export RUN_TESTS="${RUN_TESTS}"
+          export DEBUG_CI="${DEBUG_CI}"
+          export VERBOSE_CI="${VERBOSE_CI}"
+          export PORTABLE_PYTHON_BUILDSYSTEM_BRANCH="${PORTABLE_PYTHON_BUILDSYSTEM_BRANCH}"
+          export PLATFORM="solaris${{ matrix.release }}"
+          bash ./scripts/build_solaris.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }}
 
       - name: Interactive debugging
         if: ${{ always() && inputs.debug_interactive }}
@@ -505,29 +518,30 @@ jobs:
           name: python-solaris${{ matrix.release }}-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./python/
 
-      - name: Test in VM
+      - name: Start VM
         uses: vmactions/solaris-vm@v1
         with:
-          envs: 'RUN_TESTS DEBUG_CI VERBOSE_CI PORTABLE_PYTHON_BUILDSYSTEM_BRANCH'
-          usesh: true
-          copyback: false
+          sync: sshfs
           release: ${{ steps.parse_release.outputs.release }}
-          run: |
-            cat > /tmp/test.sh <<EOF
-              unzip python/python-${{ matrix.distribution }}-${{ inputs.python_version }}-solaris${{ matrix.release }}-x86_64.zip
 
-              cd python-${{ matrix.distribution }}-${{ inputs.python_version }}-solaris${{ matrix.release }}-x86_64
-              chmod +x ./bin/python
-              ./bin/python --version
-              ./bin/python -m sysconfig
-              ./bin/python ${{ github.workspace }}/scripts/test.py
-              ./bin/pip3
+      - name: Test in VM
+        shell: solaris {0}
+        run: |
+          cat > /tmp/test.sh <<EOF
+            unzip python/python-${{ matrix.distribution }}-${{ inputs.python_version }}-solaris${{ matrix.release }}-x86_64.zip
 
-              if [[ "${{ inputs.run_tests }}" == "true" ]]; then
-                ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
-              fi
-            EOF
-            bash -e /tmp/test.sh
+            cd python-${{ matrix.distribution }}-${{ inputs.python_version }}-solaris${{ matrix.release }}-x86_64
+            chmod +x ./bin/python
+            ./bin/python --version
+            ./bin/python -m sysconfig
+            ./bin/python ${{ github.workspace }}/scripts/test.py
+            ./bin/pip3
+
+            if [[ "${{ inputs.run_tests }}" == "true" ]]; then
+              ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
+            fi
+          EOF
+          bash -e /tmp/test.sh
 
   build_cosmo:
     name: Cosmopolitan ${{ inputs.python_version }} (build)
