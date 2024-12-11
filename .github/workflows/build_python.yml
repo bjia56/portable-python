@@ -351,6 +351,7 @@ jobs:
       - name: Build in VM
         shell: freebsd {0}
         run: |
+          cd ${{ github.workspace }}
           export RUN_TESTS="${RUN_TESTS}"
           export DEBUG_CI="${DEBUG_CI}"
           export VERBOSE_CI="${VERBOSE_CI}"
@@ -416,6 +417,7 @@ jobs:
       - name: Test in VM
         shell: freebsd {0}
         run: |
+          cd ${{ github.workspace }}
           cat > /tmp/test.sh <<EOF
             unzip python/python-${{ matrix.distribution }}-${{ inputs.python_version }}-freebsd${{ matrix.release }}-x86_64.zip
 
@@ -466,6 +468,7 @@ jobs:
       - name: Build in VM
         shell: solaris {0}
         run: |
+          cd ${{ github.workspace }}
           export RUN_TESTS="${RUN_TESTS}"
           export DEBUG_CI="${DEBUG_CI}"
           export VERBOSE_CI="${VERBOSE_CI}"
@@ -527,6 +530,7 @@ jobs:
       - name: Test in VM
         shell: solaris {0}
         run: |
+          cd ${{ github.workspace }}
           cat > /tmp/test.sh <<EOF
             unzip python/python-${{ matrix.distribution }}-${{ inputs.python_version }}-solaris${{ matrix.release }}-x86_64.zip
 
