@@ -51,6 +51,10 @@ case "$ARCH" in
     sudo apt -y install libc6-ppc64el-cross
     sudo ln -s /usr/powerpc64le-linux-gnu/lib/ld64.so.2 /lib64/ld64.so.2
     ;;
+  mips64el)
+    sudo apt -y install libc6-mips64el-cross
+    sudo ln -s /usr/mips64el-linux-gnuabi64/lib64/ld.so.1 /lib64/ld.so.1
+    ;;
 esac
 sudo pip install https://github.com/mesonbuild/meson/archive/2baae24.zip ninja cmake==3.28.4 --break-system-packages
 
@@ -88,6 +92,16 @@ elif [[ "${ARCH}" == "i386" ]]; then
   export CPPFLAGS="-m32 ${CPPFLAGS}"
   export CXXFLAGS="-m32 ${CXXFLAGS}"
   export LDFLAGS="-m32 ${LDFLAGS}"
+elif [[ "${ARCH}" == "mips64el" ]]; then
+  # See above comment
+  sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/${ARCH}-linux-gnuabi64-gcc-ar
+  sudo cp ${WORKDIR}/zigshim/zig_cc /usr/bin/${ARCH}-linux-gnuabi64-gcc
+  sudo cp ${WORKDIR}/zigshim/zig_cxx /usr/bin/${ARCH}-linux-gnuabi64-g++
+  export AR="${ARCH}-linux-gnuabi64-gcc-ar"
+  export CC="${ARCH}-linux-gnuabi64-gcc"
+  export CXX="${ARCH}-linux-gnuabi64-g++"
+  export CHOST=${ARCH}-linux-gnuabi64
+  export ZIG_FLAGS="-target ${ARCH}-linux-gnuabi64"
 else
   # See above comment
   sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/${ARCH}-linux-gnu-gcc-ar
@@ -107,6 +121,10 @@ else
     export ZIG_FLAGS="-target ${ARCH}-linux-gnu.2.17"
   fi
   export CHOST=${ARCH}-linux-gnu
+fi
+
+if [[ "${ARCH}" == "mips64el" ]]; then
+  export LDFLAGS="${LDFLAGS} -Wl,-z,notext"
 fi
 
 cd ${WORKDIR}
@@ -157,7 +175,7 @@ if [[ "${ARCH}" == "arm" ]]; then
   ./Configure linux-generic32 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 elif [[ "${ARCH}" == "i386" ]]; then
   CFLAGS="${CFLAGS} -fgnuc-version=0 -D__STDC_NO_ATOMICS__" ./Configure linux-x86 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
-elif [[ "${ARCH}" == "riscv64" ]]; then
+elif [[ "${ARCH}" == "riscv64" || "${ARCH}" == "mips64el" ]]; then
   CFLAGS="${CFLAGS} -fgnuc-version=0 -D__STDC_NO_ATOMICS__" ./Configure linux-generic64 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 elif [[ "${ARCH}" == "loongarch64" ]]; then
   ./Configure linux64-loongarch64 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
