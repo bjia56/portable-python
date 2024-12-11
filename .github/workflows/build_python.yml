@@ -352,10 +352,10 @@ jobs:
         shell: freebsd {0}
         run: |
           cd ${{ github.workspace }}
-          export RUN_TESTS="${RUN_TESTS}"
-          export DEBUG_CI="${DEBUG_CI}"
-          export VERBOSE_CI="${VERBOSE_CI}"
-          export PORTABLE_PYTHON_BUILDSYSTEM_BRANCH="${PORTABLE_PYTHON_BUILDSYSTEM_BRANCH}"
+          export RUN_TESTS="${{ env.RUN_TESTS }}"
+          export DEBUG_CI="${{ env.DEBUG_CI }}"
+          export VERBOSE_CI="${{ env.VERBOSE_CI }}"
+          export PORTABLE_PYTHON_BUILDSYSTEM_BRANCH="${{ env.PORTABLE_PYTHON_BUILDSYSTEM_BRANCH }}"
           export PLATFORM="freebsd${{ matrix.release }}"
           bash ./scripts/build_freebsd.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }}
 
@@ -469,10 +469,10 @@ jobs:
         shell: solaris {0}
         run: |
           cd ${{ github.workspace }}
-          export RUN_TESTS="${RUN_TESTS}"
-          export DEBUG_CI="${DEBUG_CI}"
-          export VERBOSE_CI="${VERBOSE_CI}"
-          export PORTABLE_PYTHON_BUILDSYSTEM_BRANCH="${PORTABLE_PYTHON_BUILDSYSTEM_BRANCH}"
+          export RUN_TESTS="${{ env.RUN_TESTS }}"
+          export DEBUG_CI="${{ env.DEBUG_CI }}"
+          export VERBOSE_CI="${{ env.VERBOSE_CI }}"
+          export PORTABLE_PYTHON_BUILDSYSTEM_BRANCH="${{ env.PORTABLE_PYTHON_BUILDSYSTEM_BRANCH }}"
           export PLATFORM="solaris${{ matrix.release }}"
           bash ./scripts/build_solaris.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }}
 
