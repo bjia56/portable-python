@@ -352,11 +352,11 @@ jobs:
         shell: freebsd {0}
         run: |
           cd ${{ github.workspace }}
-          export RUN_TESTS="${{ env.RUN_TESTS }}"
-          export DEBUG_CI="${{ env.DEBUG_CI }}"
-          export VERBOSE_CI="${{ env.VERBOSE_CI }}"
-          export PORTABLE_PYTHON_BUILDSYSTEM_BRANCH="${{ env.PORTABLE_PYTHON_BUILDSYSTEM_BRANCH }}"
-          export PLATFORM="freebsd${{ matrix.release }}"
+          setenv RUN_TESTS "${{ env.RUN_TESTS }}"
+          setenv DEBUG_CI "${{ env.DEBUG_CI }}"
+          setenv VERBOSE_CI "${{ env.VERBOSE_CI }}"
+          setenv PORTABLE_PYTHON_BUILDSYSTEM_BRANCH "${{ env.PORTABLE_PYTHON_BUILDSYSTEM_BRANCH }}"
+          setenv PLATFORM "freebsd${{ matrix.release }}"
           bash ./scripts/build_freebsd.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }}
 
       - name: Interactive debugging
