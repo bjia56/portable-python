@@ -346,7 +346,7 @@ jobs:
           sync: sshfs
           release: ${{ steps.parse_release.outputs.release }}
           prepare: |
-            pkg install -y cmake bash wget patch git zip python3 autoconf automake libtool gettext bison pkgconf gmake gperf patchelf
+            pkg install -y cmake bash wget patch git zip python3 autoconf automake libtool gettext bison pkgconf gmake gperf patchelf texinfo
 
       - name: Build in VM
         shell: freebsd {0}
