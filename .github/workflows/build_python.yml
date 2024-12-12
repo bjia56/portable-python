@@ -347,6 +347,7 @@ jobs:
           release: ${{ steps.parse_release.outputs.release }}
           prepare: |
             pkg install -y cmake bash wget patch git zip python3 autoconf automake libtool gettext bison pkgconf gmake gperf patchelf texinfo
+            chsh -s /usr/local/bin/bash root
 
       - name: Build in VM
         shell: freebsd {0}
@@ -413,26 +414,24 @@ jobs:
           release: ${{ steps.parse_release.outputs.release }}
           prepare: |
             pkg install -y bash
+            chsh -s /usr/local/bin/bash root
 
       - name: Test in VM
         shell: freebsd {0}
         run: |
           cd ${{ github.workspace }}
-          cat > /tmp/test.sh <<EOF
-            unzip python/python-${{ matrix.distribution }}-${{ inputs.python_version }}-freebsd${{ matrix.release }}-x86_64.zip
+          unzip python/python-${{ matrix.distribution }}-${{ inputs.python_version }}-freebsd${{ matrix.release }}-x86_64.zip
 
-            cd python-${{ matrix.distribution }}-${{ inputs.python_version }}-freebsd${{ matrix.release }}-x86_64
-            chmod +x ./bin/python
-            ./bin/python --version
-            ./bin/python -m sysconfig
-            ./bin/python ${{ github.workspace }}/scripts/test.py
-            ./bin/pip3
+          cd python-${{ matrix.distribution }}-${{ inputs.python_version }}-freebsd${{ matrix.release }}-x86_64
+          chmod +x ./bin/python
+          ./bin/python --version
+          ./bin/python -m sysconfig
+          ./bin/python ${{ github.workspace }}/scripts/test.py
+          ./bin/pip3
 
-            if [[ "${{ inputs.run_tests }}" == "true" ]]; then
-              ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
-            fi
-          EOF
-          bash -e /tmp/test.sh
+          if [[ "${{ inputs.run_tests }}" == "true" ]]; then
+            ./bin/python -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
+          fi
 
   build_solaris:
     name: Solaris ${{ matrix.release }} ${{ inputs.python_version }} x86_64 ${{ matrix.distribution }} (build)
