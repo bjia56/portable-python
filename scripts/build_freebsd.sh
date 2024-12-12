@@ -119,7 +119,7 @@ echo "::group::bzip2"
 cd ${BUILDDIR}
 
 wget --no-verbose -O bzip2.tar.gz https://github.com/commontk/bzip2/tarball/master
-tar --no-same-permissions --no-same-owner -xf bzip2*.tar.gz
+tar -xf bzip2*.tar.gz
 rm *.tar.gz
 cd commontk-bzip2*
 mkdir build
@@ -375,7 +375,7 @@ fi
 ldconfig -i -m -v ${DEPSDIR}/lib
 
 wget --no-verbose -O portable-python-cmake-buildsystem.tar.gz https://github.com/bjia56/portable-python-cmake-buildsystem/tarball/${CMAKE_BUILDSYSTEM_BRANCH}
-tar --no-same-permissions --no-same-owner -xf portable-python-cmake-buildsystem.tar.gz
+tar -xf portable-python-cmake-buildsystem.tar.gz
 rm *.tar.gz
 mv *portable-python-cmake-buildsystem* portable-python-cmake-buildsystem
 mkdir python-build

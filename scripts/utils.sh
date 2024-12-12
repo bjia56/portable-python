@@ -33,7 +33,7 @@ if [[ "${PLATFORM}" == "solaris"* ]]; then
     #set -x
     file="$1"
     download_and_verify $file
-    gtar --no-same-permissions --no-same-owner -xf $file
+    gtar --no-same-permissions -xf $file
     rm $file
     #set +x
   }
@@ -42,7 +42,7 @@ else
     #set -x
     file="$1"
     download_and_verify $file
-    tar --no-same-permissions --no-same-owner -xf $file
+    tar --no-same-permissions -xf $file
     rm $file
     #set +x
   }

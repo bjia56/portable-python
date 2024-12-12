@@ -28,7 +28,7 @@ echo "::group::autoconf"
 cd ${BUILDDIR}
 
 wget https://ftp.gnu.org/gnu/autoconf/autoconf-2.70.tar.gz
-gtar --no-same-permissions --no-same-owner -xf autoconf-2.70.tar.gz
+gtar xf autoconf-2.70.tar.gz
 cd autoconf-2.70
 ./configure
 gmake -j4
@@ -142,7 +142,7 @@ echo "::group::bzip2"
 cd ${BUILDDIR}
 
 wget --no-verbose -O bzip2.tar.gz https://github.com/commontk/bzip2/tarball/master
-gtar --no-same-permissions --no-same-owner -xf bzip2*.tar.gz
+gtar -xf bzip2*.tar.gz
 rm *.tar.gz
 cd commontk-bzip2*
 mkdir build
@@ -408,7 +408,7 @@ else
 fi
 
 wget --no-verbose -O portable-python-cmake-buildsystem.tar.gz https://github.com/bjia56/portable-python-cmake-buildsystem/tarball/${CMAKE_BUILDSYSTEM_BRANCH}
-gtar --no-same-permissions --no-same-owner -xf portable-python-cmake-buildsystem.tar.gz
+gtar -xf portable-python-cmake-buildsystem.tar.gz
 rm *.tar.gz
 mv *portable-python-cmake-buildsystem* portable-python-cmake-buildsystem
 mkdir python-build
