@@ -417,6 +417,7 @@ cd python-build
 # https://stackoverflow.com/a/52240320
 CFLAGS="${CFLAGS} -D_XOPEN_SOURCE=500 -D__EXTENSIONS__" LDFLAGS="${LDFLAGS} -lsocket -lnsl" cmake \
   "${cmake_verbose_flags[@]}" \
+  "${cmake_python_options[@]}" \
   -DCMAKE_IGNORE_PATH=/usr/include \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
   -DPORTABLE_PYTHON_BUILD=ON \

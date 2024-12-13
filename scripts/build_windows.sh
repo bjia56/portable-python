@@ -186,6 +186,7 @@ mkdir python-install
 cd python-build
 cmake \
   "${cmake_verbose_flags[@]}" \
+  "${cmake_python_options[@]}" \
   -G "Visual Studio 17 2022" -A x64 \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
   -DPORTABLE_PYTHON_BUILD=ON \

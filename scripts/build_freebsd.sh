@@ -383,6 +383,7 @@ mkdir python-install
 cd python-build
 cmake \
   "${cmake_verbose_flags[@]}" \
+  "${cmake_python_options[@]}" \
   -DCMAKE_IGNORE_PATH=/usr/include \
   -DPYTHON_VERSION=${PYTHON_FULL_VER} \
   -DPORTABLE_PYTHON_BUILD=ON \

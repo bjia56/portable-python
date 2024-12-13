@@ -194,6 +194,7 @@ mkdir python-install
 cd python-build
 cmake \
   "${cmake_verbose_flags[@]}" \
+  "${cmake_python_options[@]}" \
   -DCMAKE_C_COMPILER=${CC} \
   -DCMAKE_CXX_COMPILER=${CXX} \
   -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \

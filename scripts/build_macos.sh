@@ -288,6 +288,7 @@ mkdir python-install
 cd python-build
 cmake \
   "${cmake_verbose_flags[@]}" \
+  "${cmake_python_options[@]}" \
   -G "Unix Makefiles" \
   "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET} \
