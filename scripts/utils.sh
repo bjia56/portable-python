@@ -51,13 +51,6 @@ fi
 ARCH=$1
 PYTHON_FULL_VER=$2
 
-cmake_python_options=()
-# Parse Python options out of full version string
-if [[ "${PYTHON_FULL_VER}" == *t ]]; then
-  PYTHON_FULL_VER=${PYTHON_FULL_VER%"t"}
-  cmake_python_options+=(-DWITH_FREE_THREADING)
-fi
-
 DISTRIBUTION=$3
 PYTHON_VER=$(echo ${PYTHON_FULL_VER} | cut -d "." -f 1-2)
 PYTHON_MAJOR=$(echo ${PYTHON_VER} | cut -d "." -f 1)
