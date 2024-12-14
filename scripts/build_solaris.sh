@@ -301,10 +301,10 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
   #######
 
   function build_x11_lib_core() {
-    echo "::group::$1"
+    echo "::group::${python_distro_ver}"
     cd ${BUILDDIR}
 
-    pkg=$1
+    pkg=${python_distro_ver}
     ext_flags="$2"
     file=$pkg.tar.gz
     download_verify_extract $file
@@ -318,7 +318,7 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
   }
 
   function build_x11_lib () {
-    build_x11_lib_core "$1" "$2"
+    build_x11_lib_core "${python_distro_ver}" "$2"
     install_license
   }
 
@@ -413,11 +413,12 @@ rm *.tar.gz
 mv *portable-python-cmake-buildsystem* portable-python-cmake-buildsystem
 
 function build_python () {
-  echo "::group::Python $1"
-  cd ${BUILDDIR}
-
-  python_distro_ver=$1
+  python_suffix=$1
   cmake_python_features=$2
+  python_distro_ver=${PYTHON_FULL_VER}${python_suffix}
+
+  echo "::group::Python ${python_distro_ver}"
+  cd ${BUILDDIR}
 
   mkdir python-build
   mkdir python-install
@@ -470,7 +471,7 @@ function build_python () {
   #################################
   # Check executable dependencies #
   #################################
-  echo "::group::Check executable dependencies $1"
+  echo "::group::Check executable dependencies ${python_distro_ver}"
   cd ${BUILDDIR}
 
   cd python-install
@@ -484,7 +485,7 @@ function build_python () {
   ###############
   # Test python #
   ###############
-  echo "::group::Test python $1"
+  echo "::group::Test python ${python_distro_ver}"
   cd ${BUILDDIR}
 
   cd python-install
@@ -494,7 +495,7 @@ function build_python () {
   ###############
   # Preload pip #
   ###############
-  echo "::group::Preload pip $1"
+  echo "::group::Preload pip ${python_distro_ver}"
   cd ${BUILDDIR}
 
   cd python-install
@@ -508,7 +509,7 @@ function build_python () {
   ###################
   # Compress output #
   ###################
-  echo "::group::Compress output $1"
+  echo "::group::Compress output ${python_distro_ver}"
   cd ${BUILDDIR}
 
   python3 -m ensurepip
@@ -522,7 +523,7 @@ function build_python () {
   echo "::endgroup::"
 }
 
-build_python "${PYTHON_FULL_VER}"
+build_python
 if [[ "${PYTHON_MINOR}" == "13" ]]; then
-  build_python "${PYTHON_FULL_VER}t" "-DWITH_FREE_THREADING=ON"
+  build_python t "-DWITH_FREE_THREADING=ON"
 fi
