@@ -352,13 +352,19 @@ jobs:
       - name: Build in VM
         shell: freebsd {0}
         run: |
-          cd ${{ github.workspace }}
+          # Avoid building on the NFS mount
+          cp -r ${{ github.workspace }} $HOME/workspace
+          cd $HOME/workspace
+
           export RUN_TESTS="${{ env.RUN_TESTS }}"
           export DEBUG_CI="${{ env.DEBUG_CI }}"
           export VERBOSE_CI="${{ env.VERBOSE_CI }}"
           export PORTABLE_PYTHON_BUILDSYSTEM_BRANCH="${{ env.PORTABLE_PYTHON_BUILDSYSTEM_BRANCH }}"
           export PLATFORM="freebsd${{ matrix.release }}"
           bash ./scripts/build_freebsd.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }}
+
+          cp *.zip ${{ github.workspace }}
+          cp *.tar.gz ${{ github.workspace }}
 
       - name: Interactive debugging
         if: ${{ always() && inputs.debug_interactive }}
@@ -467,13 +473,19 @@ jobs:
       - name: Build in VM
         shell: solaris {0}
         run: |
-          cd ${{ github.workspace }}
+          # Avoid building on the NFS mount
+          cp -r ${{ github.workspace }} $HOME/workspace
+          cd $HOME/workspace
+
           export RUN_TESTS="${{ env.RUN_TESTS }}"
           export DEBUG_CI="${{ env.DEBUG_CI }}"
           export VERBOSE_CI="${{ env.VERBOSE_CI }}"
           export PORTABLE_PYTHON_BUILDSYSTEM_BRANCH="${{ env.PORTABLE_PYTHON_BUILDSYSTEM_BRANCH }}"
           export PLATFORM="solaris${{ matrix.release }}"
           bash ./scripts/build_solaris.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }}
+
+          cp *.zip ${{ github.workspace }}
+          cp *.tar.gz ${{ github.workspace }}
 
       - name: Interactive debugging
         if: ${{ always() && inputs.debug_interactive }}
