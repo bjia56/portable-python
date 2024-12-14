@@ -87,7 +87,7 @@ elif [[ "${ARCH}" == "i386" ]]; then
   export CFLAGS="-m32 -Wl,--undefined-version ${CFLAGS}"
   export CPPFLAGS="-m32 ${CPPFLAGS}"
   export CXXFLAGS="-m32 ${CXXFLAGS}"
-  export LDFLAGS="-m32 ${LDFLAGS}"
+  export LDFLAGS="-m32 -Wl,-z,notext ${LDFLAGS}"
 else
   # See above comment
   sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/${ARCH}-linux-gnu-gcc-ar
