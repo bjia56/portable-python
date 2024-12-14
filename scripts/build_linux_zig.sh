@@ -530,7 +530,7 @@ fi
 ##########
 # Python #
 ##########
-echo "::group::Python"
+echo "::group::Build setup"
 cd ${BUILDDIR}
 
 additionalparams=()
@@ -573,6 +573,9 @@ rm *.tar.gz
 mv *portable-python-cmake-buildsystem* portable-python-cmake-buildsystem
 
 function build_python () {
+  echo "::group::Python $1"
+  cd ${BUILDDIR}
+
   python_distro_ver=$1
   cmake_python_features=$2
 
@@ -633,7 +636,7 @@ function build_python () {
   #################################
   # Check executable dependencies #
   #################################
-  echo "::group::Check executable dependencies"
+  echo "::group::Check executable dependencies $1"
   cd ${BUILDDIR}
 
   cd python-install
@@ -647,7 +650,7 @@ function build_python () {
   ###############
   # Test python #
   ###############
-  echo "::group::Test python"
+  echo "::group::Test python $1"
   cd ${BUILDDIR}
 
   cd python-install
@@ -657,7 +660,7 @@ function build_python () {
   ###############
   # Preload pip #
   ###############
-  echo "::group::Preload pip"
+  echo "::group::Preload pip $1"
   cd ${BUILDDIR}
 
   cd python-install
@@ -671,7 +674,7 @@ function build_python () {
   ###################
   # Compress output #
   ###################
-  echo "::group::Compress output"
+  echo "::group::Compress output $1"
   cd ${BUILDDIR}
 
   python3 -m pip install pyclean --break-system-packages

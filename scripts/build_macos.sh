@@ -270,7 +270,7 @@ echo "::endgroup::"
 #########
 # Build #
 #########
-echo "::group::Build"
+echo "::group::Build setup"
 cd ${BUILDDIR}
 
 additionalparams=()
@@ -284,6 +284,9 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
 fi
 
 function build_python () {
+  echo "::group::Python $1"
+  cd ${BUILDDIR}
+
   python_distro_ver=$1
   cmake_python_features=$2
 
@@ -342,7 +345,7 @@ function build_python () {
   #########################
   # Test and patch python #
   #########################
-  echo "::group::Test and patch python"
+  echo "::group::Test and patch python $1"
   cd ${BUILDDIR}
 
   ./python-install/bin/python --version
@@ -358,7 +361,7 @@ function build_python () {
   ###############
   # Preload pip #
   ###############
-  echo "::group::Preload pip"
+  echo "::group::Preload pip $1"
   cd ${BUILDDIR}
 
   ./python-install/bin/python -m ensurepip
@@ -370,7 +373,7 @@ function build_python () {
   ###################
   # Compress output #
   ###################
-  echo "::group::Compress output"
+  echo "::group::Compress output $1"
   cd ${BUILDDIR}
 
   python3 -m pip install pyclean
