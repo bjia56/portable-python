@@ -686,5 +686,5 @@ function build_python () {
 
 build_python "${PYTHON_FULL_VER}"
 if [[ "${PYTHON_MINOR}" == "13" ]]; then
-  build_python "${PYTHON_FULL_VER}t" "-DWITH_FREE_THREADING"
+  build_python "${PYTHON_FULL_VER}t" "-DWITH_FREE_THREADING=ON"
 fi
