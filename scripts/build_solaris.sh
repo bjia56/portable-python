@@ -479,7 +479,7 @@ function build_python () {
   greadelf -d ./bin/python
   echo
   echo "libpython dependencies"
-  greadelf -d ./lib/libpython${PYTHON_VER}.so
+  greadelf -d ./lib/libpython${PYTHON_VER}${python_suffix}.so
 
   echo "::endgroup::"
   ###############

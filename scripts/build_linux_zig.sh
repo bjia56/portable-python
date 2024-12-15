@@ -645,7 +645,7 @@ function build_python () {
   readelf -d ./bin/python
   echo
   echo "libpython dependencies"
-  readelf -d ./lib/libpython${PYTHON_VER}.so
+  readelf -d ./lib/libpython${PYTHON_VER}${python_suffix}.so$
 
   echo "::endgroup::"
   ###############
