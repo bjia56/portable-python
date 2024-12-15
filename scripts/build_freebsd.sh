@@ -278,10 +278,10 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
   #######
 
   function build_x11_lib_core() {
-    echo "::group::${python_distro_ver}"
+    echo "::group::$1"
     cd ${BUILDDIR}
 
-    pkg=${python_distro_ver}
+    pkg=$1
     ext_flags="$2"
     file=$pkg.tar.gz
     download_verify_extract $file
@@ -295,7 +295,7 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
   }
 
   function build_x11_lib () {
-    build_x11_lib_core "${python_distro_ver}" "$2"
+    build_x11_lib_core "$1" "$2"
     install_license
   }
 
