@@ -235,7 +235,7 @@ jobs:
       - name: Test python in clean environment
         shell: bash
         run: |
-          ./scripts/launch_test.sh ${{ matrix.arch }} ${{ inputs.python_version }} ${{ matrix.distribution }} windows "${{ env.RUN_TESTS }}"
+          ./scripts/launch_test.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }} windows "${{ env.RUN_TESTS }}"
 
   build_macos:
     name: MacOS ${{ inputs.python_version }} universal2 ${{ matrix.distribution }} (build)
@@ -306,7 +306,7 @@ jobs:
       - name: Test python in clean environment
         shell: bash
         run: |
-          ./scripts/launch_test.sh ${{ matrix.arch }} ${{ inputs.python_version }} ${{ matrix.distribution }} darwin "${{ env.RUN_TESTS }}"
+          ./scripts/launch_test.sh universal2 ${{ inputs.python_version }} ${{ matrix.distribution }} darwin "${{ env.RUN_TESTS }}"
 
   build_freebsd:
     name: FreeBSD ${{ matrix.release }} ${{ inputs.python_version }} x86_64 ${{ matrix.distribution }} (build)
@@ -419,7 +419,7 @@ jobs:
         run: |
           set -e
           cd ${{ github.workspace }}
-          ./scripts/launch_test.sh ${{ matrix.arch }} ${{ inputs.python_version }} ${{ matrix.distribution }} freebsd${{ matrix.release }} "${{ env.RUN_TESTS }}"
+          ./scripts/launch_test.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }} freebsd${{ matrix.release }} "${{ env.RUN_TESTS }}"
 
   build_solaris:
     name: Solaris ${{ matrix.release }} ${{ inputs.python_version }} x86_64 ${{ matrix.distribution }} (build)
@@ -512,7 +512,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: python-solaris${{ matrix.release }}-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
-          path: ./python/
+          path: .
 
       - name: Start VM
         uses: bjia56/solaris-vm@nfs
@@ -525,7 +525,7 @@ jobs:
         run: |
           set -e
           cd ${{ github.workspace }}
-          ./scripts/launch_test.sh ${{ matrix.arch }} ${{ inputs.python_version }} ${{ matrix.distribution }} solaris${{ matrix.release }} "${{ env.RUN_TESTS }}"
+          ./scripts/launch_test.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }} solaris${{ matrix.release }} "${{ env.RUN_TESTS }}"
 
   build_cosmo:
     name: Cosmopolitan ${{ inputs.python_version }} (build)
