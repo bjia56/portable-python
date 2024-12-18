@@ -149,6 +149,11 @@ jobs:
           name: python-linux-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: .
 
+      - name: Install interpreters
+        run: |
+          sudo apt update
+          sudo apt -y install qemu-user-static
+
       - name: Test python in clean environment
         uses: addnab/docker-run-action@v3
         with:
@@ -419,7 +424,7 @@ jobs:
         run: |
           set -e
           cd ${{ github.workspace }}
-          ./scripts/launch_test.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }} freebsd${{ matrix.release }} "${{ env.RUN_TESTS }}"
+          bash ./scripts/launch_test.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }} freebsd${{ matrix.release }} "${{ env.RUN_TESTS }}"
 
   build_solaris:
     name: Solaris ${{ matrix.release }} ${{ inputs.python_version }} x86_64 ${{ matrix.distribution }} (build)
@@ -525,7 +530,7 @@ jobs:
         run: |
           set -e
           cd ${{ github.workspace }}
-          ./scripts/launch_test.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }} solaris${{ matrix.release }} "${{ env.RUN_TESTS }}"
+          bash ./scripts/launch_test.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }} solaris${{ matrix.release }} "${{ env.RUN_TESTS }}"
 
   build_cosmo:
     name: Cosmopolitan ${{ inputs.python_version }} (build)
@@ -624,7 +629,7 @@ jobs:
           run: |
             cat > /tmp/test.sh <<EOF
               export HOST_OS="${{ matrix.os }}"
-              ./scripts/launch_test.sh unknown ${{ inputs.python_version }} - cosmo "${{ env.RUN_TESTS }}"
+              bash ./scripts/launch_test.sh unknown ${{ inputs.python_version }} - cosmo "${{ env.RUN_TESTS }}"
             EOF
             bash -e /tmp/test.sh
 
@@ -638,6 +643,6 @@ jobs:
           run: |
             cat > /tmp/test.sh <<EOF
               export HOST_OS="${{ matrix.os }}"
-              ./scripts/launch_test.sh unknown ${{ inputs.python_version }} - cosmo "${{ env.RUN_TESTS }}"
+              bash ./scripts/launch_test.sh unknown ${{ inputs.python_version }} - cosmo "${{ env.RUN_TESTS }}"
             EOF
             bash -e /tmp/test.sh
