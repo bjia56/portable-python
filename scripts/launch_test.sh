@@ -12,6 +12,8 @@ function run_test () {
 
   echo "::group::Python ${python_distro_ver}"
 
+  cd ${WORKDIR}
+
   if [[ "${DISTRIBUTION}" == "-" ]]; then
     FULL_DISTRO=python-${PYTHON_FULL_VER}${python_suffix}-${OS}-${ARCH}
   else
