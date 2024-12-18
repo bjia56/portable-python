@@ -58,7 +58,7 @@ function run_test () {
   ./bin/${PYTHON_EXE} --version
   ./bin/${PYTHON_EXE} -m sysconfig
   ./bin/${PYTHON_EXE} ${WORKDIR}/scripts/test.py
-  ./bin/pip3
+  ./bin/${PYTHON_EXE} -m pip
 
   if [[ "${RUN_TESTS}" == "true" ]]; then
     ./bin/${PYTHON_EXE} -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
