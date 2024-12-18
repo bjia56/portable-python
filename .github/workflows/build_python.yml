@@ -610,7 +610,7 @@ jobs:
         shell: bash
         run: |
           export HOST_OS="${{ matrix.os }}"
-          ./scripts/launch_test.sh unknown ${{ inputs.python_version }} ${{ matrix.distribution }} cosmo "${{ env.RUN_TESTS }}"
+          ./scripts/launch_test.sh unknown ${{ inputs.python_version }} - cosmo "${{ env.RUN_TESTS }}"
 
       - name: Test in VM
         if: ${{ matrix.os == 'FreeBSD' }}
@@ -624,7 +624,7 @@ jobs:
           run: |
             cat > /tmp/test.sh <<EOF
               export HOST_OS="${{ matrix.os }}"
-              ./scripts/launch_test.sh unknown ${{ inputs.python_version }} ${{ matrix.distribution }} cosmo "${{ env.RUN_TESTS }}"
+              ./scripts/launch_test.sh unknown ${{ inputs.python_version }} - cosmo "${{ env.RUN_TESTS }}"
             EOF
             bash -e /tmp/test.sh
 
@@ -638,6 +638,6 @@ jobs:
           run: |
             cat > /tmp/test.sh <<EOF
               export HOST_OS="${{ matrix.os }}"
-              ./scripts/launch_test.sh unknown ${{ inputs.python_version }} ${{ matrix.distribution }} cosmo "${{ env.RUN_TESTS }}"
+              ./scripts/launch_test.sh unknown ${{ inputs.python_version }} - cosmo "${{ env.RUN_TESTS }}"
             EOF
             bash -e /tmp/test.sh

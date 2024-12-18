@@ -12,7 +12,11 @@ function run_test () {
 
   echo "::group::Python ${python_distro_ver}"
 
-  FULL_DISTRO=python-${DISTRIBUTION}-${PYTHON_FULL_VER}${python_suffix}-${OS}-${ARCH}
+  if [[ "${DISTRIBUTION}" == "-" ]]; then
+    FULL_DISTRO=python-${PYTHON_FULL_VER}${python_suffix}-${OS}-${ARCH}
+  else
+    FULL_DISTRO=python-${DISTRIBUTION}-${PYTHON_FULL_VER}${python_suffix}-${OS}-${ARCH}
+  fi
   PYTHON_EXE=python
 
   case "$OS" in
