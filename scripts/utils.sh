@@ -50,6 +50,7 @@ fi
 
 ARCH=$1
 PYTHON_FULL_VER=$2
+
 DISTRIBUTION=$3
 PYTHON_VER=$(echo ${PYTHON_FULL_VER} | cut -d "." -f 1-2)
 PYTHON_MAJOR=$(echo ${PYTHON_VER} | cut -d "." -f 1)
