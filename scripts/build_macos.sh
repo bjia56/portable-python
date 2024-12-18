@@ -354,7 +354,7 @@ function build_python () {
 
   otool -l ./python-install/bin/python
   install_name_tool -add_rpath @executable_path/../lib ./python-install/bin/python
-  install_name_tool -change ${BUILDDIR}/python-install/lib/libpython${PYTHON_VER}.dylib @rpath/libpython${PYTHON_VER}.dylib ./python-install/bin/python
+  install_name_tool -change ${BUILDDIR}/python-install/lib/libpython${PYTHON_VER}${python_suffix}.dylib @rpath/libpython${PYTHON_VER}${python_suffix}.dylib ./python-install/bin/python
   otool -l ./python-install/bin/python
 
   ./python-install/bin/python --version
