@@ -37,8 +37,8 @@ console.log(child_process.execSync(`${pythonExe} --version`).toString());
 
 ## Available distributions
 
-Currently, CPython 3.9, 3.10, 3.11, and 3.12 are built for the following targets:
-- Linux x86_64, i386, aarch64, arm <sup id="a1">[1](#f1)</sup>, riscv64, s390x, loongarch64 (glibc)
+Currently, CPython 3.9, 3.10, 3.11, 3.12, and 3.13 are built for the following targets:
+- Linux x86_64, i386, aarch64, arm <sup id="a1">[1](#f1)</sup>, riscv64, s390x, loongarch64, powerpc64le (glibc)
 - Windows x86_64 <sup id="a2">[2](#f2)</sup>
 - MacOS x86_64, arm64 <sup id="a3">[3](#f3)</sup>
 - FreeBSD 13, 14, 15 x86_64
@@ -56,6 +56,7 @@ For Linux CPython builds, the minimum glibc required is as follows:
 | riscv64     | 2.27 |
 | s390x       | 2.19 |
 | loongarch64 | 2.36 |
+| powerpc64le | 2.19 |
 
 
 For all CPython distributions except for the Cosmopolitan libc build, there are two available variants: `full` and `headless`. The distinction is that `headless` builds do not include any UI libraries (i.e. `tkinter` and its dependencies), so are better suited for non-graphical server installations.
