@@ -12,6 +12,7 @@ To get started, download archives from [GitHub releases](https://github.com/bjia
 - `npm i @bjia56/portable-python-3.10`
 - `npm i @bjia56/portable-python-3.11`
 - `npm i @bjia56/portable-python-3.12`
+- `npm i @bjia56/portable-python-3.13`
 
 For example, on Linux via bash:
 ```
