@@ -30,6 +30,7 @@ export class PortablePython implements IPortablePython {
     private _experimentalTag: string
     implementation: string = "cpython"
     distribution: string = "auto"
+    abiflags: string = ""
     installDir = dirname(__dirname);
 
     constructor(version: string, installDir: string | null = null, options: IPortablePythonOptions = {}) {
@@ -43,14 +44,13 @@ export class PortablePython implements IPortablePython {
         if (options.distribution) {
             this.distribution = options.distribution;
         }
+        if (options.abiflags) {
+            this.abiflags = options.abiflags;
+        }
 
         if (!INSTALLERS.has(this.implementation)) {
             throw Error("invalid implementation");
         }
-
-        const ctor = INSTALLERS.get(this.implementation)!;
-        this._installer = new ctor(this);
-        this._installer.validateOptions();
 
         if (installDir) {
             this.installDir = installDir;
@@ -71,6 +71,10 @@ export class PortablePython implements IPortablePython {
         if (!this.releaseTag) {
             throw Error("no releases available for this version");
         }
+
+        const ctor = INSTALLERS.get(this.implementation)!;
+        this._installer = new ctor(this);
+        this._installer.validateOptions();
     }
 
     /**
