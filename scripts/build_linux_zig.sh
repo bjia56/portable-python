@@ -583,7 +583,7 @@ function build_python () {
   mkdir python-build
   mkdir python-install
   cd python-build
-  LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
+  LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype -ltinfo" cmake \
     "${cmake_verbose_flags[@]}" \
     ${cmake_python_features} \
     -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
