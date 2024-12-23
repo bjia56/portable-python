@@ -236,7 +236,7 @@ function build_python () {
     -DREADLINE_INCLUDE_PATH:PATH=${DEPSDIR}/include \
     -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.a \
     -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncursesw.a \
-    -DTINFO_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtinfo.a \
+    -DTINFO_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtinfow.a \
     -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanelw.a \
     -DGDBM_INCLUDE_PATH:PATH=${DEPSDIR}/include \
     -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.a \
