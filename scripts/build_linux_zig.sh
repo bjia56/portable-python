@@ -229,7 +229,7 @@ cd ${BUILDDIR}
 
 download_verify_extract ncurses-6.4.tar.gz
 cd ncurses*
-./configure --host=${CHOST} --with-normal --without-progs --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
+./configure --host=${CHOST} --with-normal --without-progs --enable-overwrite --disable-stripping --with-termlib --disable-database --with-fallbacks=xterm,xterm-256color,screen-256color,linux,vt100 --prefix=${DEPSDIR}
 make -j4
 make install
 install_license
