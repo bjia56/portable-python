@@ -102,7 +102,7 @@ cd ${BUILDDIR}
 
 download_verify_extract ncurses-6.4.tar.gz
 cd ncurses*
-./configure --with-normal --without-progs --enable-overwrite --disable-stripping --with-termlib --disable-database --with-fallbacks=xterm,xterm-256color,screen-256color,linux,vt100 --prefix=${DEPSDIR}
+./configure --with-normal --without-progs --enable-overwrite --disable-stripping --enable-widec --with-termlib --disable-database --with-fallbacks=xterm,xterm-256color,screen-256color,linux,vt100 --prefix=${DEPSDIR}
 make -j4
 make install
 cp lib/.aarch64/lib*.a ${DEPSDIR}/lib/.aarch64
@@ -235,9 +235,9 @@ function build_python () {
     -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libbz2.a \
     -DREADLINE_INCLUDE_PATH:PATH=${DEPSDIR}/include \
     -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.a \
-    -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.a \
+    -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncursesw.a \
     -DTINFO_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtinfo.a \
-    -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.a \
+    -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanelw.a \
     -DGDBM_INCLUDE_PATH:PATH=${DEPSDIR}/include \
     -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.a \
     -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.a \
