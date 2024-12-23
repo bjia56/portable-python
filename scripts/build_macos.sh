@@ -32,7 +32,7 @@ cd ${BUILDDIR}
 
 download_verify_extract ncurses-6.4.tar.gz
 cd ncurses*
-CC=clang CXX=clang++ CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" CXXFLAGS="${CXXFLAGS} -arch x86_64 -arch arm64" ./configure --with-normal --without-progs --enable-overwrite --disable-stripping --with-termlib --disable-database --with-fallbacks=xterm,xterm-256color,screen-256color,linux,vt100 --prefix=${DEPSDIR}
+CC=clang CXX=clang++ CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" CXXFLAGS="${CXXFLAGS} -arch x86_64 -arch arm64" ./configure --with-normal --without-progs --enable-overwrite --disable-stripping --enable-widec --with-termlib --disable-database --with-fallbacks=xterm,xterm-256color,screen-256color,linux,vt100 --prefix=${DEPSDIR}
 make -j4
 make install.libs
 install_license
@@ -329,7 +329,7 @@ function build_python () {
     -DREADLINE_INCLUDE_PATH:PATH=${DEPSDIR}/include \
     -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.a \
     -DUUID_LIBRARY:FILEPATH=${DEPSDIR}/lib/libuuid.a \
-    -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.a \
+    -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncursesw.a \
     -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.a \
     -DGDBM_INCLUDE_PATH:PATH=${DEPSDIR}/include \
     -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.a \
