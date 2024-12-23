@@ -201,7 +201,7 @@ function build_python () {
   mkdir python-build
   mkdir python-install
   cd python-build
-  LDFLAGS="${LDFLAGS} -lreadline -ltinfo" cmake \
+  LDFLAGS="${LDFLAGS} -ltinfo" cmake \
     "${cmake_verbose_flags[@]}" \
     ${cmake_python_features} \
     -DCMAKE_C_COMPILER=${CC} \
