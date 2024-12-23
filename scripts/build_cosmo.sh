@@ -201,7 +201,7 @@ function build_python () {
   mkdir python-build
   mkdir python-install
   cd python-build
-  cmake \
+  LDFLAGS="${LDFLAGS} -ltinfo" cmake \
     "${cmake_verbose_flags[@]}" \
     ${cmake_python_features} \
     -DCMAKE_C_COMPILER=${CC} \
@@ -214,7 +214,6 @@ function build_python () {
     -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
     -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install \
     -DBUILD_EXTENSIONS_AS_BUILTIN=ON \
-    -DWITH_STATIC_DEPENDENCIES=ON \
     -DBUILD_LIBPYTHON_SHARED=OFF \
     -DUSE_SYSTEM_LIBRARIES=OFF \
     -DBUILD_TESTING=${INSTALL_TEST} \
@@ -236,7 +235,6 @@ function build_python () {
     -DREADLINE_INCLUDE_PATH:PATH=${DEPSDIR}/include \
     -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.a \
     -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.a \
-    -DTINFO_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtinfo.a \
     -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.a \
     -DGDBM_INCLUDE_PATH:PATH=${DEPSDIR}/include \
     -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.a \
