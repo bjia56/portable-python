@@ -109,6 +109,24 @@ cp lib/.aarch64/lib*.a ${DEPSDIR}/lib/.aarch64
 install_license
 
 echo "::endgroup::"
+#######
+# gpm #
+#######
+echo "::group::gpm"
+cd ${BUILDDIR}
+
+wget --no-verbose -O gpm.tar.gz https://github.com/telmich/gpm/archive/refs/tags/1.20.7.tar.gz
+tar -xf gpm*.tar.gz
+rm *.tar.gz
+cd gpm*
+./autogen.sh
+./configure --prefix=${DEPSDIR}
+make -j4
+make install
+cp lib/.aarch64/lib*.a ${DEPSDIR}/lib/.aarch64
+install_license
+
+echo "::endgroup::"
 ############
 # readline #
 ############
@@ -237,6 +255,7 @@ function build_python () {
     -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.a \
     -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.a \
     -DTINFO_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtinfo.a \
+    -DGPM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgpm.a \
     -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.a \
     -DGDBM_INCLUDE_PATH:PATH=${DEPSDIR}/include \
     -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.a \
