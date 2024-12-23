@@ -452,7 +452,7 @@ function build_python () {
     -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.a \
     -DREADLINE_INCLUDE_PATH:PATH=${DEPSDIR}/include \
     -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.a \
-    "-DCURSES_LIBRARIES=${DEPSDIR}/lib/libncursesw.a;${DEPSDIR}/lib/libtinfow.a" \
+    -DCURSES_LIBRARIES="${DEPSDIR}/lib/libncursesw.a;${DEPSDIR}/lib/libtinfow.a" \
     -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanelw.a \
     -DGDBM_INCLUDE_PATH:PATH=${DEPSDIR}/include \
     -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.a \
