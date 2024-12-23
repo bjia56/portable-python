@@ -92,7 +92,7 @@ cd ${BUILDDIR}
 
 download_verify_extract ncurses-6.4.tar.gz
 cd ncurses*
-./configure --with-normal --without-shared --without-progs --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
+./configure --with-normal --without-shared --without-progs --enable-overwrite --disable-stripping --enable-widec --with-termlib --disable-database --with-fallbacks=xterm,xterm-256color,screen-256color,linux,vt100 --prefix=${DEPSDIR}
 gmake -j4
 gmake install.libs
 install_license
@@ -418,8 +418,8 @@ function build_python () {
     -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.a \
     -DREADLINE_INCLUDE_PATH:PATH=${DEPSDIR}/include \
     -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.a \
-    -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.a \
-    -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.a \
+    -DCURSES_LIBRARIES="${DEPSDIR}/lib/libncursesw.a;${DEPSDIR}/lib/libtinfow.a" \
+    -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanelw.a \
     -DGDBM_INCLUDE_PATH:PATH=${DEPSDIR}/include \
     -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.a \
     -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.a \
