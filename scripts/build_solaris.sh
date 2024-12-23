@@ -115,7 +115,7 @@ cd ${BUILDDIR}
 
 download_verify_extract ncurses-6.4.tar.gz
 cd ncurses*
-./configure --with-normal --without-shared --without-progs --enable-overwrite --disable-stripping --enable-widec --with-termlib --disable-database --with-fallbacks=xterm,xterm-256color,screen-256color,linux,vt100 --with-tic-path=/usr/bin/gtic --prefix=${DEPSDIR}
+./configure --with-normal --without-shared --without-progs --enable-overwrite --disable-stripping --enable-widec --with-termlib --disable-database --with-fallbacks=xterm,xterm-256color,screen-256color,linux,vt100 --with-tic-path=/usr/bin/gtic --with-infocmp-path=/usr/bin/ginfocmp --prefix=${DEPSDIR}
 gmake -j4
 gmake install.libs
 install_license
