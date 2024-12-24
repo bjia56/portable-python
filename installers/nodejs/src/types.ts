@@ -21,6 +21,7 @@ export interface IPortablePython extends IInstallerProps {
     extractPath: string;
     executablePath: string;
     pipPath: string;
+    abiflags: string;
 
     isInstalled(): boolean;
     install(zipFile: string | null): Promise<void>;
@@ -30,6 +31,7 @@ export interface IPortablePython extends IInstallerProps {
 export interface IPortablePythonOptions {
     implementation?: string;
     distribution?: string;
+    abiflags?: string;
 
     /**
      * Override the version of Python to install. For development use only.

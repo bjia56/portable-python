@@ -92,7 +92,7 @@ cd ${BUILDDIR}
 
 download_verify_extract ncurses-6.4.tar.gz
 cd ncurses*
-./configure --with-normal --without-shared --without-progs --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
+./configure --with-normal --without-shared --without-progs --enable-overwrite --disable-stripping --enable-widec --with-termlib --disable-database --with-fallbacks=xterm,xterm-256color,screen-256color,linux,vt100 --prefix=${DEPSDIR}
 gmake -j4
 gmake install.libs
 install_license
@@ -119,7 +119,7 @@ echo "::group::bzip2"
 cd ${BUILDDIR}
 
 wget --no-verbose -O bzip2.tar.gz https://github.com/commontk/bzip2/tarball/master
-tar -xf bzip2*.tar.gz
+tar --no-same-permissions --no-same-owner -xf bzip2*.tar.gz
 rm *.tar.gz
 cd commontk-bzip2*
 mkdir build
@@ -357,7 +357,7 @@ fi
 ##########
 # Python #
 ##########
-echo "::group::Python"
+echo "::group::Build setup"
 cd ${BUILDDIR}
 
 additionalparams=()
@@ -375,104 +375,121 @@ fi
 ldconfig -i -m -v ${DEPSDIR}/lib
 
 wget --no-verbose -O portable-python-cmake-buildsystem.tar.gz https://github.com/bjia56/portable-python-cmake-buildsystem/tarball/${CMAKE_BUILDSYSTEM_BRANCH}
-tar -xf portable-python-cmake-buildsystem.tar.gz
+tar --no-same-permissions --no-same-owner -xf portable-python-cmake-buildsystem.tar.gz
 rm *.tar.gz
 mv *portable-python-cmake-buildsystem* portable-python-cmake-buildsystem
-mkdir python-build
-mkdir python-install
-cd python-build
-cmake \
-  "${cmake_verbose_flags[@]}" \
-  -DCMAKE_IGNORE_PATH=/usr/include \
-  -DPYTHON_VERSION=${PYTHON_FULL_VER} \
-  -DPORTABLE_PYTHON_BUILD=ON \
-  -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
-  -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install \
-  -DBUILD_EXTENSIONS_AS_BUILTIN=ON \
-  -DBUILD_LIBPYTHON_SHARED=ON \
-  -DUSE_SYSTEM_LIBRARIES=OFF \
-  -DBUILD_TESTING=${INSTALL_TEST} \
-  -DINSTALL_TEST=${INSTALL_TEST} \
-  -DINSTALL_MANUAL=OFF \
-  -DOPENSSL_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-  -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/libssl.a;${DEPSDIR}/lib/libcrypto.a" \
-  -DSQLite3_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-  -DSQLite3_LIBRARY:FILEPATH=${DEPSDIR}/lib/libsqlite3.a \
-  -DZLIB_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-  -DZLIB_LIBRARY:FILEPATH=${DEPSDIR}/lib/libz.a \
-  -DLZMA_INCLUDE_PATH:PATH=${DEPSDIR}/include \
-  -DLZMA_LIBRARY:FILEPATH=${DEPSDIR}/lib/liblzma.a \
-  -DBZIP2_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-  -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libbz2.a \
-  -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-  -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.a \
-  -DREADLINE_INCLUDE_PATH:PATH=${DEPSDIR}/include \
-  -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.a \
-  -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.a \
-  -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.a \
-  -DGDBM_INCLUDE_PATH:PATH=${DEPSDIR}/include \
-  -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.a \
-  -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.a \
-  -DNDBM_TAG=NDBM \
-  -DNDBM_USE=NDBM \
-  "${additionalparams[@]}" \
-  ../portable-python-cmake-buildsystem
-make -j4
-make install
 
-cd ${BUILDDIR}
-cp -r ${LICENSEDIR} ./python-install
+function build_python () {
+  python_suffix=$1
+  cmake_python_features=$2
+  python_distro_ver=${PYTHON_FULL_VER}${python_suffix}
 
-echo "::endgroup::"
-#################################
-# Check executable dependencies #
-#################################
-echo "::group::Check executable dependencies"
-cd ${BUILDDIR}
+  echo "::group::Python ${python_distro_ver}"
+  cd ${BUILDDIR}
 
-cd python-install
-echo "python dependencies"
-readelf -d ./bin/python
-echo
-echo "libpython dependencies"
-readelf -d ./lib/libpython${PYTHON_VER}.so
+  mkdir python-build
+  mkdir python-install
+  cd python-build
+  cmake \
+    "${cmake_verbose_flags[@]}" \
+    ${cmake_python_features} \
+    -DCMAKE_IGNORE_PATH=/usr/include \
+    -DPYTHON_VERSION=${PYTHON_FULL_VER} \
+    -DPORTABLE_PYTHON_BUILD=ON \
+    -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
+    -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install \
+    -DBUILD_EXTENSIONS_AS_BUILTIN=ON \
+    -DBUILD_LIBPYTHON_SHARED=ON \
+    -DUSE_SYSTEM_LIBRARIES=OFF \
+    -DBUILD_TESTING=${INSTALL_TEST} \
+    -DINSTALL_TEST=${INSTALL_TEST} \
+    -DINSTALL_MANUAL=OFF \
+    -DOPENSSL_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+    -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/libssl.a;${DEPSDIR}/lib/libcrypto.a" \
+    -DSQLite3_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+    -DSQLite3_LIBRARY:FILEPATH=${DEPSDIR}/lib/libsqlite3.a \
+    -DZLIB_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+    -DZLIB_LIBRARY:FILEPATH=${DEPSDIR}/lib/libz.a \
+    -DLZMA_INCLUDE_PATH:PATH=${DEPSDIR}/include \
+    -DLZMA_LIBRARY:FILEPATH=${DEPSDIR}/lib/liblzma.a \
+    -DBZIP2_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+    -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libbz2.a \
+    -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+    -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.a \
+    -DREADLINE_INCLUDE_PATH:PATH=${DEPSDIR}/include \
+    -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.a \
+    -DCURSES_LIBRARIES="${DEPSDIR}/lib/libncursesw.a;${DEPSDIR}/lib/libtinfow.a" \
+    -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanelw.a \
+    -DGDBM_INCLUDE_PATH:PATH=${DEPSDIR}/include \
+    -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.a \
+    -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.a \
+    -DNDBM_TAG=NDBM \
+    -DNDBM_USE=NDBM \
+    "${additionalparams[@]}" \
+    ../portable-python-cmake-buildsystem
+  make -j4
+  make install
 
-echo "::endgroup::"
-###############
-# Test python #
-###############
-echo "::group::Test python"
-cd ${BUILDDIR}
+  cd ${BUILDDIR}
+  cp -r ${LICENSEDIR} ./python-install
 
-cd python-install
-./bin/python --version
+  echo "::endgroup::"
+  #################################
+  # Check executable dependencies #
+  #################################
+  echo "::group::Check executable dependencies ${python_distro_ver}"
+  cd ${BUILDDIR}
 
-echo "::endgroup::"
-###############
-# Preload pip #
-###############
-echo "::group::Preload pip"
-cd ${BUILDDIR}
+  cd python-install
+  echo "python dependencies"
+  readelf -d ./bin/python
+  echo
+  echo "libpython dependencies"
+  readelf -d ./lib/libpython${PYTHON_VER}${python_suffix}.so
 
-cd python-install
-./bin/python -m ensurepip
-./bin/python -m pip install -r ${WORKDIR}/baseline/requirements.txt
+  echo "::endgroup::"
+  ###############
+  # Test python #
+  ###############
+  echo "::group::Test python ${python_distro_ver}"
+  cd ${BUILDDIR}
 
-python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip3
-python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip${PYTHON_VER}
+  cd python-install
+  ./bin/python --version
 
-echo "::endgroup::"
-###################
-# Compress output #
-###################
-echo "::group::Compress output"
-cd ${BUILDDIR}
+  echo "::endgroup::"
+  ###############
+  # Preload pip #
+  ###############
+  echo "::group::Preload pip ${python_distro_ver}"
+  cd ${BUILDDIR}
 
-python3 -m ensurepip
-python3 -m pip install pyclean
-python3 -m pyclean -v python-install
-mv python-install python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
-tar -czf ${WORKDIR}/python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
-zip ${WORKDIR}/python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.zip $(tar tf ${WORKDIR}/python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz)
+  cd python-install
+  ./bin/python -m ensurepip
+  ./bin/python -m pip install -r ${WORKDIR}/baseline/requirements.txt
 
-echo "::endgroup::"
+  python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip3
+  python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip${PYTHON_VER}
+
+  echo "::endgroup::"
+  ###################
+  # Compress output #
+  ###################
+  echo "::group::Compress output ${python_distro_ver}"
+  cd ${BUILDDIR}
+
+  python3 -m ensurepip
+  python3 -m pip install pyclean
+  python3 -m pyclean -v python-install
+  mv python-install python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}
+  tar -czf ${WORKDIR}/python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}.tar.gz python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}
+  zip ${WORKDIR}/python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}.zip $(tar tf ${WORKDIR}/python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}.tar.gz)
+
+  rm -rf python-build
+  echo "::endgroup::"
+}
+
+build_python
+if [[ "${PYTHON_MINOR}" == "13" ]]; then
+  build_python t "-DWITH_FREE_THREADING=ON"
+fi

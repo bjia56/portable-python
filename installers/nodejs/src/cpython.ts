@@ -35,6 +35,8 @@ const DL_ARCH = (() => {
         return "aarch64";
     case "loong64":
         return "loongarch64";
+    case "ppc64":
+        return "powerpc64le";
     }
 
     return arch();
@@ -59,10 +61,10 @@ export default class CPythonInstaller implements IInstaller {
 
     get pythonDistributionName(): string {
         if (this.parent.distribution === "cosmo") {
-            return `python-${this.parent.version}-cosmo-unknown`;
+            return `python-${this.parent.version}${this.parent.abiflags}-cosmo-unknown`;
         }
         const distribution = this.parent.distribution === "auto" ? "headless" : this.parent.distribution;
-        return `python-${distribution}-${this.parent.version}-${DL_PLATFORM}-${DL_ARCH}`;
+        return `python-${distribution}-${this.parent.version}${this.parent.abiflags}-${DL_PLATFORM}-${DL_ARCH}`;
     }
 
     validateOptions(): void {
@@ -72,6 +74,14 @@ export default class CPythonInstaller implements IInstaller {
 
         if (!["auto", "cosmo", "headless", "full"].includes(this.parent.distribution)) {
             throw Error("invalid distribution");
+        }
+
+        if (this.parent.abiflags && this.parent.abiflags != "t") {
+            throw Error("invalid abiflags");
+        }
+
+        if (this.parent.abiflags == "t" && this.parent.minor != "13") {
+            throw Error("abiflags 't' is only supported for Python 3.13");
         }
     }
 

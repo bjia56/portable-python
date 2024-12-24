@@ -168,7 +168,7 @@ fi
 #########
 # Build #
 #########
-echo "::group::Build"
+echo "::group::Build setup"
 cd ${BUILDDIR}
 
 additionalparams=()
@@ -181,86 +181,102 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
   )
 fi
 
-mkdir python-build
-mkdir python-install
-cd python-build
-cmake \
-  "${cmake_verbose_flags[@]}" \
-  -G "Visual Studio 17 2022" -A x64 \
-  -DPYTHON_VERSION=${PYTHON_FULL_VER} \
-  -DPORTABLE_PYTHON_BUILD=ON \
-  -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
-  -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install \
-  -DBUILD_EXTENSIONS_AS_BUILTIN=OFF \
-  -DBUILD_LIBPYTHON_SHARED=ON \
-  -DBUILD_TESTING=${INSTALL_TEST} \
-  -DINSTALL_TEST=${INSTALL_TEST} \
-  -DINSTALL_MANUAL=OFF \
-  -DBUILD_WININST=OFF \
-  -DINSTALL_WINDOWS_TRADITIONAL:BOOL=OFF \
-  -DOPENSSL_ROOT_DIR:PATH=${DEPSDIR}/openssl \
-  -DSQLite3_INCLUDE_DIR:PATH=${DEPSDIR}/sqlite3 \
-  -DSQLite3_LIBRARY:FILEPATH=${DEPSDIR}/sqlite3/sqlite3.lib \
-  -DZLIB_INCLUDE_DIR:PATH=${DEPSDIR}/zlib/include \
-  -DZLIB_LIBRARY:FILEPATH=${DEPSDIR}/zlib/lib/zlibstatic.lib \
-  -DLZMA_INCLUDE_PATH:PATH=${DEPSDIR}/xz/include \
-  -DLZMA_LIBRARY:FILEPATH=${DEPSDIR}/xz/lib/liblzma.lib \
-  -DBZIP2_INCLUDE_DIR:PATH=${DEPSDIR}/bzip2/include \
-  -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/bzip2/lib/libbz2.lib \
-  -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/libffi/include \
-  -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/libffi/lib/libffi-8.lib \
-  "${additionalparams[@]}" \
-  ../portable-python-cmake-buildsystem
-cmake --build . --config ${BUILD_TYPE} -- /property:Configuration=${BUILD_TYPE}
-cmake --build . --target INSTALL -- /property:Configuration=${BUILD_TYPE}
-cp -r ${LICENSEDIR} ${BUILDDIR}/python-install
-cd ${BUILDDIR}
+function build_python () {
+  python_suffix=$1
+  cmake_python_features=$2
+  python_distro_ver=${PYTHON_FULL_VER}${python_suffix}
 
-# Need to bundle openssl with the executable
-cp ${DEPSDIR}/openssl/bin/*.dll python-install/bin
+  echo "::group::Python ${python_distro_ver}"
+  cd ${BUILDDIR}
 
-# Need to bundle libffi with the executable
-cp ${DEPSDIR}/libffi/lib/*.dll python-install/bin
+  mkdir python-build
+  mkdir python-install
+  cd python-build
+  cmake \
+    "${cmake_verbose_flags[@]}" \
+    ${cmake_python_features} \
+    -G "Visual Studio 17 2022" -A x64 \
+    -DPYTHON_VERSION=${PYTHON_FULL_VER} \
+    -DPORTABLE_PYTHON_BUILD=ON \
+    -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
+    -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install \
+    -DBUILD_EXTENSIONS_AS_BUILTIN=OFF \
+    -DBUILD_LIBPYTHON_SHARED=ON \
+    -DBUILD_TESTING=${INSTALL_TEST} \
+    -DINSTALL_TEST=${INSTALL_TEST} \
+    -DINSTALL_MANUAL=OFF \
+    -DBUILD_WININST=OFF \
+    -DINSTALL_WINDOWS_TRADITIONAL:BOOL=OFF \
+    -DOPENSSL_ROOT_DIR:PATH=${DEPSDIR}/openssl \
+    -DSQLite3_INCLUDE_DIR:PATH=${DEPSDIR}/sqlite3 \
+    -DSQLite3_LIBRARY:FILEPATH=${DEPSDIR}/sqlite3/sqlite3.lib \
+    -DZLIB_INCLUDE_DIR:PATH=${DEPSDIR}/zlib/include \
+    -DZLIB_LIBRARY:FILEPATH=${DEPSDIR}/zlib/lib/zlibstatic.lib \
+    -DLZMA_INCLUDE_PATH:PATH=${DEPSDIR}/xz/include \
+    -DLZMA_LIBRARY:FILEPATH=${DEPSDIR}/xz/lib/liblzma.lib \
+    -DBZIP2_INCLUDE_DIR:PATH=${DEPSDIR}/bzip2/include \
+    -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/bzip2/lib/libbz2.lib \
+    -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/libffi/include \
+    -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/libffi/lib/libffi-8.lib \
+    "${additionalparams[@]}" \
+    ../portable-python-cmake-buildsystem
+  cmake --build . --config ${BUILD_TYPE} -- /property:Configuration=${BUILD_TYPE}
+  cmake --build . --target INSTALL -- /property:Configuration=${BUILD_TYPE}
+  cp -r ${LICENSEDIR} ${BUILDDIR}/python-install
+  cd ${BUILDDIR}
 
-if [[ "${DISTRIBUTION}" != "headless" ]]; then
-  # Need to bundle tcl/tk with the executable
-  cp ${DEPSDIR}/tcltk/bin/*.dll python-install/bin
-  cp -r ${DEPSDIR}/tcltk/lib/tcl8.6 python-install/lib
-  cp -r ${DEPSDIR}/tcltk/lib/tk8.6 python-install/lib
+  # Need to bundle openssl with the executable
+  cp ${DEPSDIR}/openssl/bin/*.dll python-install/bin
+
+  # Need to bundle libffi with the executable
+  cp ${DEPSDIR}/libffi/lib/*.dll python-install/bin
+
+  if [[ "${DISTRIBUTION}" != "headless" ]]; then
+    # Need to bundle tcl/tk with the executable
+    cp ${DEPSDIR}/tcltk/bin/*.dll python-install/bin
+    cp -r ${DEPSDIR}/tcltk/lib/tcl8.6 python-install/lib
+    cp -r ${DEPSDIR}/tcltk/lib/tk8.6 python-install/lib
+  fi
+
+  # Need to bundle vcredist
+  #cp /c/WINDOWS/SYSTEM32/VCRUNTIME140.dll python-install/bin
+
+  echo "::endgroup::"
+  ###############
+  # Test python #
+  ###############
+  echo "::group::Test python ${python_distro_ver}"
+  cd ${BUILDDIR}
+
+  ./python-install/bin/python --version
+
+  echo "::endgroup::"
+  ###############
+  # Preload pip #
+  ###############
+  echo "::group::Preload pip ${python_distro_ver}"
+  cd ${BUILDDIR}
+
+  ./python-install/bin/python -m ensurepip
+  ./python-install/bin/python -m pip install -r ${WORKDIR}/baseline/requirements.txt
+
+  ###################
+  # Compress output #
+  ###################
+  echo "::group::Compress output ${python_distro_ver}"
+  cd ${BUILDDIR}
+
+  python3 -m pip install pyclean
+  python3 -m pyclean -v python-install
+  mv python-install python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}
+  tar -czf ${WORKDIR}/python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}.tar.gz python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}
+  7z.exe a ${WORKDIR}/python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}.zip python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}
+
+  rm -rf python-build
+  echo "::endgroup::"
+}
+
+build_python
+if [[ "${PYTHON_MINOR}" == "13" ]]; then
+  build_python t "-DWITH_FREE_THREADING=ON"
 fi
-
-# Need to bundle vcredist
-#cp /c/WINDOWS/SYSTEM32/VCRUNTIME140.dll python-install/bin
-
-echo "::endgroup::"
-###############
-# Test python #
-###############
-echo "::group::Test python"
-cd ${BUILDDIR}
-
-./python-install/bin/python --version
-
-echo "::endgroup::"
-###############
-# Preload pip #
-###############
-echo "::group::Preload pip"
-cd ${BUILDDIR}
-
-./python-install/bin/python -m ensurepip
-./python-install/bin/python -m pip install -r ${WORKDIR}/baseline/requirements.txt
-
-###################
-# Compress output #
-###################
-echo "::group::Compress output"
-cd ${BUILDDIR}
-
-python3 -m pip install pyclean
-python3 -m pyclean -v python-install
-mv python-install python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
-tar -czf ${WORKDIR}/python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
-7z.exe a ${WORKDIR}/python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.zip python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
-
-echo "::endgroup::"

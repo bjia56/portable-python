@@ -33,7 +33,7 @@ if [[ "${PLATFORM}" == "solaris"* ]]; then
     #set -x
     file="$1"
     download_and_verify $file
-    gtar -xf $file
+    gtar --no-same-permissions --no-same-owner -xf $file
     rm $file
     #set +x
   }
@@ -42,7 +42,7 @@ else
     #set -x
     file="$1"
     download_and_verify $file
-    tar -xf $file
+    tar --no-same-permissions --no-same-owner -xf $file
     rm $file
     #set +x
   }
@@ -50,6 +50,7 @@ fi
 
 ARCH=$1
 PYTHON_FULL_VER=$2
+
 DISTRIBUTION=$3
 PYTHON_VER=$(echo ${PYTHON_FULL_VER} | cut -d "." -f 1-2)
 PYTHON_MAJOR=$(echo ${PYTHON_VER} | cut -d "." -f 1)

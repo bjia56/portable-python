@@ -91,7 +91,7 @@ elif [[ "${ARCH}" == "i386" ]]; then
   export CFLAGS="-m32 -Wl,--undefined-version ${CFLAGS}"
   export CPPFLAGS="-m32 ${CPPFLAGS}"
   export CXXFLAGS="-m32 ${CXXFLAGS}"
-  export LDFLAGS="-m32 ${LDFLAGS}"
+  export LDFLAGS="-m32 -Wl,-z,notext ${LDFLAGS}"
 elif [[ "${ARCH}" == "mips64el" ]]; then
   # See above comment
   sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/${ARCH}-linux-gnuabi64-gcc-ar
@@ -102,6 +102,7 @@ elif [[ "${ARCH}" == "mips64el" ]]; then
   export CXX="${ARCH}-linux-gnuabi64-g++"
   export CHOST=${ARCH}-linux-gnuabi64
   export ZIG_FLAGS="-target ${ARCH}-linux-gnuabi64"
+  export LDFLAGS="${LDFLAGS} -Wl,-z,notext"
 else
   # See above comment
   sudo cp ${WORKDIR}/zigshim/zig_ar /usr/bin/${ARCH}-linux-gnu-gcc-ar
@@ -121,10 +122,6 @@ else
     export ZIG_FLAGS="-target ${ARCH}-linux-gnu.2.17"
   fi
   export CHOST=${ARCH}-linux-gnu
-fi
-
-if [[ "${ARCH}" == "mips64el" ]]; then
-  export LDFLAGS="${LDFLAGS} -Wl,-z,notext"
 fi
 
 cd ${WORKDIR}
@@ -247,7 +244,7 @@ cd ${BUILDDIR}
 
 download_verify_extract ncurses-6.4.tar.gz
 cd ncurses*
-./configure --host=${CHOST} --with-normal --without-progs --enable-overwrite --disable-stripping --prefix=${DEPSDIR}
+./configure --host=${CHOST} --with-normal --without-progs --enable-overwrite --disable-stripping --enable-widec --with-termlib --disable-database --with-fallbacks=xterm,xterm-256color,screen-256color,linux,vt100 --prefix=${DEPSDIR}
 make -j4
 make install
 install_license
@@ -548,7 +545,7 @@ fi
 ##########
 # Python #
 ##########
-echo "::group::Python"
+echo "::group::Build setup"
 cd ${BUILDDIR}
 
 additionalparams=()
@@ -589,107 +586,124 @@ wget --no-verbose -O portable-python-cmake-buildsystem.tar.gz https://github.com
 tar -xf portable-python-cmake-buildsystem.tar.gz
 rm *.tar.gz
 mv *portable-python-cmake-buildsystem* portable-python-cmake-buildsystem
-mkdir python-build
-mkdir python-install
-cd python-build
-LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
-  "${cmake_verbose_flags[@]}" \
-  -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
-  -DCMAKE_CROSSCOMPILING_EMULATOR=${WORKDIR}/scripts/qemu_${ARCH}_interpreter \
-  -DCMAKE_IGNORE_PATH=/usr/include \
-  -DPYTHON_VERSION=${PYTHON_FULL_VER} \
-  -DPORTABLE_PYTHON_BUILD=ON \
-  -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
-  -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install \
-  -DBUILD_EXTENSIONS_AS_BUILTIN=ON \
-  -DBUILD_LIBPYTHON_SHARED=ON \
-  -DUSE_SYSTEM_LIBRARIES=OFF \
-  -DBUILD_TESTING=${INSTALL_TEST} \
-  -DINSTALL_TEST=${INSTALL_TEST} \
-  -DINSTALL_MANUAL=OFF \
-  "${additionalparams[@]}" \
-  "${opensslparams[@]}" \
-  -DSQLite3_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-  -DSQLite3_LIBRARY:FILEPATH=${DEPSDIR}/lib/libsqlite3.a \
-  -DZLIB_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-  -DZLIB_LIBRARY:FILEPATH=${DEPSDIR}/lib/libz.a \
-  -DLZMA_INCLUDE_PATH:PATH=${DEPSDIR}/include \
-  -DLZMA_LIBRARY:FILEPATH=${DEPSDIR}/lib/liblzma.a \
-  -DBZIP2_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-  -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libbz2.a \
-  -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/include \
-  -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.a \
-  -DREADLINE_INCLUDE_PATH:PATH=${DEPSDIR}/include \
-  -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.a \
-  -DUUID_LIBRARY:FILEPATH=${DEPSDIR}/lib/libuuid.a \
-  -DCURSES_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libncurses.a \
-  -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanel.a \
-  -DGDBM_INCLUDE_PATH:PATH=${DEPSDIR}/include \
-  -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.a \
-  -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.a \
-  -DNDBM_TAG=NDBM \
-  -DNDBM_USE=NDBM \
-  ../portable-python-cmake-buildsystem
-make -j4
-make install
 
-cd ${BUILDDIR}
+function build_python () {
+  python_suffix=$1
+  cmake_python_features=$2
+  python_distro_ver=${PYTHON_FULL_VER}${python_suffix}
 
-if [[ "${DISTRIBUTION}" != "headless" ]]; then
-  cp -r ${DEPSDIR}/lib/tcl8.6 ./python-install/lib
-  cp -r ${DEPSDIR}/lib/tk8.6 ./python-install/lib
+  echo "::group::Python ${python_distro_ver}"
+  cd ${BUILDDIR}
+
+  mkdir python-build
+  mkdir python-install
+  cd python-build
+  LDFLAGS="${LDFLAGS} -lfontconfig -lfreetype" cmake \
+    "${cmake_verbose_flags[@]}" \
+    ${cmake_python_features} \
+    -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
+    -DCMAKE_CROSSCOMPILING_EMULATOR=${WORKDIR}/scripts/qemu_${ARCH}_interpreter \
+    -DCMAKE_IGNORE_PATH=/usr/include \
+    -DPYTHON_VERSION=${PYTHON_FULL_VER} \
+    -DPORTABLE_PYTHON_BUILD=ON \
+    -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
+    -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install \
+    -DBUILD_EXTENSIONS_AS_BUILTIN=ON \
+    -DBUILD_LIBPYTHON_SHARED=ON \
+    -DUSE_SYSTEM_LIBRARIES=OFF \
+    -DBUILD_TESTING=${INSTALL_TEST} \
+    -DINSTALL_TEST=${INSTALL_TEST} \
+    -DINSTALL_MANUAL=OFF \
+    "${additionalparams[@]}" \
+    "${opensslparams[@]}" \
+    -DSQLite3_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+    -DSQLite3_LIBRARY:FILEPATH=${DEPSDIR}/lib/libsqlite3.a \
+    -DZLIB_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+    -DZLIB_LIBRARY:FILEPATH=${DEPSDIR}/lib/libz.a \
+    -DLZMA_INCLUDE_PATH:PATH=${DEPSDIR}/include \
+    -DLZMA_LIBRARY:FILEPATH=${DEPSDIR}/lib/liblzma.a \
+    -DBZIP2_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+    -DBZIP2_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libbz2.a \
+    -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+    -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.a \
+    -DREADLINE_INCLUDE_PATH:PATH=${DEPSDIR}/include \
+    -DREADLINE_LIBRARY:FILEPATH=${DEPSDIR}/lib/libreadline.a \
+    -DUUID_LIBRARY:FILEPATH=${DEPSDIR}/lib/libuuid.a \
+    -DCURSES_LIBRARIES="${DEPSDIR}/lib/libncursesw.a;${DEPSDIR}/lib/libtinfow.a" \
+    -DPANEL_LIBRARIES:FILEPATH=${DEPSDIR}/lib/libpanelw.a \
+    -DGDBM_INCLUDE_PATH:PATH=${DEPSDIR}/include \
+    -DGDBM_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm.a \
+    -DGDBM_COMPAT_LIBRARY:FILEPATH=${DEPSDIR}/lib/libgdbm_compat.a \
+    -DNDBM_TAG=NDBM \
+    -DNDBM_USE=NDBM \
+    ../portable-python-cmake-buildsystem
+  make -j4
+  make install
+
+  cd ${BUILDDIR}
+
+  if [[ "${DISTRIBUTION}" != "headless" ]]; then
+    cp -r ${DEPSDIR}/lib/tcl8.6 ./python-install/lib
+    cp -r ${DEPSDIR}/lib/tk8.6 ./python-install/lib
+  fi
+  cp -r ${LICENSEDIR} ./python-install
+
+  echo "::endgroup::"
+  #################################
+  # Check executable dependencies #
+  #################################
+  echo "::group::Check executable dependencies ${python_distro_ver}"
+  cd ${BUILDDIR}
+
+  cd python-install
+  echo "python dependencies"
+  readelf -d ./bin/python
+  echo
+  echo "libpython dependencies"
+  readelf -d ./lib/libpython${PYTHON_VER}${python_suffix}.so
+
+  echo "::endgroup::"
+  ###############
+  # Test python #
+  ###############
+  echo "::group::Test python ${python_distro_ver}"
+  cd ${BUILDDIR}
+
+  cd python-install
+  ${WORKDIR}/scripts/qemu_${ARCH}_interpreter ./bin/python --version
+
+  echo "::endgroup::"
+  ###############
+  # Preload pip #
+  ###############
+  echo "::group::Preload pip ${python_distro_ver}"
+  cd ${BUILDDIR}
+
+  cd python-install
+  ${WORKDIR}/scripts/qemu_${ARCH}_interpreter ./bin/python -m ensurepip
+  ${WORKDIR}/scripts/qemu_${ARCH}_interpreter ./bin/python -m pip install -r ${WORKDIR}/baseline/requirements.txt
+
+  python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip3
+  python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip${PYTHON_VER}
+
+  echo "::endgroup::"
+  ###################
+  # Compress output #
+  ###################
+  echo "::group::Compress output ${python_distro_ver}"
+  cd ${BUILDDIR}
+
+  python3 -m pip install pyclean --break-system-packages
+  python3 -m pyclean -v python-install
+  mv python-install python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}
+  tar -czf ${WORKDIR}/python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}.tar.gz python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}
+  zip ${WORKDIR}/python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}.zip $(tar tf ${WORKDIR}/python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}.tar.gz)
+
+  rm -rf python-build
+  echo "::endgroup::"
+}
+
+build_python
+if [[ "${PYTHON_MINOR}" == "13" ]]; then
+  build_python t "-DWITH_FREE_THREADING=ON"
 fi
-cp -r ${LICENSEDIR} ./python-install
-
-echo "::endgroup::"
-#################################
-# Check executable dependencies #
-#################################
-echo "::group::Check executable dependencies"
-cd ${BUILDDIR}
-
-cd python-install
-echo "python dependencies"
-readelf -d ./bin/python
-echo
-echo "libpython dependencies"
-readelf -d ./lib/libpython${PYTHON_VER}.so
-
-echo "::endgroup::"
-###############
-# Test python #
-###############
-echo "::group::Test python"
-cd ${BUILDDIR}
-
-cd python-install
-${WORKDIR}/scripts/qemu_${ARCH}_interpreter ./bin/python --version
-
-echo "::endgroup::"
-###############
-# Preload pip #
-###############
-echo "::group::Preload pip"
-cd ${BUILDDIR}
-
-cd python-install
-${WORKDIR}/scripts/qemu_${ARCH}_interpreter ./bin/python -m ensurepip
-${WORKDIR}/scripts/qemu_${ARCH}_interpreter ./bin/python -m pip install -r ${WORKDIR}/baseline/requirements.txt
-
-python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip3
-python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip${PYTHON_VER}
-
-echo "::endgroup::"
-###################
-# Compress output #
-###################
-echo "::group::Compress output"
-cd ${BUILDDIR}
-
-python3 -m pip install pyclean --break-system-packages
-python3 -m pyclean -v python-install
-mv python-install python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
-tar -czf ${WORKDIR}/python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}
-zip ${WORKDIR}/python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.zip $(tar tf ${WORKDIR}/python-${DISTRIBUTION}-${PYTHON_FULL_VER}-${PLATFORM}-${ARCH}.tar.gz)
-
-echo "::endgroup::"
