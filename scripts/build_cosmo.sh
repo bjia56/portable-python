@@ -196,7 +196,7 @@ function build_python () {
   python_distro_ver=${PYTHON_FULL_VER}${python_suffix}
 
   python_build_dir=python-build-${python_distro_ver}
-  python_install_dir=${python_install_dir}
+  python_install_dir=python-install-${python_distro_ver}
 
   echo "::group::Python ${python_distro_ver}"
   cd ${BUILDDIR}
