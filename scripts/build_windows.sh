@@ -186,12 +186,15 @@ function build_python () {
   cmake_python_features=$2
   python_distro_ver=${PYTHON_FULL_VER}${python_suffix}
 
+  python_build_dir=python-build-${python_distro_ver}
+  python_install_dir=python-install-${python_distro_ver}
+
   echo "::group::Python ${python_distro_ver}"
   cd ${BUILDDIR}
 
-  mkdir python-build
-  mkdir python-install
-  cd python-build
+  mkdir ${python_build_dir}
+  mkdir ${python_install_dir}
+  cd ${python_build_dir}
   cmake \
     "${cmake_verbose_flags[@]}" \
     ${cmake_python_features} \
@@ -199,7 +202,7 @@ function build_python () {
     -DPYTHON_VERSION=${PYTHON_FULL_VER} \
     -DPORTABLE_PYTHON_BUILD=ON \
     -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
-    -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install \
+    -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/${python_install_dir} \
     -DBUILD_EXTENSIONS_AS_BUILTIN=OFF \
     -DBUILD_LIBPYTHON_SHARED=ON \
     -DBUILD_TESTING=${INSTALL_TEST} \
@@ -222,24 +225,24 @@ function build_python () {
     ../portable-python-cmake-buildsystem
   cmake --build . --config ${BUILD_TYPE} -- /property:Configuration=${BUILD_TYPE}
   cmake --build . --target INSTALL -- /property:Configuration=${BUILD_TYPE}
-  cp -r ${LICENSEDIR} ${BUILDDIR}/python-install
+  cp -r ${LICENSEDIR} ${BUILDDIR}/${python_install_dir}
   cd ${BUILDDIR}
 
   # Need to bundle openssl with the executable
-  cp ${DEPSDIR}/openssl/bin/*.dll python-install/bin
+  cp ${DEPSDIR}/openssl/bin/*.dll ${python_install_dir}/bin
 
   # Need to bundle libffi with the executable
-  cp ${DEPSDIR}/libffi/lib/*.dll python-install/bin
+  cp ${DEPSDIR}/libffi/lib/*.dll ${python_install_dir}/bin
 
   if [[ "${DISTRIBUTION}" != "headless" ]]; then
     # Need to bundle tcl/tk with the executable
-    cp ${DEPSDIR}/tcltk/bin/*.dll python-install/bin
-    cp -r ${DEPSDIR}/tcltk/lib/tcl8.6 python-install/lib
-    cp -r ${DEPSDIR}/tcltk/lib/tk8.6 python-install/lib
+    cp ${DEPSDIR}/tcltk/bin/*.dll ${python_install_dir}/bin
+    cp -r ${DEPSDIR}/tcltk/lib/tcl8.6 ${python_install_dir}/lib
+    cp -r ${DEPSDIR}/tcltk/lib/tk8.6 ${python_install_dir}/lib
   fi
 
   # Need to bundle vcredist
-  #cp /c/WINDOWS/SYSTEM32/VCRUNTIME140.dll python-install/bin
+  #cp /c/WINDOWS/SYSTEM32/VCRUNTIME140.dll ${python_install_dir}/bin
 
   echo "::endgroup::"
   ###############
@@ -248,7 +251,7 @@ function build_python () {
   echo "::group::Test python ${python_distro_ver}"
   cd ${BUILDDIR}
 
-  ./python-install/bin/python --version
+  ./${python_install_dir}/bin/python --version
 
   echo "::endgroup::"
   ###############
@@ -257,8 +260,8 @@ function build_python () {
   echo "::group::Preload pip ${python_distro_ver}"
   cd ${BUILDDIR}
 
-  ./python-install/bin/python -m ensurepip
-  ./python-install/bin/python -m pip install -r ${WORKDIR}/baseline/requirements.txt
+  ./${python_install_dir}/bin/python -m ensurepip
+  ./${python_install_dir}/bin/python -m pip install -r ${WORKDIR}/baseline/requirements.txt
 
   ###################
   # Compress output #
@@ -267,12 +270,11 @@ function build_python () {
   cd ${BUILDDIR}
 
   python3 -m pip install pyclean
-  python3 -m pyclean -v python-install
-  mv python-install python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}
+  python3 -m pyclean -v ${python_install_dir}
+  mv ${python_install_dir} python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}
   tar -czf ${WORKDIR}/python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}.tar.gz python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}
   7z.exe a ${WORKDIR}/python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}.zip python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}
 
-  rm -rf python-build
   echo "::endgroup::"
 }
 
