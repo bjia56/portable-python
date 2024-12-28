@@ -417,12 +417,15 @@ function build_python () {
   cmake_python_features=$2
   python_distro_ver=${PYTHON_FULL_VER}${python_suffix}
 
+  python_build_dir=python-build-${python_distro_ver}
+  python_install_dir=python-install-${python_distro_ver}
+
   echo "::group::Python ${python_distro_ver}"
   cd ${BUILDDIR}
 
-  mkdir python-build
-  mkdir python-install
-  cd python-build
+  mkdir ${python_build_dir}
+  mkdir ${python_install_dir}
+  cd ${python_build_dir}
   # https://stackoverflow.com/a/52240320
   CFLAGS="${CFLAGS} -D_XOPEN_SOURCE=500 -D__EXTENSIONS__" LDFLAGS="${LDFLAGS} -lsocket -lnsl" cmake \
     "${cmake_verbose_flags[@]}" \
@@ -431,7 +434,7 @@ function build_python () {
     -DPYTHON_VERSION=${PYTHON_FULL_VER} \
     -DPORTABLE_PYTHON_BUILD=ON \
     -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
-    -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install \
+    -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/${python_install_dir} \
     -DBUILD_EXTENSIONS_AS_BUILTIN=ON \
     -DBUILD_LIBPYTHON_SHARED=ON \
     -DUSE_SYSTEM_LIBRARIES=OFF \
@@ -465,7 +468,7 @@ function build_python () {
   gmake install
 
   cd ${BUILDDIR}
-  cp -r ${LICENSEDIR} ./python-install
+  cp -r ${LICENSEDIR} ./${python_install_dir}
 
   echo "::endgroup::"
   #################################
@@ -474,7 +477,7 @@ function build_python () {
   echo "::group::Check executable dependencies ${python_distro_ver}"
   cd ${BUILDDIR}
 
-  cd python-install
+  cd ${python_install_dir}
   echo "python dependencies"
   greadelf -d ./bin/python
   echo
@@ -488,7 +491,7 @@ function build_python () {
   echo "::group::Test python ${python_distro_ver}"
   cd ${BUILDDIR}
 
-  cd python-install
+  cd ${python_install_dir}
   ./bin/python --version
 
   echo "::endgroup::"
@@ -498,7 +501,7 @@ function build_python () {
   echo "::group::Preload pip ${python_distro_ver}"
   cd ${BUILDDIR}
 
-  cd python-install
+  cd ${python_install_dir}
   ./bin/python -m ensurepip
   ./bin/python -m pip install -r ${WORKDIR}/baseline/requirements.txt
 
@@ -514,12 +517,11 @@ function build_python () {
 
   python3 -m ensurepip
   python3 -m pip install pyclean
-  python3 -m pyclean -v python-install
-  mv python-install python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}
+  python3 -m pyclean -v ${python_install_dir}
+  mv ${python_install_dir} python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}
   tar -czf ${WORKDIR}/python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}.tar.gz python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}
   zip ${WORKDIR}/python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}.zip $(tar tf ${WORKDIR}/python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}.tar.gz)
 
-  rm -rf python-build
   echo "::endgroup::"
 }
 
