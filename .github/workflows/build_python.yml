@@ -340,7 +340,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Start VM
-        uses: bjia56/freebsd-vm@nfs
+        uses: vmactions/freebsd-vm@v1
         with:
           sync: nfs
           release: ${{ steps.parse_release.outputs.release }}
@@ -413,7 +413,7 @@ jobs:
           path: .
 
       - name: Start VM
-        uses: bjia56/freebsd-vm@nfs
+        uses: vmactions/freebsd-vm@v1
         with:
           sync: nfs
           release: ${{ steps.parse_release.outputs.release }}
@@ -451,7 +451,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Start VM
-        uses: bjia56/solaris-vm@nfs
+        uses: vmactions/solaris-vm@v1
         with:
           sync: nfs
           release: ${{ steps.parse_release.outputs.release }}
@@ -522,7 +522,7 @@ jobs:
           path: .
 
       - name: Start VM
-        uses: bjia56/solaris-vm@nfs
+        uses: vmactions/solaris-vm@v1
         with:
           sync: nfs
           release: ${{ steps.parse_release.outputs.release }}
