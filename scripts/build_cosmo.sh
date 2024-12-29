@@ -296,7 +296,9 @@ function build_python () {
   $(which assimilate) -e -x -o ./bin/python.x86_64.elf ./bin/python.com
   $(which assimilate) -e -a -o ./bin/python.aarch64.elf ./bin/python.com
   $(which assimilate) -m -x -o ./bin/python.x86_64.macho ./bin/python.com
-  $(which assimilate) -m -a -o ./bin/python.aarch64.macho ./bin/python.com
+
+  # M1 macs should rely on xcode to compile the launcher from the embedded ape-m1.c
+  #$(which assimilate) -m -a -o ./bin/python.aarch64.macho ./bin/python.com
 
   echo "::endgroup::"
   ###################
