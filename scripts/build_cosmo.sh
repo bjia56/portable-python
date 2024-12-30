@@ -286,6 +286,21 @@ function build_python () {
   python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip${PYTHON_VER} .com
 
   echo "::endgroup::"
+  ##############
+  # Assimilate #
+  ##############
+  echo "::group::Assimilate python.com"
+  cd ${BUILDDIR}
+
+  cd ${python_install_dir}
+  $(which assimilate) -e -x -o ./bin/python.x86_64.elf ./bin/python.com
+  $(which assimilate) -e -a -o ./bin/python.aarch64.elf ./bin/python.com
+  $(which assimilate) -m -x -o ./bin/python.x86_64.macho ./bin/python.com
+
+  # M1 macs should rely on xcode to compile the launcher from the embedded ape-m1.c
+  #$(which assimilate) -m -a -o ./bin/python.aarch64.macho ./bin/python.com
+
+  echo "::endgroup::"
   ###################
   # Compress output #
   ###################
