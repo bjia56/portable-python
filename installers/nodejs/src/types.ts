@@ -14,6 +14,7 @@ export interface IPortablePython extends IInstallerProps {
     major: string;
     minor: string;
     patch: string;
+    micro: string;
     releaseTag: string;
     implementation: string;
     distribution: string;

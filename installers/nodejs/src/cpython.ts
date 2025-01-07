@@ -1,4 +1,5 @@
 import { platform, arch, release, version } from "os";
+import { accessSync } from "fs";
 import { chmod, symlink, rename } from "fs/promises";
 import { join } from "path";
 
@@ -42,13 +43,42 @@ const DL_ARCH = (() => {
     return arch();
 })();
 
+const COSMO_EXES = [
+    "python.com",
+    "python.x86_64.elf",
+    "python.x86_64.macho",
+    "python.aarch64.elf"
+]
+
 export default class CPythonInstaller implements IInstaller {
     constructor(private parent: IPortablePython) {}
 
     get relativeExecutablePath(): string {
+        if (this.parent.distribution === "cosmo") {
+            let exe = "python.com";
+            if (platform() == "darwin") {
+                if (arch() == "x64") {
+                    exe = "python.x86_64.macho";
+                }
+            } else if (platform() != "win32") {
+                if (arch() == "x64") {
+                    exe = "python.x86_64.elf";
+                } else if (arch() == "arm64") {
+                    exe = "python.aarch64.elf";
+                }
+            }
+
+            try {
+                accessSync(join(this.parent.extractPath, "bin", exe));
+            } catch {
+                exe = "python.com";
+            }
+
+            return join(this.pythonDistributionName, "bin", exe);
+        }
+
         return join(this.pythonDistributionName, "bin", "python" + (
-            this.parent.distribution === "cosmo" ? ".com" :
-            (platform() === "win32" ? ".exe" : "")
+            platform() === "win32" ? ".exe" : ""
         ));
     }
 
@@ -98,6 +128,20 @@ export default class CPythonInstaller implements IInstaller {
             await rename(`${this.parent.executablePath}${this.parent.major}_`, `${this.parent.executablePath}${this.parent.major}`);
             await symlink("python", `${this.parent.executablePath}${this.parent.major}.${this.parent.minor}_`, "file");
             await rename(`${this.parent.executablePath}${this.parent.major}.${this.parent.minor}_`, `${this.parent.executablePath}${this.parent.major}.${this.parent.minor}`);
+
+            // ensure the pip script is executable
+            await chmod(this.parent.pipPath, 0o777);
+            await chmod(`${this.parent.pipPath}.${this.parent.minor}`, 0o777);
+        }
+
+        if (this.parent.distribution === "cosmo" && platform() != "win32") {
+            for (const exe of COSMO_EXES) {
+                try {
+                    await chmod(join(this.parent.extractPath, "bin", exe), 0o777);
+                } catch(e) {
+                    // ignore
+                }
+            }
 
             // ensure the pip script is executable
             await chmod(this.parent.pipPath, 0o777);

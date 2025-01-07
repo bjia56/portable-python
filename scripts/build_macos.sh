@@ -288,13 +288,15 @@ function build_python () {
   cmake_python_features=$2
   python_distro_ver=${PYTHON_FULL_VER}${python_suffix}
 
+  python_build_dir=python-build-${python_distro_ver}
+  python_install_dir=python-install-${python_distro_ver}
+
   echo "::group::Python ${python_distro_ver}"
   cd ${BUILDDIR}
 
-
-  mkdir python-build
-  mkdir python-install
-  cd python-build
+  mkdir ${python_build_dir}
+  mkdir ${python_install_dir}
+  cd ${python_build_dir}
   cmake \
     "${cmake_verbose_flags[@]}" \
     ${cmake_python_features} \
@@ -305,7 +307,7 @@ function build_python () {
     -DPYTHON_VERSION=${PYTHON_FULL_VER} \
     -DPORTABLE_PYTHON_BUILD=ON \
     -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
-    -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/python-install \
+    -DCMAKE_INSTALL_PREFIX:PATH=${BUILDDIR}/${python_install_dir} \
     -DBUILD_EXTENSIONS_AS_BUILTIN=OFF \
     -DBUILD_LIBPYTHON_SHARED=ON \
     -DUSE_SYSTEM_LIBRARIES=OFF \
@@ -340,7 +342,7 @@ function build_python () {
     ../portable-python-cmake-buildsystem
   make -j${NPROC}
   make install
-  cp -r ${LICENSEDIR} ${BUILDDIR}/python-install
+  cp -r ${LICENSEDIR} ${BUILDDIR}/${python_install_dir}
   cd ${BUILDDIR}
 
   echo "::endgroup::"
@@ -350,14 +352,14 @@ function build_python () {
   echo "::group::Test and patch python ${python_distro_ver}"
   cd ${BUILDDIR}
 
-  ./python-install/bin/python --version
+  ./${python_install_dir}/bin/python --version
 
-  otool -l ./python-install/bin/python
-  install_name_tool -add_rpath @executable_path/../lib ./python-install/bin/python
-  install_name_tool -change ${BUILDDIR}/python-install/lib/libpython${PYTHON_VER}${python_suffix}.dylib @rpath/libpython${PYTHON_VER}${python_suffix}.dylib ./python-install/bin/python
-  otool -l ./python-install/bin/python
+  otool -l ./${python_install_dir}/bin/python
+  install_name_tool -add_rpath @executable_path/../lib ./${python_install_dir}/bin/python
+  install_name_tool -change ${BUILDDIR}/${python_install_dir}/lib/libpython${PYTHON_VER}${python_suffix}.dylib @rpath/libpython${PYTHON_VER}${python_suffix}.dylib ./${python_install_dir}/bin/python
+  otool -l ./${python_install_dir}/bin/python
 
-  ./python-install/bin/python --version
+  ./${python_install_dir}/bin/python --version
 
   echo "::endgroup::"
   ###############
@@ -366,11 +368,11 @@ function build_python () {
   echo "::group::Preload pip ${python_distro_ver}"
   cd ${BUILDDIR}
 
-  ./python-install/bin/python -m ensurepip
-  ./python-install/bin/python -m pip install -r ${WORKDIR}/baseline/requirements.txt
+  ./${python_install_dir}/bin/python -m ensurepip
+  ./${python_install_dir}/bin/python -m pip install -r ${WORKDIR}/baseline/requirements.txt
 
-  python3 ${WORKDIR}/scripts/patch_pip_script.py ./python-install/bin/pip3
-  python3 ${WORKDIR}/scripts/patch_pip_script.py ./python-install/bin/pip${PYTHON_VER}
+  python3 ${WORKDIR}/scripts/patch_pip_script.py ./${python_install_dir}/bin/pip3
+  python3 ${WORKDIR}/scripts/patch_pip_script.py ./${python_install_dir}/bin/pip${PYTHON_VER}
 
   ###################
   # Compress output #
@@ -379,12 +381,11 @@ function build_python () {
   cd ${BUILDDIR}
 
   python3 -m pip install pyclean
-  python3 -m pyclean -v python-install
-  mv python-install python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}
+  python3 -m pyclean -v ${python_install_dir}
+  mv ${python_install_dir} python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}
   tar -czf ${WORKDIR}/python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}.tar.gz python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}
   zip ${WORKDIR}/python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}.zip $(tar tf ${WORKDIR}/python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}.tar.gz)
 
-  rm -rf python-build
   echo "::endgroup::"
 }
 

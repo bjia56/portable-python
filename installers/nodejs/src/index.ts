@@ -113,10 +113,17 @@ export class PortablePython implements IPortablePython {
     }
 
     /**
+     * Contains the micro version number.
+     */
+    get micro() {
+        return this.version.split(".")[2];
+    }
+
+    /**
      * Contains the patch version number.
      */
     get patch() {
-        return this.version.split(".")[2];
+        return this.micro;
     }
 
     /**
