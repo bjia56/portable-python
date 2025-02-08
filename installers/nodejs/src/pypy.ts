@@ -61,7 +61,7 @@ export default class PyPyInstaller implements IInstaller {
             throw Error("expected pypy implementation");
         }
 
-        if (!["auto", "3.9", "3.10"].includes(this.parent.distribution)) {
+        if (!["auto", "3.9", "3.10", "3.11"].includes(this.parent.distribution)) {
             throw Error("invalid distribution");
         }
     }
