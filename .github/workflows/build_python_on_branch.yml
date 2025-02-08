@@ -43,7 +43,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        graalpy_version: [ 24.1.1 ]
+        graalpy_version: [ 24.1.2 ]
     uses: ./.github/workflows/repackage_graalpy.yml
     with:
       graalpy_version: ${{ matrix.graalpy_version }}
