@@ -33,6 +33,11 @@ export default class PyPyInstaller implements IInstaller {
 
     get pythonMinor(): string {
         if (this.parent.distribution === "auto") {
+            if ((parseInt(this.parent.major) > 7) ||
+                (this.parent.major == "7" && parseInt(this.parent.minor) > 3) ||
+                (this.parent.major == "7" && this.parent.minor == "3" && parseInt(this.parent.patch) > 18)) {
+                return "11";
+            }
             return "10";
         }
         return this.parent.distribution.split(".")[1];
@@ -61,8 +66,21 @@ export default class PyPyInstaller implements IInstaller {
             throw Error("expected pypy implementation");
         }
 
-        if (!["auto", "3.9", "3.10", "3.11"].includes(this.parent.distribution)) {
-            throw Error("invalid distribution");
+        if ((parseInt(this.parent.major) > 7) ||
+            (this.parent.major == "7" && parseInt(this.parent.minor) > 3) ||
+            (this.parent.major == "7" && this.parent.minor == "3" && parseInt(this.parent.patch) > 18)) {
+            // https://pypy.org/posts/2025/02/pypy-v7318-release.html
+            if (!["auto", "3.11"].includes(this.parent.distribution)) {
+                throw Error("invalid distribution");
+            }
+        } else if (this.parent.major == "7" && this.parent.minor == "3" && this.parent.patch == "18") {
+            if (!["auto", "3.10", "3.11"].includes(this.parent.distribution)) {
+                throw Error("invalid distribution");
+            }
+        } else {
+            if (!["auto", "3.9", "3.10"].includes(this.parent.distribution)) {
+                throw Error("invalid distribution");
+            }
         }
     }
 
