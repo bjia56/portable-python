@@ -27,7 +27,7 @@ jobs:
   build_linux:
     name: Linux ${{ inputs.pypy_version }} ${{ matrix.arch }}
     if: ${{ contains(inputs.platforms, 'linux') }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.arch == 'x86_64' && 'ubuntu-latest' || 'ubuntu-24.04-arm' }}
     strategy:
       fail-fast: false
       matrix:

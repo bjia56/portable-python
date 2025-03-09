@@ -18,7 +18,6 @@ if [[ "${PLATFORM}" == "darwin" ]]; then
 fi
 
 python3 -m pip install pyclean
-
 WORKDIR=$(pwd)
 
 function repackage_pypy () {
@@ -84,3 +83,4 @@ function repackage_pypy () {
 }
 
 repackage_pypy 3.10
+repackage_pypy 3.11
