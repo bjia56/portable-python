@@ -21,18 +21,6 @@ if [[ "${PLATFORM}" != "windows" ]]; then
   source venv/bin/activate
 fi
 
-if [[ "${PLATFORM}" == "linux" ]]; then
-  docker pull --platform "${DOCKER_PLATFORM}" "${DOCKER_IMAGE}"
-  function maybe_docker () {
-    docker run --platform "${DOCKER_PLATFORM}" -v .:/ws --workdir /ws "${DOCKER_IMAGE}" "$@"
-    sudo chown -R $(id -u):$(id -g) .
-  }
-else
-  function maybe_docker () {
-    "$@"
-  }
-fi
-
 python3 -m pip install pyclean
 WORKDIR=$(pwd)
 
@@ -70,12 +58,12 @@ function repackage_graal () {
   cd ${EXTRACTED_FILENAME}
   if [[ "${DISTRIBUTION}" == *"jvm"* ]]; then
     if [[ "${DISTRIBUTION}" == *"community"* ]]; then
-      maybe_docker ./libexec/graalpy-polyglot-get js-community
+      ./libexec/graalpy-polyglot-get js-community
     else
-      maybe_docker ./libexec/graalpy-polyglot-get js
+      ./libexec/graalpy-polyglot-get js
     fi
   fi
-  maybe_docker ./bin/python -m ensurepip
+  ./bin/python -m ensurepip
 
   if [[ "${PLATFORM}" != "windows" ]]; then
     python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip3
@@ -98,15 +86,7 @@ function repackage_graal () {
   echo "::endgroup::"
 }
 
-if [[ "${PLATFORM}" == "linux" ]]; then
-  if [[ "${MATRIX_DISTRIBUTION}" == "standard" ]]; then
-    repackage_graal
-  else
-    repackage_graal "${MATRIX_DISTRIBUTION}"
-  fi
-else
-  repackage_graal
-  repackage_graal jvm
-  repackage_graal community
-  repackage_graal community-jvm
-fi
+repackage_graal
+repackage_graal jvm
+repackage_graal community
+repackage_graal community-jvm
