@@ -82,7 +82,7 @@ jobs:
       - name: Set up zig
         uses: mlugg/setup-zig@v1
         with:
-          version: 0.14.0
+          version: zig-0.15.0-dev.276+9bbac4288
 
       - name: Checkout
         uses: actions/checkout@v4
