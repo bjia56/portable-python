@@ -24,7 +24,7 @@ fi
 
 function download_and_verify () {
   file="$1"
-  curl -s -S -f -L -o $file https://github.com/bjia56/build-dependencies/releases/download/portable-python/$file
+  curl -s -S -f -L --retry 5 --retry-delay 0 --retry-all-errors -o $file https://github.com/bjia56/build-dependencies/releases/download/portable-python/$file
   verify_checksum $file
 }
 
