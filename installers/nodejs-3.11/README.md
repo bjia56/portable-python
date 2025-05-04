@@ -44,7 +44,7 @@ Currently, CPython 3.9, 3.10, 3.11, 3.12, and 3.13 are built for the following t
 - MacOS x86_64, arm64 <sup id="a3">[3](#f3)</sup>
 - FreeBSD 13, 14, 15 x86_64
 - Solaris 11 x86_64
-- Cosmopolitan libc <sup id="a4">[4](#f4)</sup>
+- Cosmopolitan Libc <sup id="a4">[4](#f4)</sup>
 
 For Linux CPython builds, the minimum glibc required is as follows:
 
@@ -70,7 +70,7 @@ PyPy and GraalPy distributions are also available as repackaged versions of offi
 
 <sub><b id="f3">3</b> MacOS distributions are provided as universal2, which will work on both x86_64 and arm64. The minimum MacOS version is 10.9 on x86_64 and 11.0 on arm64. [↩](#a3)</sub>
 
-<sub><b id="f4">4</b> [Cosmopolitan](https://justine.lol/cosmopolitan/index.html) builds are statically linked and may not support all Python features. See the Cosmopolitan project's documentation for minimum operating system requirements. [↩](#a4)</sub>
+<sub><b id="f4">4</b> [Cosmopolitan Libc](https://justine.lol/cosmopolitan/index.html) builds are statically linked and may not support all Python features. See the Cosmopolitan Libc project's documentation for minimum operating system requirements. [↩](#a4)</sub>
 
 ## Licensing
 
