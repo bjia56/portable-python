@@ -1,6 +1,6 @@
 {
   "name": "@bjia56/portable-python",
-  "version": "0.1.117",
+  "version": "0.1.118",
   "description": "Portable Python",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -91,12 +91,14 @@
     },
     "pypy": {
       "versions": [
+        "7.3.18",
         "7.3.17",
         "7.3.16"
       ],
       "versionBuilds": {
         "7.3.16": "pypy-v7.3.16-build.0",
-        "7.3.17": "pypy-v7.3.17-build.0"
+        "7.3.17": "pypy-v7.3.17-build.0",
+        "7.3.18": "pypy-v7.3.18-build.0"
       }
     }
   }
