@@ -20,6 +20,31 @@ fi
 python3 -m pip install pyclean
 WORKDIR=$(pwd)
 
+function get_version_code() {
+  local semver=$1
+  local major minor patch
+
+  # Split the semver string into components
+  IFS='.' read -r major minor patch <<< "$semver"
+
+  # Validate that major, minor, and patch are numbers
+  if [[ ! $major =~ ^[0-9]+$ ]] || [[ ! $minor =~ ^[0-9]+$ ]] || [[ ! $patch =~ ^[0-9]+$ ]]; then
+    echo "Invalid version format"
+    return 1
+  fi
+
+  # Compare version components
+  if (( major < 7 )) || { (( major == 7 )) && (( minor < 3 )); } || { (( major == 7 )) && (( minor == 3 )) && (( patch < 16 )); }; then
+    echo 9
+  elif (( major == 7 && minor == 3 && patch == 16 )); then
+    echo "9 10"
+  elif (( major == 7 && minor == 3 && patch == 17 )); then
+    echo 10
+  else
+    echo "10 11"
+  fi
+}
+
 function repackage_pypy () {
   DISTRIBUTION=$1
   echo "::group::PyPy ${DISTRIBUTION}"
@@ -82,5 +107,6 @@ function repackage_pypy () {
   echo "::endgroup::"
 }
 
-repackage_pypy 3.10
-repackage_pypy 3.11
+for python_minor in $(get_version_code ${PYPY_VERSION}); do
+  repackage_pypy 3.${python_minor}
+done

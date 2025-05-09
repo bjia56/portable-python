@@ -24,6 +24,31 @@ fi
 python3 -m pip install pyclean
 WORKDIR=$(pwd)
 
+function get_version_code() {
+  local semver=$1
+  local major minor patch
+
+  # Split the semver string into components
+  IFS='.' read -r major minor patch <<< "$semver"
+
+  # Validate that major and minor are numbers
+  if [[ ! $major =~ ^[0-9]+$ ]] || [[ ! $minor =~ ^[0-9]+$ ]]; then
+    echo "Invalid version format"
+    return 1
+  fi
+
+  # Apply the conditions
+  if (( major < 24 )); then
+    echo 10
+  elif (( major == 24 && minor < 1 )); then
+    echo 10
+  else
+    echo 11
+  fi
+}
+
+PYTHON_MINOR=$(get_version_code ${GRAALPY_VERSION})
+
 function repackage_graal () {
   DISTRIBUTION=$1
   echo "::group::GraalPy ${DISTRIBUTION}"
@@ -67,7 +92,7 @@ function repackage_graal () {
 
   if [[ "${PLATFORM}" != "windows" ]]; then
     python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip3
-    python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip3.11
+    python3 ${WORKDIR}/scripts/patch_pip_script.py ./bin/pip3.${PYTHON_MINOR}
   fi
 
   cd ${WORKDIR}
