@@ -166,7 +166,7 @@ export default class CPythonInstaller implements IInstaller {
             const glibcInterpreterPath = join(glibcPath, "lib", glibcInterpreter);
 
             // Run patchelf to set the interpreter
-            execSync(`patchelf --set-interpreter ${glibcInterpreterPath} ${this.parent.executablePath}`);
+            execSync(`nix-shell -p patchelf --run 'patchelf --set-interpreter ${glibcInterpreterPath} ${this.parent.executablePath}'`);
         }
     }
 }
