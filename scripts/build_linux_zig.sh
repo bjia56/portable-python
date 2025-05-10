@@ -403,7 +403,7 @@ cd ${BUILDDIR}
 
 download_verify_extract freetype-2.13.2.tar.gz
 cd freetype*
-./configure --host=${CHOST} --prefix=${DEPSDIR}
+./configure --host=${CHOST} --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
 install_license ./docs/FTL.TXT
