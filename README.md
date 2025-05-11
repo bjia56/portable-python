@@ -1,5 +1,5 @@
 # portable-python
-[![GitHub Downloads (all assets, all releases)](https://bjia56.github.io/stats/bjia56/portable-python/downloads_badge.svg)](https://bjia56.github.io/portable-python/)
+![GitHub Downloads (all assets, all releases)](https://bjia56.github.io/stats/bjia56/portable-python/downloads_badge.svg)
 [![NPM Version](https://img.shields.io/npm/v/%40bjia56%2Fportable-python)](https://www.npmjs.com/package/@bjia56/portable-python)
 
 
