@@ -549,7 +549,7 @@ jobs:
           echo "cosmocc_version=${version}" >> "$GITHUB_ENV"
 
       - name: Set up cosmocc
-        uses: bjia56/setup-cosmocc@v0.0.3
+        uses: bjia56/setup-cosmocc@v0.0.4
         with:
           version: ${{ env.cosmocc_version }}
 
@@ -601,7 +601,7 @@ jobs:
     steps:
       - name: Set up cosmocc
         if: ${{ matrix.os == 'Linux' }}
-        uses: bjia56/setup-cosmocc@v0.0.3
+        uses: bjia56/setup-cosmocc@v0.0.4
 
       - name: Checkout
         uses: actions/checkout@v4
