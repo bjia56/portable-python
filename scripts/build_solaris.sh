@@ -515,8 +515,7 @@ function build_python () {
   echo "::group::Compress output ${python_distro_ver}"
   cd ${BUILDDIR}
 
-  python3 -m ensurepip
-  python3 -m pip install pyclean
+  python3 -m pip install pyclean --break-system-packages
   python3 -m pyclean -v ${python_install_dir}
   mv ${python_install_dir} python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}
   tar -czf ${WORKDIR}/python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}.tar.gz python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}
