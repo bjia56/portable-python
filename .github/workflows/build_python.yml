@@ -167,18 +167,12 @@ jobs:
   build_windows:
     name: Windows ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (build)
     if: ${{ contains(inputs.platforms, 'windows') }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.arch == 'x86_64' && 'windows-latest' || 'windows-11-arm' }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ windows-latest, windows-11-arm ]
         arch: [x86_64, aarch64]
         distribution: [full, headless]
-        include:
-          - os: windows-latest
-            arch: x86_64
-          - os: windows-11-arm
-            arch: arm64
         exclude:
           - arch: ${{ !contains(inputs.platforms, 'windows-x86_64') && 'x86_64' || '' }}
           - arch: ${{ !contains(inputs.platforms, 'windows-aarch64') && 'aarch64' || '' }}
@@ -226,18 +220,12 @@ jobs:
   test_windows:
     name: Windows ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (test)
     needs: build_windows
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.arch == 'x86_64' && 'windows-latest' || 'windows-11-arm' }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ windows-latest, windows-11-arm ]
         arch: [x86_64, aarch64]
         distribution: [full, headless]
-        include:
-          - os: windows-latest
-            arch: x86_64
-          - os: windows-11-arm
-            arch: arm64
         exclude:
           - arch: ${{ !contains(inputs.platforms, 'windows-x86_64') && 'x86_64' || '' }}
           - arch: ${{ !contains(inputs.platforms, 'windows-aarch64') && 'aarch64' || '' }}
@@ -308,17 +296,12 @@ jobs:
   test_macos:
     name: MacOS ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (test)
     needs: build_macos
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.arch == 'x86_64' && 'macos-13' || 'macos-14' }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-13, macos-14 ]
+        arch: [x86_64, aarch64]
         distribution: [full, headless]
-        include:
-          - os: macos-13
-            arch: x86_64
-          - os: macos-14
-            arch: arm64
 
     steps:
       - name: Checkout
