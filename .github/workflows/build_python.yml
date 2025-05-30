@@ -171,6 +171,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        os: [ windows-latest, windows-11-arm ]
         distribution: [full, headless]
         include:
           - os: windows-latest
@@ -228,6 +229,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        os: [ windows-latest, windows-11-arm ]
         distribution: [full, headless]
         include:
           - os: windows-latest
