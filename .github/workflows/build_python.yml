@@ -172,6 +172,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ windows-latest, windows-11-arm ]
+        arch: [x86_64, aarch64]
         distribution: [full, headless]
         include:
           - os: windows-latest
@@ -230,6 +231,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ windows-latest, windows-11-arm ]
+        arch: [x86_64, aarch64]
         distribution: [full, headless]
         include:
           - os: windows-latest
