@@ -29,8 +29,10 @@ cd ${BUILDDIR}
 
 if (( ${PYTHON_MINOR} < 11 )); then
   OPENSSL_VER=1.1.1u
+  OPENSSL_LICENSE=LICENSE
 else
   OPENSSL_VER=3.0.15
+  OPENSSL_LICENSE=LICENSE.txt
 fi
 curl -L https://github.com/python/cpython-bin-deps/archive/refs/tags/openssl-bin-${OPENSSL_VER}.tar.gz --output cpython-bin-deps-openssl-bin-${OPENSSL_VER}.tar.gz
 tar -xf cpython-bin-deps-openssl-bin-${OPENSSL_VER}.tar.gz
@@ -49,7 +51,7 @@ mkdir ${DEPSDIR}/openssl/bin
 cp ${BINDEPS_ARCH}/lib* ${DEPSDIR}/openssl/bin/
   
 cd ${BINDEPS_ARCH}
-install_license LICENSE.txt openssl-${OPENSSL_VER}
+install_license ${OPENSSL_LICENSE} openssl-${OPENSSL_VER}
 
 echo "::endgroup::"
 #########
