@@ -19,6 +19,7 @@ cd ${BUILDDIR}
 
 download_verify_extract zlib-1.3.1.tar.gz
 cd zlib*
+maybe_patch
 ./configure --prefix=${DEPSDIR} --static
 gmake -j4
 gmake install
@@ -37,6 +38,7 @@ else
   download_verify_extract openssl-3.0.15.tar.gz
 fi
 cd openssl*
+maybe_patch
 ./Configure BSD-${ARCH} no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 gmake -j4
 gmake install_sw
@@ -51,6 +53,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libffi-3.4.6.tar.gz
 cd libffi*
+maybe_patch
 ./configure --disable-shared --prefix=${DEPSDIR}
 gmake -j4
 gmake install
@@ -65,6 +68,7 @@ cd ${BUILDDIR}
 
 download_verify_extract sqlite-autoconf-3450000.tar.gz
 cd sqlite*
+maybe_patch
 ./configure --disable-shared --prefix=${DEPSDIR}
 gmake -j4
 gmake install
@@ -78,6 +82,7 @@ cd ${BUILDDIR}
 
 download_verify_extract expat-2.6.2.tar.gz
 cd expat*
+maybe_patch
 ./configure --disable-shared --prefix=${DEPSDIR}
 gmake -j4
 gmake install
@@ -92,6 +97,7 @@ cd ${BUILDDIR}
 
 download_verify_extract ncurses-6.4.tar.gz
 cd ncurses*
+maybe_patch
 ./configure --with-normal --without-shared --without-progs --enable-overwrite --disable-stripping --enable-widec --with-termlib --disable-database --with-fallbacks=xterm,xterm-256color,screen-256color,linux,vt100 --prefix=${DEPSDIR}
 gmake -j4
 gmake install.libs
@@ -106,6 +112,7 @@ cd ${BUILDDIR}
 
 download_verify_extract readline-8.2.tar.gz
 cd readline*
+maybe_patch
 ./configure --with-curses --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
 gmake -j4
 gmake install
@@ -122,6 +129,7 @@ wget --no-verbose -O bzip2.tar.gz https://github.com/commontk/bzip2/tarball/mast
 tar --no-same-permissions --no-same-owner -xf bzip2*.tar.gz
 rm *.tar.gz
 cd commontk-bzip2*
+maybe_patch bzip2-1.0.8
 mkdir build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
@@ -139,6 +147,7 @@ cd ${BUILDDIR}
 
 download_verify_extract xz-5.4.5.tar.gz
 cd xz*
+maybe_patch
 mkdir build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DBUILD_SHARED_LIBS=OFF ..
@@ -156,6 +165,7 @@ cd ${BUILDDIR}
 
 download_verify_extract brotli-1.1.0.tar.gz
 cd brotli*
+maybe_patch
 mkdir build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
@@ -173,6 +183,7 @@ cd ${BUILDDIR}
 
 download_verify_extract gdbm-1.23.tar.gz
 cd gdbm*
+maybe_patch
 ./configure --enable-libgdbm-compat --disable-shared --prefix=${DEPSDIR}
 gmake -j4
 gmake install
@@ -187,6 +198,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libxml2-2.12.4.tar.xz
 cd libxml2*
+maybe_patch
 ./configure --without-python --enable-static --disable-shared --prefix=${DEPSDIR}
 gmake -j4
 gmake install
@@ -201,9 +213,11 @@ cd ${BUILDDIR}
 
 download_verify_extract libpng-1.6.41.tar.gz
 cd libpng*
+maybe_patch
 ./configure --with-zlib-prefix=${DEPSDIR}  --enable-static --disable-shared --disable-tools --prefix=${DEPSDIR}
 gmake -j4
 gmake install
+install_license
 
 echo "::endgroup::"
 #############
@@ -214,6 +228,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libgpg-error-1.47.tar.bz2
 cd libgpg-error*
+maybe_patch
 ./configure --enable-static --disable-shared --prefix=${DEPSDIR}
 gmake -j4
 gmake install
@@ -223,6 +238,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libgcrypt-1.10.3.tar.bz2
 cd libgcrypt*
+maybe_patch
 ./configure --enable-static --disable-shared --disable-asm --prefix=${DEPSDIR}
 gmake -j4
 gmake install
@@ -237,6 +253,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libxslt-1.1.39.tar.xz
 cd libxslt*
+maybe_patch
 CFLAGS="${CFLAGS} -I${DEPSDIR}/include/libxml2" ./configure --enable-static --disable-shared --with-libxml-prefix=${DEPSDIR} --without-python --prefix=${DEPSDIR}
 gmake -j4
 gmake install
@@ -251,6 +268,7 @@ cd ${BUILDDIR}
 
 download_verify_extract freetype-2.13.2.tar.gz
 cd freetype*
+maybe_patch
 ./configure --enable-static --disable-shared --prefix=${DEPSDIR}
 gmake -j4
 gmake install
@@ -265,6 +283,7 @@ cd ${BUILDDIR}
 
 download_verify_extract fontconfig-2.15.0.tar.gz
 cd fontconfig*
+maybe_patch
 ./configure --enable-libxml2 --disable-cache-build --enable-static --disable-shared --prefix=${DEPSDIR}
 gmake -j4
 gmake install
@@ -286,6 +305,7 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
     file=$pkg.tar.gz
     download_verify_extract $file
     cd $pkg
+    maybe_patch
     autoreconf -vfi ${AL_OPTS}
     ./configure --enable-static --disable-shared $ext_flags --prefix=${DEPSDIR}
     gmake -j4
@@ -329,7 +349,9 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
   cd ${BUILDDIR}
 
   download_verify_extract tcl8.6.13-src.tar.gz
-  cd tcl*/unix
+  cd tcl*
+  maybe_patch
+  cd unix
   ./configure --enable-static --disable-shared --prefix=${DEPSDIR}
   gmake -j4
   gmake install
@@ -344,7 +366,9 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
   cd ${BUILDDIR}
 
   download_verify_extract tk8.6.13-src.tar.gz
-  cd tk*/unix
+  cd tk*
+  maybe_patch
+  cd unix
   LDFLAGS="${LDFLAGS} -lxml2 -lxcb -lXau" ./configure --enable-static --disable-shared --prefix=${DEPSDIR}
   gmake -j4
   gmake install

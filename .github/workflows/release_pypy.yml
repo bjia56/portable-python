@@ -70,10 +70,10 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload files
-        uses: softprops/action-gh-release@v2
-        with:
-          files: /tmp/pypy/pypy*.zip
-          tag_name: ${{ env.SELECTED_TAG }}
+        run: |
+          gh release upload ${{ env.SELECTED_TAG }} /tmp/pypy/pypy*.zip
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     outputs:
       release_tag: ${{ steps.pick_tag.outputs.release_tag }}

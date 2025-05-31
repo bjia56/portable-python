@@ -1,0 +1,11 @@
+diff '--color=auto' -urN sqlite-autoconf-3450000-2/configure sqlite-autoconf-3450000/configure
+--- sqlite-autoconf-3450000-2/configure 2024-01-15 12:26:48.000000000 -0500
++++ sqlite-autoconf-3450000/configure   2025-05-30 22:31:12.654535850 -0400
+@@ -622,7 +622,7 @@
+ PACKAGE_NAME='sqlite'
+ PACKAGE_TARNAME='sqlite'
+ PACKAGE_VERSION='3.45.0'
+-PACKAGE_STRING='sqlite 3.45.0'
++PACKAGE_STRING='sqlite\\x203.45.0'
+ PACKAGE_BUGREPORT='http://www.sqlite.org'
+ PACKAGE_URL=''

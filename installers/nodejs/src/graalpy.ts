@@ -23,7 +23,14 @@ const DL_ARCH = (() => {
 
 export default class GraalPyInstaller implements IInstaller {
     private pythonMajor: number = 3;
-    private pythonMinor: number = 10;
+    private get pythonMinor(): number {
+        const parentMajor = parseInt(this.parent.major);
+        const parentMinor = parseInt(this.parent.minor);
+        if (parentMajor < 24 || (parentMajor === 24 && parentMinor < 1)) {
+            return 10;
+        }
+        return 11;
+    };
 
     constructor(private parent: IPortablePython) {}
 

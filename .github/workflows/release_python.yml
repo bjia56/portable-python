@@ -26,7 +26,7 @@ jobs:
     uses: ./.github/workflows/build_python.yml
     with:
       python_version: ${{ inputs.python_version }}
-      platforms: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,linux-loongarch64,linux-s390x,linux-powerpc64le,macos,windows,cosmo,freebsd13-x86_64,freebsd14-x86_64,freebsd15-x86_64,freebsd13-aarch64,freebsd14-aarch64,freebsd15-aarch64,solaris11-x86_64"
+      platforms: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,linux-loongarch64,linux-s390x,linux-powerpc64le,macos,windows-x86_64,windows-aarch64,cosmo,freebsd13-x86_64,freebsd14-x86_64,freebsd15-x86_64,freebsd13-aarch64,freebsd14-aarch64,freebsd15-aarch64,solaris11-x86_64"
 
   publish:
     name: Publish CPython ${{ inputs.python_version }}
@@ -70,10 +70,10 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload files
-        uses: softprops/action-gh-release@v2
-        with:
-          files: /tmp/python/python*.zip
-          tag_name: ${{ env.SELECTED_TAG }}
+        run: |
+          gh release upload ${{ env.SELECTED_TAG }} /tmp/python/python*.zip
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     outputs:
       release_tag: ${{ steps.pick_tag.outputs.release_tag }}

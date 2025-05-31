@@ -7,6 +7,15 @@ echo "Selected portable-python-cmake-buildsystem branch: ${CMAKE_BUILDSYSTEM_BRA
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 
+ARCH=$1
+PYTHON_FULL_VER=$2
+
+DISTRIBUTION=$3
+PYTHON_VER=$(echo ${PYTHON_FULL_VER} | cut -d "." -f 1-2)
+PYTHON_MAJOR=$(echo ${PYTHON_VER} | cut -d "." -f 1)
+PYTHON_MINOR=$(echo ${PYTHON_VER} | cut -d "." -f 2)
+export PORTABLE_PYTHON_PY_VER=${PYTHON_VER}
+
 if [[ "${PLATFORM}" == "freebsd"* ]]; then
   function verify_checksum () {
     file="$1"
@@ -24,7 +33,7 @@ fi
 
 function download_and_verify () {
   file="$1"
-  curl -s -S -f -L -o $file https://github.com/bjia56/build-dependencies/releases/download/portable-python/$file
+  curl -s -S -f -L --retry 15 --retry-delay 0 --retry-all-errors -o $file https://github.com/bjia56/build-dependencies/releases/download/portable-python/$file
   verify_checksum $file
 }
 
@@ -48,14 +57,20 @@ else
   }
 fi
 
-ARCH=$1
-PYTHON_FULL_VER=$2
-
-DISTRIBUTION=$3
-PYTHON_VER=$(echo ${PYTHON_FULL_VER} | cut -d "." -f 1-2)
-PYTHON_MAJOR=$(echo ${PYTHON_VER} | cut -d "." -f 1)
-PYTHON_MINOR=$(echo ${PYTHON_VER} | cut -d "." -f 2)
-export PORTABLE_PYTHON_PY_VER=${PYTHON_VER}
+function maybe_patch () {
+  project=$(basename $(pwd))
+  if [[ "$1" != "" ]]; then
+    project=$1
+  fi
+  patch_dir="${SCRIPT_DIR}/../patches/${PLATFORM}/${ARCH}/${project}"
+  if [ -d "$patch_dir" ]; then
+    for patch_file in "$patch_dir"/*.patch; do
+      [ -e "$patch_file" ] || continue  # Skip if no .patch files
+      echo "Applying patch: $patch_file"
+      patch -p1 < "$patch_file"
+    done
+  fi
+}
 
 WORKDIR=$(pwd)
 BUILDDIR=${WORKDIR}/build
