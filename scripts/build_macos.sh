@@ -32,6 +32,7 @@ cd ${BUILDDIR}
 
 download_verify_extract ncurses-6.4.tar.gz
 cd ncurses*
+maybe_patch
 CC=clang CXX=clang++ CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" CXXFLAGS="${CXXFLAGS} -arch x86_64 -arch arm64" ./configure --with-normal --without-progs --enable-overwrite --disable-stripping --enable-widec --with-termlib --disable-database --with-fallbacks=xterm,xterm-256color,screen-256color,linux,vt100 --prefix=${DEPSDIR}
 make -j4
 make install.libs
@@ -46,6 +47,7 @@ cd ${BUILDDIR}
 
 download_verify_extract readline-8.2.tar.gz
 cd readline*
+maybe_patch
 CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --with-curses --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
@@ -61,7 +63,9 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
   cd ${BUILDDIR}
 
   download_verify_extract tcl8.6.13-src.tar.gz
-  cd tcl*/unix
+  cd tcl*
+  maybe_patch
+  cd unix
   CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --disable-shared --enable-aqua --prefix=${DEPSDIR}
   make -j${NPROC}
   make install
@@ -76,7 +80,9 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
   cd ${BUILDDIR}
 
   download_verify_extract tk8.6.13-src.tar.gz
-  cd tk*/unix
+  cd tk*
+  maybe_patch
+  cd unix
   CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --disable-shared --enable-aqua --prefix=${DEPSDIR}
   make -j${NPROC}
   make install
@@ -94,11 +100,11 @@ cd ${BUILDDIR}
 
 if (( ${PYTHON_MINOR} < 11 )); then
   download_verify_extract openssl-1.1.1w.tar.gz
-  cd openssl-1.1.1w
 else
   download_verify_extract openssl-3.0.15.tar.gz
-  cd openssl-3.0.15
 fi
+cd openssl*
+maybe_patch
 CC=${WORKDIR}/scripts/cc ./Configure enable-rc5 zlib no-asm no-shared darwin64-x86_64-cc --prefix=${DEPSDIR}
 make -j${NPROC}
 make install_sw
@@ -116,6 +122,7 @@ cd ${BUILDDIR}
 
 git clone https://github.com/commontk/bzip2.git --branch master --single-branch --depth 1
 cd bzip2
+maybe_patch bzip2-1.0.8
 mkdir build
 cd build
 cmake \
@@ -127,7 +134,7 @@ cmake \
 make -j${NPROC}
 make install
 cd ..
-install_license
+install_license ./LICENSE bzip2-1.0.8
 
 file ${DEPSDIR}/lib/libbz2.a
 
@@ -140,6 +147,7 @@ cd ${BUILDDIR}
 
 download_verify_extract xz-5.4.5.tar.gz
 cd xz*
+maybe_patch
 mkdir build
 cd build
 cmake \
@@ -164,6 +172,7 @@ cd ${WORKDIR}
 
 download_verify_extract sqlite-autoconf-3450000.tar.gz
 cd sqlite-autoconf-3450000
+maybe_patch
 CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64"  ./configure --prefix ${DEPSDIR}
 make -j${NPROC}
 make install
@@ -179,6 +188,7 @@ cd ${BUILDDIR}
 
 download_verify_extract zlib-1.3.1.tar.gz
 cd zlib-1.3.1
+maybe_patch
 mkdir build
 cd build
 cmake \
@@ -203,6 +213,7 @@ cd ${BUILDDIR}
 
 download_verify_extract expat-2.6.2.tar.gz
 cd expat*
+maybe_patch
 CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64"  ./configure --disable-shared --prefix=${DEPSDIR}
 make -j${NPROC}
 make install
@@ -219,6 +230,7 @@ cd ${BUILDDIR}
 
 download_verify_extract gdbm-1.23.tar.gz
 cd gdbm*
+maybe_patch
 CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --enable-libgdbm-compat --without-readline --prefix=${DEPSDIR}
 make -j${NPROC}
 make install
@@ -232,6 +244,9 @@ echo "::group::libffi"
 cd ${BUILDDIR}
 
 download_verify_extract libffi-3.4.6.tar.gz
+cd libffi-3.4.6
+maybe_patch
+cd ..
 cp -r libffi-3.4.6 libffi-3.4.6-arm64
 cd libffi-3.4.6
 CC="/usr/bin/cc" ./configure --prefix ${DEPSDIR}
@@ -260,6 +275,7 @@ cd ${BUILDDIR}
 
 download_verify_extract util-linux-2.39.3.tar.gz
 cd util-linux*
+maybe_patch libuuid-2.39.3
 ./autogen.sh
 CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --disable-all-programs --enable-libuuid --prefix=${DEPSDIR}
 make -j${NPROC}
