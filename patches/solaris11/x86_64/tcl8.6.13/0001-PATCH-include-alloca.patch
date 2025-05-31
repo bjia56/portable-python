@@ -1,0 +1,11 @@
+diff '--color=auto' -urN tcl8.6.13.orig/pkgs/sqlite3.40.0/compat/sqlite3/sqlite3.c tcl8.6.13/pkgs/sqlite3.40.0/compat/sqlite3/sqlite3.c
+--- tcl8.6.13.orig/pkgs/sqlite3.40.0/compat/sqlite3/sqlite3.c   2025-05-30 23:16:15.801788868 -0400
++++ tcl8.6.13/pkgs/sqlite3.40.0/compat/sqlite3/sqlite3.c        2025-05-30 23:16:37.352353599 -0400
+@@ -17,6 +17,7 @@
+ ** language. The code for the "sqlite3" command-line shell is also in a
+ ** separate file. This file contains only code for the core SQLite library.
+ */
++#include <alloca.h>
+ #define SQLITE_CORE 1
+ #define SQLITE_AMALGAMATION 1
+ #ifndef SQLITE_PRIVATE

@@ -456,8 +456,7 @@ jobs:
           sync: nfs
           release: ${{ steps.parse_release.outputs.release }}
           prepare: |
-            pkg install --accept cmake git autoconf automake libtool bison gperf gcc pkg-config python-39
-            ln -sf /usr/bin/python3.9 /usr/bin/python3
+            pkg install --accept cmake git autoconf automake libtool bison gperf gcc pkg-config pip
 
       - name: Build in VM
         shell: solaris {0}
