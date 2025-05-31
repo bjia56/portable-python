@@ -1,0 +1,73 @@
+From e4c4549ed227c7c57c346b76930a5ba2f9a11de5 Mon Sep 17 00:00:00 2001
+From: Brett Jia <dev.bjia56@gmail.com>
+Date: Wed, 16 Oct 2024 22:24:08 -0400
+Subject: [PATCH] use register numbers
+
+---
+ src/s390/sysv.S | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
+
+diff --git a/src/s390/sysv.S b/src/s390/sysv.S
+index c4b5006ae..7145646cd 100644
+--- a/src/s390/sysv.S
++++ b/src/s390/sysv.S
+@@ -203,11 +203,11 @@ ffi_call_SYSV:
+ 	stg	%r6,88(%r2)			# Save registers
+ 	stmg	%r12,%r14,96(%r2)
+ 	lgr	%r13,%r2			# Install frame pointer
+-	.cfi_rel_offset r6, 88
+-	.cfi_rel_offset r12, 96
+-	.cfi_rel_offset r13, 104
+-	.cfi_rel_offset r14, 112
+-	.cfi_def_cfa_register r13
++	.cfi_rel_offset 6, 88
++	.cfi_rel_offset 12, 96
++	.cfi_rel_offset 13, 104
++	.cfi_rel_offset 14, 112
++	.cfi_def_cfa_register 13
+ 	stg	%r2,0(%r15)			# Set up back chain
+ 	larl	%r14,.Ltable			# Set up return address
+ 	slag	%r3,%r3,3			# ret_type *= 8
+@@ -252,11 +252,11 @@ ffi_call_SYSV:
+ 	lg	%r12,96(%r13)
+ 	lg	%r6,88(%r13)
+ 	lg	%r13,104(%r13)
+-	.cfi_restore r14
+-	.cfi_restore r13
+-	.cfi_restore r12
+-	.cfi_restore r6
+-	.cfi_def_cfa r15, 160
++	.cfi_restore 14
++	.cfi_restore 13
++	.cfi_restore 12
++	.cfi_restore 6
++	.cfi_def_cfa 15, 160
+ 	br	%r14
+ 	.cfi_endproc
+ 	.size	 ffi_call_SYSV,.-ffi_call_SYSV
+@@ -291,11 +291,11 @@ ffi_closure_SYSV:
+ .Ldoclosure:
+ 	stmg	%r13,%r15,104(%r15)		# Save registers
+ 	lgr	%r13,%r15
+-	.cfi_def_cfa_register r13
+-	.cfi_rel_offset r6, 48
+-	.cfi_rel_offset r13, 104
+-	.cfi_rel_offset r14, 112
+-	.cfi_rel_offset r15, 120
++	.cfi_def_cfa_register 13
++	.cfi_rel_offset 6, 48
++	.cfi_rel_offset 13, 104
++	.cfi_rel_offset 14, 112
++	.cfi_rel_offset 15, 120
+ 	aghi	%r15,-160-16			# Set up stack frame
+ 	stg	%r13,0(%r15)			# Set up back chain
+ 
+@@ -310,7 +310,7 @@ ffi_closure_SYSV:
+ 	brasl	%r14,ffi_closure_helper_SYSV	# Call helper
+ 
+ 	lgr	%r15,%r13
+-	.cfi_def_cfa_register r15
++	.cfi_def_cfa_register 15
+ 	lmg	%r13,%r14,104(%r13)		# Restore saved registers
+ 	lg	%r6,48(%r15)
+ 	ld	%f0,128(%r15)			# Load return registers

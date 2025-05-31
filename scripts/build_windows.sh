@@ -58,6 +58,7 @@ cd ${BUILDDIR}
 git clone https://github.com/commontk/bzip2.git --branch master --single-branch --depth 1
 mkdir ${DEPSDIR}/bzip2
 cd bzip2
+maybe_patch bzip2-1.0.8
 mkdir build
 cd build
 cmake \
@@ -67,7 +68,7 @@ cmake \
 cmake --build . --config Release -- /property:Configuration=Release
 cmake --build . --target INSTALL -- /property:Configuration=Release
 cd ..
-install_license
+install_license ./LICENSE bzip2-1.0.8
 
 echo "::endgroup::"
 ########
@@ -79,6 +80,7 @@ cd ${BUILDDIR}
 download_verify_extract xz-5.4.5.tar.gz
 mkdir ${DEPSDIR}/xz
 cd xz-5.4.5
+maybe_patch
 mkdir build
 cd build
 cmake \
@@ -99,6 +101,9 @@ cd ${BUILDDIR}
 
 download_and_verify sqlite-amalgamation-3430100.zip
 unzip -qq sqlite-amalgamation-3430100.zip
+cd sqlite-amalgamation-3430100
+maybe_patch
+cd ..
 mv sqlite-amalgamation-3430100 ${DEPSDIR}/sqlite3
 cd ${DEPSDIR}/sqlite3
 cl //c sqlite3.c
@@ -114,6 +119,7 @@ cd ${BUILDDIR}
 download_verify_extract zlib-1.3.1.tar.gz
 mkdir ${DEPSDIR}/zlib
 cd zlib-1.3.1
+maybe_patch
 mkdir build
 cd build
 cmake \
