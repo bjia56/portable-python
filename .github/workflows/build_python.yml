@@ -9,7 +9,7 @@ on:
       platforms:
         required: true
         type: string
-        default: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,linux-loongarch64,linux-s390x,linux-powerpc64le,macos,windows,cosmo,freebsd13-x86_64,freebsd14-x86_64,freebsd15-x86_64,solaris11-x86_64"
+        default: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,linux-loongarch64,linux-s390x,linux-powerpc64le,macos,windows-x86_64,windows-aarch64,cosmo,freebsd13-x86_64,freebsd14-x86_64,freebsd15-x86_64,solaris11-x86_64"
       buildsystem_branch:
         required: false
         type: string
@@ -165,13 +165,17 @@ jobs:
             ./scripts/launch_test.sh ${{ matrix.arch }} ${{ inputs.python_version }} ${{ matrix.distribution }} linux "${{ env.RUN_TESTS }}"
 
   build_windows:
-    name: Windows ${{ inputs.python_version }} x86_64 ${{ matrix.distribution }} (build)
+    name: Windows ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (build)
     if: ${{ contains(inputs.platforms, 'windows') }}
-    runs-on: windows-latest
+    runs-on: ${{ matrix.arch == 'x86_64' && 'windows-latest' || 'windows-11-arm' }}
     strategy:
       fail-fast: false
       matrix:
+        arch: [x86_64, aarch64]
         distribution: [full, headless]
+        exclude:
+          - arch: ${{ !contains(inputs.platforms, 'windows-x86_64') && 'x86_64' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'windows-aarch64') && 'aarch64' || '' }}
 
     steps:
       - name: Set git to use LF
@@ -182,8 +186,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Configure build for x86_64
-        uses: ilammy/msvc-dev-cmd@v1.13.0
+      - name: Configure build
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch == 'x86_64' && 'amd64' || 'amd64_arm64' }}
 
       - name: Remove Strawberry
         shell: pwsh
@@ -194,7 +200,7 @@ jobs:
         shell: bash
         run: |
           set -ex
-          ./scripts/build_windows.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }}
+          ./scripts/build_windows.sh ${{ matrix.arch }} ${{ inputs.python_version }} ${{ matrix.distribution }}
 
       - name: Interactive debugging
         uses: fawazahmed0/action-debug-vscode@v3
@@ -203,24 +209,28 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: python-windows-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
+          name: python-windows-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         if: ${{ always() && inputs.debug }}
         with:
-          name: build-python-windows-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
+          name: build-python-windows-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./*python*.tar.gz
 
   test_windows:
-    name: Windows ${{ inputs.python_version }} x86_64 ${{ matrix.distribution }} (test)
+    name: Windows ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (test)
     needs: build_windows
-    runs-on: windows-latest
+    runs-on: ${{ matrix.arch == 'x86_64' && 'windows-latest' || 'windows-11-arm' }}
     strategy:
       fail-fast: false
       matrix:
+        arch: [x86_64, aarch64]
         distribution: [full, headless]
+        exclude:
+          - arch: ${{ !contains(inputs.platforms, 'windows-x86_64') && 'x86_64' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'windows-aarch64') && 'aarch64' || '' }}
 
     steps:
       - name: Set git to use LF
@@ -234,13 +244,13 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: python-windows-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
+          name: python-windows-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: .
 
       - name: Test python in clean environment
         shell: bash
         run: |
-          ./scripts/launch_test.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }} windows "${{ env.RUN_TESTS }}"
+          ./scripts/launch_test.sh ${{ matrix.arch }} ${{ inputs.python_version }} ${{ matrix.distribution }} windows "${{ env.RUN_TESTS }}"
 
   build_macos:
     name: MacOS ${{ inputs.python_version }} universal2 ${{ matrix.distribution }} (build)
@@ -288,17 +298,12 @@ jobs:
   test_macos:
     name: MacOS ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (test)
     needs: build_macos
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.arch == 'x86_64' && 'macos-13' || 'macos-14' }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-13, macos-14 ]
+        arch: [x86_64, aarch64]
         distribution: [full, headless]
-        include:
-          - os: macos-13
-            arch: x86_64
-          - os: macos-14
-            arch: arm64
 
     steps:
       - name: Checkout
