@@ -2,8 +2,10 @@ import { platform, arch, release, version } from "os";
 import { accessSync } from "fs";
 import { chmod, symlink, rename } from "fs/promises";
 import { join } from "path";
+import { execSync } from "child_process";
 
 import { IInstaller, IPortablePython } from './types';
+import { isNixOS } from './util';
 
 const DL_PLATFORM = (() => {
     if (platform() == "win32") {
@@ -146,6 +148,25 @@ export default class CPythonInstaller implements IInstaller {
             // ensure the pip script is executable
             await chmod(this.parent.pipPath, 0o777);
             await chmod(`${this.parent.pipPath}.${this.parent.minor}`, 0o777);
+        }
+
+        if (this.parent.distribution !== "cosmo" && isNixOS()) {
+            // Get glibc path
+            const glibcOut = execSync('nix --extra-experimental-features "nix-command flakes" path-info nixpkgs#glibc.out');
+            const glibcPath = glibcOut.toString().trim();
+            const glibcInterpreter = (() => {
+                switch (arch()) {
+                case "x64":
+                    return "ld-linux-x86-64.so.2";
+                case "arm64":
+                    return "ld-linux-aarch64.so.1";
+                };
+                throw new Error("Unsupported architecture");
+            })();
+            const glibcInterpreterPath = join(glibcPath, "lib", glibcInterpreter);
+
+            // Run patchelf to set the interpreter
+            execSync(`nix-shell -p patchelf --run 'patchelf --set-interpreter ${glibcInterpreterPath} ${this.parent.executablePath}'`);
         }
     }
 }

@@ -150,6 +150,7 @@ cd ${BUILDDIR}
 
 download_verify_extract zlib-1.3.1.tar.gz
 cd zlib*
+maybe_patch
 ./configure --prefix=${DEPSDIR}
 make -j4
 make install
@@ -168,6 +169,7 @@ else
   download_verify_extract openssl-3.0.15.tar.gz
 fi
 cd openssl*
+maybe_patch
 if [[ "${ARCH}" == "arm" ]]; then
   ./Configure linux-generic32 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 elif [[ "${ARCH}" == "i386" ]]; then
@@ -194,15 +196,9 @@ echo "::endgroup::"
 echo "::group::libffi"
 cd ${BUILDDIR}
 
-if [[ "${ARCH}" == "s390x" ]]; then
-  git clone https://github.com/bjia56/libffi.git
-  cd libffi
-  git checkout v3.4.6-s390x
-  ./autogen.sh
-else
-  download_verify_extract libffi-3.4.6.tar.gz
-  cd libffi*
-fi
+download_verify_extract libffi-3.4.6.tar.gz
+cd libffi*
+maybe_patch
 CFLAGS="${CFLAGS} -Wl,--undefined-version" ./configure --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
@@ -217,6 +213,7 @@ cd ${BUILDDIR}
 
 download_verify_extract sqlite-autoconf-3450000.tar.gz
 cd sqlite*
+maybe_patch
 ./configure --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
@@ -230,6 +227,7 @@ cd ${BUILDDIR}
 
 download_verify_extract expat-2.6.2.tar.gz
 cd expat*
+maybe_patch
 ./configure --host=${CHOST} --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
@@ -244,6 +242,7 @@ cd ${BUILDDIR}
 
 download_verify_extract ncurses-6.4.tar.gz
 cd ncurses*
+maybe_patch
 ./configure --host=${CHOST} --with-normal --without-progs --enable-overwrite --disable-stripping --enable-widec --with-termlib --disable-database --with-fallbacks=xterm,xterm-256color,screen-256color,linux,vt100 --prefix=${DEPSDIR}
 make -j4
 make install
@@ -258,6 +257,7 @@ cd ${BUILDDIR}
 
 download_verify_extract readline-8.2.tar.gz
 cd readline*
+maybe_patch
 ./configure --with-curses --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
@@ -274,6 +274,7 @@ wget --no-verbose -O bzip2.tar.gz https://github.com/commontk/bzip2/tarball/mast
 tar -xf bzip2*.tar.gz
 rm *.tar.gz
 cd commontk-bzip2*
+maybe_patch bzip2-1.0.8
 mkdir build
 cd build
 cmake -DCMAKE_SYSTEM_PROCESSOR=${ARCH} -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
@@ -291,6 +292,7 @@ cd ${BUILDDIR}
 
 download_verify_extract xz-5.4.5.tar.gz
 cd xz*
+maybe_patch
 mkdir build
 cd build
 cmake -DCMAKE_SYSTEM_PROCESSOR=${ARCH} -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
@@ -308,6 +310,7 @@ cd ${BUILDDIR}
 
 download_verify_extract brotli-1.1.0.tar.gz
 cd brotli*
+maybe_patch
 mkdir build
 cd build
 cmake -DCMAKE_SYSTEM_PROCESSOR=${ARCH} -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
@@ -325,6 +328,7 @@ cd ${BUILDDIR}
 
 download_verify_extract util-linux-2.39.3.tar.gz
 cd util-linux*
+maybe_patch libuuid-2.39.3
 ./autogen.sh
 ./configure --host=${CHOST} --disable-all-programs --enable-libuuid --prefix=${DEPSDIR}
 make -j4
@@ -340,6 +344,7 @@ cd ${BUILDDIR}
 
 download_verify_extract gdbm-1.24.tar.gz
 cd gdbm*
+maybe_patch
 ./configure --host=${CHOST} --enable-libgdbm-compat --prefix=${DEPSDIR}
 make -j4
 make install
@@ -354,6 +359,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libxml2-2.12.4.tar.xz
 cd libxml2*
+maybe_patch
 ./configure --host=${CHOST} --enable-static --disable-shared --without-python --prefix=${DEPSDIR}
 make -j4
 make install
@@ -368,9 +374,11 @@ cd ${BUILDDIR}
 
 download_verify_extract libpng-1.6.41.tar.gz
 cd libpng*
+maybe_patch
 ./configure --host=${CHOST} --with-zlib-prefix=${DEPSDIR} --disable-tools --prefix=${DEPSDIR}
 make -j4
 make install
+install_license
 
 echo "::endgroup::"
 #############
@@ -381,6 +389,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libgpg-error-1.50.tar.bz2
 cd libgpg-error*
+maybe_patch
 ./configure --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
@@ -390,6 +399,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libgcrypt-1.11.0.tar.bz2
 cd libgcrypt*
+maybe_patch
 LDFLAGS="${LDFLAGS} -Wl,--undefined-version" ./configure --disable-asm --host=${CHOST} --prefix=${DEPSDIR}
 make -j4
 make install
@@ -404,6 +414,7 @@ cd ${BUILDDIR}
 
 download_verify_extract libxslt-1.1.39.tar.xz
 cd libxslt*
+maybe_patch
 CFLAGS="${CFLAGS} -I${DEPSDIR}/include/libxml2" ./configure --host=${CHOST} --with-libxml-prefix=${DEPSDIR} --without-python --prefix=${DEPSDIR}
 make -j4
 make install
@@ -418,7 +429,8 @@ cd ${BUILDDIR}
 
 download_verify_extract freetype-2.13.2.tar.gz
 cd freetype*
-./configure --host=${CHOST} --prefix=${DEPSDIR}
+maybe_patch
+./configure --host=${CHOST} --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
 install_license ./docs/FTL.TXT
@@ -432,6 +444,7 @@ cd ${BUILDDIR}
 
 download_verify_extract fontconfig-2.15.0.tar.gz
 cd fontconfig*
+maybe_patch
 if [[ "${ARCH}" == "loongarch64" ]]; then
   # remove this once upstream fontconfig updates config.*
   cp /usr/share/misc/config.* .
@@ -459,6 +472,7 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
     file=$pkg.tar.gz
     download_verify_extract $file
     cd $pkg
+    maybe_patch
     autoreconf -vfi
     ./configure $ext_flags --host=${CHOST} --prefix=${DEPSDIR}
     make -j4
@@ -501,7 +515,9 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
   cd ${BUILDDIR}
 
   download_verify_extract tcl8.6.13-src.tar.gz
-  cd tcl*/unix
+  cd tcl*
+  maybe_patch
+  cd unix
   LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
   make -j4
   make install
@@ -516,7 +532,9 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
   cd ${BUILDDIR}
 
   download_verify_extract tk8.6.13-src.tar.gz
-  cd tk*/unix
+  cd tk*
+  maybe_patch
+  cd unix
   LDFLAGS="${LDFLAGS} -lxml2 -lxcb -lXau" ./configure --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
   make -j4
   make install
@@ -535,6 +553,7 @@ if [[ "${ARCH}" == "arm" ]]; then
 
   download_verify_extract mpdecimal-2.5.0.tar.gz
   cd mpdecimal*
+  maybe_patch
   ./configure --disable-cxx --host=${CHOST} --prefix=${DEPSDIR}
   make -j4
   make install

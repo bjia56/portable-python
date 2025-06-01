@@ -9,7 +9,7 @@ on:
       platforms:
         required: true
         type: string
-        default: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,linux-loongarch64,linux-s390x,linux-powerpc64le,linux-mips64el,macos,windows,cosmo,freebsd13-x86_64,freebsd14-x86_64,freebsd15-x86_64,solaris11-x86_64"
+        default: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,linux-loongarch64,linux-s390x,linux-powerpc64le,linux-mips64el,macos,windows-x86_64,windows-aarch64,cosmo,freebsd13-x86_64,freebsd14-x86_64,freebsd15-x86_64,freebsd13-aarch64,freebsd14-aarch64,freebsd15-aarch64,solaris11-x86_64"
       buildsystem_branch:
         required: false
         type: string
@@ -54,7 +54,7 @@ env:
   PORTABLE_PYTHON_BUILDSYSTEM_BRANCH: ${{ inputs.buildsystem_branch || 'portable-python' }}
   image_map: '{"x86_64": "amd64/ubuntu:18.04", "i386": "i386/ubuntu:18.04", "aarch64": "arm64v8/ubuntu:18.04", "arm": "arm32v7/debian:bullseye", "riscv64": "riscv64/debian:sid", "loongarch64": "loongarch64/debian:sid", "s390x": "s390x/debian:bullseye", "powerpc64le": "ppc64le/ubuntu:18.04", "mips64el": "mips64le/debian:bullseye"}'
   platform_map: '{"x86_64": "linux/amd64", "i386": "linux/386", "aarch64": "linux/arm64/v8", "arm": "linux/arm/v7", "riscv64": "linux/riscv64", "loongarch64": "linux/loong64", "s390x": "linux/s390x", "powerpc64le": "linux/ppc64le", "mips64el": "linux/mips64le"}'
-  freebsd_release_map: '{"15": "15.0", "14": "14.0", "13": "13.2"}'
+  freebsd_release_map: '{"15": "15.0", "14": "14.1", "13": "13.3"}'
   solaris_release_map: '{"11": "11.4"}'
 
 jobs:
@@ -80,7 +80,7 @@ jobs:
 
     steps:
       - name: Set up zig
-        uses: mlugg/setup-zig@v1
+        uses: mlugg/setup-zig@v2
         with:
           version: 0.15.0-dev.377+f01833e03
 
@@ -166,13 +166,17 @@ jobs:
             ./scripts/launch_test.sh ${{ matrix.arch }} ${{ inputs.python_version }} ${{ matrix.distribution }} linux "${{ env.RUN_TESTS }}"
 
   build_windows:
-    name: Windows ${{ inputs.python_version }} x86_64 ${{ matrix.distribution }} (build)
+    name: Windows ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (build)
     if: ${{ contains(inputs.platforms, 'windows') }}
-    runs-on: windows-latest
+    runs-on: ${{ matrix.arch == 'x86_64' && 'windows-latest' || 'windows-11-arm' }}
     strategy:
       fail-fast: false
       matrix:
+        arch: [x86_64, aarch64]
         distribution: [full, headless]
+        exclude:
+          - arch: ${{ !contains(inputs.platforms, 'windows-x86_64') && 'x86_64' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'windows-aarch64') && 'aarch64' || '' }}
 
     steps:
       - name: Set git to use LF
@@ -183,8 +187,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Configure build for x86_64
-        uses: ilammy/msvc-dev-cmd@v1.13.0
+      - name: Configure build
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch == 'x86_64' && 'amd64' || 'amd64_arm64' }}
 
       - name: Remove Strawberry
         shell: pwsh
@@ -195,7 +201,7 @@ jobs:
         shell: bash
         run: |
           set -ex
-          ./scripts/build_windows.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }}
+          ./scripts/build_windows.sh ${{ matrix.arch }} ${{ inputs.python_version }} ${{ matrix.distribution }}
 
       - name: Interactive debugging
         uses: fawazahmed0/action-debug-vscode@v3
@@ -204,24 +210,28 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: python-windows-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
+          name: python-windows-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         if: ${{ always() && inputs.debug }}
         with:
-          name: build-python-windows-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
+          name: build-python-windows-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./*python*.tar.gz
 
   test_windows:
-    name: Windows ${{ inputs.python_version }} x86_64 ${{ matrix.distribution }} (test)
+    name: Windows ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (test)
     needs: build_windows
-    runs-on: windows-latest
+    runs-on: ${{ matrix.arch == 'x86_64' && 'windows-latest' || 'windows-11-arm' }}
     strategy:
       fail-fast: false
       matrix:
+        arch: [x86_64, aarch64]
         distribution: [full, headless]
+        exclude:
+          - arch: ${{ !contains(inputs.platforms, 'windows-x86_64') && 'x86_64' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'windows-aarch64') && 'aarch64' || '' }}
 
     steps:
       - name: Set git to use LF
@@ -235,13 +245,13 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: python-windows-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
+          name: python-windows-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: .
 
       - name: Test python in clean environment
         shell: bash
         run: |
-          ./scripts/launch_test.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }} windows "${{ env.RUN_TESTS }}"
+          ./scripts/launch_test.sh ${{ matrix.arch }} ${{ inputs.python_version }} ${{ matrix.distribution }} windows "${{ env.RUN_TESTS }}"
 
   build_macos:
     name: MacOS ${{ inputs.python_version }} universal2 ${{ matrix.distribution }} (build)
@@ -289,17 +299,12 @@ jobs:
   test_macos:
     name: MacOS ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (test)
     needs: build_macos
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.arch == 'x86_64' && 'macos-13' || 'macos-14' }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-13, macos-14 ]
+        arch: [x86_64, aarch64]
         distribution: [full, headless]
-        include:
-          - os: macos-13
-            arch: x86_64
-          - os: macos-14
-            arch: arm64
 
     steps:
       - name: Checkout
@@ -317,18 +322,28 @@ jobs:
           ./scripts/launch_test.sh universal2 ${{ inputs.python_version }} ${{ matrix.distribution }} darwin "${{ env.RUN_TESTS }}"
 
   build_freebsd:
-    name: FreeBSD ${{ matrix.release }} ${{ inputs.python_version }} x86_64 ${{ matrix.distribution }} (build)
+    name: FreeBSD ${{ matrix.release }} ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (build)
     if: ${{ contains(inputs.platforms, 'freebsd') }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         release: [13, 14, 15]
+        arch: [x86_64, aarch64]
         distribution: [full, headless]
         exclude:
           - release: ${{ !contains(inputs.platforms, 'freebsd13-x86_64') && '13' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd13-x86_64') && 'x86_64' || '' }}
           - release: ${{ !contains(inputs.platforms, 'freebsd14-x86_64') && '14' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd14-x86_64') && 'x86_64' || '' }}
           - release: ${{ !contains(inputs.platforms, 'freebsd15-x86_64') && '15' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd15-x86_64') && 'x86_64' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd13-aarch64') && '13' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd13-aarch64') && 'aarch64' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd14-aarch64') && '14' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd14-aarch64') && 'aarch64' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd15-aarch64') && '15' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd15-aarch64') && 'aarch64' || '' }}
 
     steps:
       - name: Parse release
@@ -345,6 +360,7 @@ jobs:
         with:
           sync: nfs
           release: ${{ steps.parse_release.outputs.release }}
+          arch: ${{ matrix.arch }}
           prepare: |
             pkg install -y cmake bash wget patch git zip python3 autoconf automake libtool gettext bison pkgconf gmake gperf patchelf texinfo
             chsh -s /usr/local/bin/bash root
@@ -361,7 +377,7 @@ jobs:
           export VERBOSE_CI="${{ env.VERBOSE_CI }}"
           export PORTABLE_PYTHON_BUILDSYSTEM_BRANCH="${{ env.PORTABLE_PYTHON_BUILDSYSTEM_BRANCH }}"
           export PLATFORM="freebsd${{ matrix.release }}"
-          bash ./scripts/build_freebsd.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }}
+          bash ./scripts/build_freebsd.sh ${{ matrix.arch }} ${{ inputs.python_version }} ${{ matrix.distribution }}
 
           cp *.zip ${{ github.workspace }}
           cp *.tar.gz ${{ github.workspace }}
@@ -373,29 +389,39 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: python-freebsd${{ matrix.release }}-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
+          name: python-freebsd${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
         if: ${{ always() && inputs.debug }}
         uses: actions/upload-artifact@v4
         with:
-          name: build-python-freebsd${{ matrix.release }}-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
+          name: build-python-freebsd${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./*python*.tar.gz
 
   test_freebsd:
-    name: FreeBSD ${{ matrix.release }} ${{ inputs.python_version }} x86_64 ${{ matrix.distribution }} (test)
+    name: FreeBSD ${{ matrix.release }} ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (test)
     needs: build_freebsd
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         release: [13, 14, 15]
+        arch: [x86_64, aarch64]
         distribution: [full, headless]
         exclude:
           - release: ${{ !contains(inputs.platforms, 'freebsd13-x86_64') && '13' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd13-x86_64') && 'x86_64' || '' }}
           - release: ${{ !contains(inputs.platforms, 'freebsd14-x86_64') && '14' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd14-x86_64') && 'x86_64' || '' }}
           - release: ${{ !contains(inputs.platforms, 'freebsd15-x86_64') && '15' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd15-x86_64') && 'x86_64' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd13-aarch64') && '13' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd13-aarch64') && 'aarch64' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd14-aarch64') && '14' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd14-aarch64') && 'aarch64' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd15-aarch64') && '15' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd15-aarch64') && 'aarch64' || '' }}
 
     steps:
       - name: Parse release
@@ -410,7 +436,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: python-freebsd${{ matrix.release }}-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
+          name: python-freebsd${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: .
 
       - name: Start VM
@@ -418,6 +444,7 @@ jobs:
         with:
           sync: nfs
           release: ${{ steps.parse_release.outputs.release }}
+          arch: ${{ matrix.arch }}
           prepare: |
             pkg install -y bash
             chsh -s /usr/local/bin/bash root
@@ -427,7 +454,7 @@ jobs:
         run: |
           set -e
           cd ${{ github.workspace }}
-          bash ./scripts/launch_test.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }} freebsd${{ matrix.release }} "${{ env.RUN_TESTS }}"
+          bash ./scripts/launch_test.sh ${{ matrix.arch }} ${{ inputs.python_version }} ${{ matrix.distribution }} freebsd${{ matrix.release }} "${{ env.RUN_TESTS }}"
 
   build_solaris:
     name: Solaris ${{ matrix.release }} ${{ inputs.python_version }} x86_64 ${{ matrix.distribution }} (build)
@@ -457,8 +484,7 @@ jobs:
           sync: nfs
           release: ${{ steps.parse_release.outputs.release }}
           prepare: |
-            pkg install --accept cmake git autoconf automake libtool bison gperf gcc pkg-config python-39
-            ln -sf /usr/bin/python3.9 /usr/bin/python3
+            pkg install --accept cmake git autoconf automake libtool bison gperf gcc pkg-config pip
 
       - name: Build in VM
         shell: solaris {0}
@@ -550,7 +576,7 @@ jobs:
           echo "cosmocc_version=${version}" >> "$GITHUB_ENV"
 
       - name: Set up cosmocc
-        uses: bjia56/setup-cosmocc@v0.0.3
+        uses: bjia56/setup-cosmocc@v0.0.4
         with:
           version: ${{ env.cosmocc_version }}
 
@@ -602,7 +628,7 @@ jobs:
     steps:
       - name: Set up cosmocc
         if: ${{ matrix.os == 'Linux' }}
-        uses: bjia56/setup-cosmocc@v0.0.3
+        uses: bjia56/setup-cosmocc@v0.0.4
 
       - name: Checkout
         uses: actions/checkout@v4

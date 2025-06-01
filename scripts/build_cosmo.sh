@@ -38,6 +38,7 @@ cd ${BUILDDIR}
 
 download_verify_extract zlib-1.3.1.tar.gz
 cd zlib*
+maybe_patch
 ./configure --prefix=${DEPSDIR} --static
 make -j4
 make install
@@ -57,6 +58,7 @@ else
   download_verify_extract openssl-3.0.15.tar.gz
 fi
 cd openssl*
+maybe_patch
 ./Configure linux-generic64 no-asm no-shared no-dso no-engine --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
 make -j4
 make install_sw
@@ -72,7 +74,7 @@ cd ${BUILDDIR}
 
 download_verify_extract sqlite-autoconf-3450000.tar.gz
 cd sqlite*
-sed -i "s/PACKAGE_STRING='sqlite 3.45.0'/PACKAGE_STRING='sqlite\\\\\\\\x203.45.0'/g" configure
+maybe_patch
 ./configure --prefix=${DEPSDIR} --disable-shared
 make -j4
 make install
@@ -87,6 +89,7 @@ cd ${BUILDDIR}
 
 download_verify_extract expat-2.6.2.tar.gz
 cd expat*
+maybe_patch
 ./configure --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
@@ -102,6 +105,7 @@ cd ${BUILDDIR}
 
 download_verify_extract ncurses-6.4.tar.gz
 cd ncurses*
+maybe_patch
 CFLAGS="${CFLAGS} -std=c89" ./configure --with-normal --without-progs --enable-overwrite --disable-stripping --enable-widec --with-termlib --disable-database --with-fallbacks=xterm,xterm-256color,screen-256color,linux,vt100 --prefix=${DEPSDIR}
 make -j4
 make install
@@ -117,6 +121,7 @@ cd ${BUILDDIR}
 
 download_verify_extract readline-8.2.tar.gz
 cd readline*
+maybe_patch
 ./configure --with-curses --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install
@@ -134,6 +139,7 @@ wget --no-verbose -O bzip2.tar.gz https://github.com/commontk/bzip2/tarball/mast
 tar -xf bzip2*.tar.gz
 rm *.tar.gz
 cd commontk-bzip2*
+maybe_patch bzip2-1.0.8
 mkdir build
 cd build
 cmake .. -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DCMAKE_C_COMPILER=${CC} -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_CXX_FLAGS="${CXXFLAGS}" -DCMAKE_AR=${AR}
@@ -152,7 +158,7 @@ cd ${BUILDDIR}
 
 download_verify_extract xz-5.4.5.tar.gz
 cd xz*
-sed -i "s/PACKAGE_NAME \"XZ Utils\"/PACKAGE_NAME \"XZ\\\\\\\\x20Utils\"/g" CMakeLists.txt
+maybe_patch
 mkdir build
 cd build
 cmake .. -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DCMAKE_C_COMPILER=${CC} -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_CXX_FLAGS="${CXXFLAGS}" -DCMAKE_AR=${AR}
@@ -171,6 +177,7 @@ cd ${BUILDDIR}
 
 download_verify_extract gdbm-1.23.tar.gz
 cd gdbm*
+maybe_patch
 ./configure --enable-libgdbm-compat --disable-shared --prefix=${DEPSDIR}
 make -j4
 make install

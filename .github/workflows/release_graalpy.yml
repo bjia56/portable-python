@@ -70,22 +70,12 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload files
-        uses: softprops/action-gh-release@v2
-        with:
-          files: /tmp/graalpy/graalpy*linux*.zip
-          tag_name: ${{ env.SELECTED_TAG }}
-
-      - name: Upload files
-        uses: softprops/action-gh-release@v2
-        with:
-          files: /tmp/graalpy/graalpy*darwin*.zip
-          tag_name: ${{ env.SELECTED_TAG }}
-
-      - name: Upload files
-        uses: softprops/action-gh-release@v2
-        with:
-          files: /tmp/graalpy/graalpy*windows*.zip
-          tag_name: ${{ env.SELECTED_TAG }}
+        run: |
+          gh release upload ${{ env.SELECTED_TAG }} /tmp/graalpy/graalpy*linux*.zip
+          gh release upload ${{ env.SELECTED_TAG }} /tmp/graalpy/graalpy*darwin*.zip
+          gh release upload ${{ env.SELECTED_TAG }} /tmp/graalpy/graalpy*windows*.zip
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     outputs:
       release_tag: ${{ steps.pick_tag.outputs.release_tag }}
