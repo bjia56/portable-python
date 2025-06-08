@@ -1,6 +1,6 @@
 {
   "name": "@bjia56/portable-python",
-  "version": "0.1.138",
+  "version": "0.1.139",
   "description": "Portable Python",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -48,6 +48,7 @@
         "3.12.8",
         "3.12.7",
         "3.12.6",
+        "3.11.13",
         "3.11.12",
         "3.11.11",
         "3.11.10",
@@ -86,7 +87,8 @@
         "3.13.2": "cpython-v3.13.2-build.0",
         "3.13.3": "cpython-v3.13.3-build.2",
         "3.9.23": "cpython-v3.9.23-build.0",
-        "3.10.18": "cpython-v3.10.18-build.0"
+        "3.10.18": "cpython-v3.10.18-build.0",
+        "3.11.13": "cpython-v3.11.13-build.0"
       }
     },
     "graalpy": {
