@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python_version: [ 3.9.23, 3.10.18, 3.11.13, 3.12.11, 3.13.4 ]
+        python_version: [ 3.9.23, 3.10.18, 3.11.13, 3.12.11, 3.13.5 ]
     uses: ./.github/workflows/build_python.yml
     with:
       python_version: ${{ matrix.python_version }}
