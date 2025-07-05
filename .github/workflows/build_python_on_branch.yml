@@ -54,7 +54,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        pypy_version: [ 7.3.19 ]
+        pypy_version: [ 7.3.20 ]
     uses: ./.github/workflows/repackage_pypy.yml
     with:
       pypy_version: ${{ matrix.pypy_version }}
