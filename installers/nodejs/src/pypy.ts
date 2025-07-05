@@ -75,7 +75,7 @@ export default class PyPyInstaller implements IInstaller {
 
         if (parentMajor > 7 ||
             (parentMajor == 7 && parentMinor > 3) ||
-            (parentMajor == 7 && parentMinor == 3 && parentPatch > 19)) {
+            (parentMajor == 7 && parentMinor == 3 && parentPatch >= 20)) {
             if (!["auto", "3.11"].includes(this.parent.distribution)) {
                 throw Error("invalid distribution");
             }
