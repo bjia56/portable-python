@@ -52,7 +52,7 @@ env:
   DEBUG_CI: ${{ inputs.debug }}
   VERBOSE_CI: ${{ inputs.verbose }}
   PORTABLE_PYTHON_BUILDSYSTEM_BRANCH: ${{ inputs.buildsystem_branch || 'portable-python' }}
-  image_map: '{"x86_64": "amd64/ubuntu:18.04", "i386": "i386/ubuntu:18.04", "aarch64": "arm64v8/ubuntu:18.04", "arm": "arm32v7/debian:bullseye", "riscv64": "riscv64/debian:sid", "loongarch64": "loongarch64/debian:sid", "s390x": "s390x/debian:bullseye", "powerpc64le": "ppc64le/ubuntu:18.04", "mips64el": "mips64le/debian:bullseye"}'
+  image_map: '{"x86_64": "amd64/ubuntu:18.04", "i386": "i386/ubuntu:18.04", "aarch64": "arm64v8/ubuntu:18.04", "arm": "arm32v7/debian:bullseye", "riscv64": "riscv64/debian:sid", "loongarch64": "loongarch64/debian:sid", "s390x": "s390x/debian:bookworm", "powerpc64le": "ppc64le/ubuntu:18.04", "mips64el": "mips64le/debian:bullseye"}'
   platform_map: '{"x86_64": "linux/amd64", "i386": "linux/386", "aarch64": "linux/arm64/v8", "arm": "linux/arm/v7", "riscv64": "linux/riscv64", "loongarch64": "linux/loong64", "s390x": "linux/s390x", "powerpc64le": "linux/ppc64le", "mips64el": "linux/mips64le"}'
   freebsd_release_map: '{"15": "15.0", "14": "14.1", "13": "13.3"}'
   solaris_release_map: '{"11": "11.4"}'
@@ -168,7 +168,7 @@ jobs:
   build_windows:
     name: Windows ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (build)
     if: ${{ contains(inputs.platforms, 'windows') }}
-    runs-on: ${{ matrix.arch == 'x86_64' && 'windows-latest' || 'windows-11-arm' }}
+    runs-on: ${{ matrix.arch == 'x86_64' && 'windows-2022' || 'windows-11-arm' }}
     strategy:
       fail-fast: false
       matrix:
@@ -223,7 +223,7 @@ jobs:
   test_windows:
     name: Windows ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (test)
     needs: build_windows
-    runs-on: ${{ matrix.arch == 'x86_64' && 'windows-latest' || 'windows-11-arm' }}
+    runs-on: ${{ matrix.arch == 'x86_64' && 'windows-2022' || 'windows-11-arm' }}
     strategy:
       fail-fast: false
       matrix:
@@ -356,7 +356,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Start VM
-        uses: vmactions/freebsd-vm@v1
+        uses: vmactions/freebsd-vm@v1.2.0
         with:
           sync: nfs
           release: ${{ steps.parse_release.outputs.release }}

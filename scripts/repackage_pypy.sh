@@ -40,8 +40,10 @@ function get_version_code() {
     echo "9 10"
   elif (( major == 7 && minor == 3 && patch == 17 )); then
     echo 10
-  else
+  elif (( major == 7 && minor == 3 && (patch == 18 || patch == 19) )); then
     echo "10 11"
+  else
+    echo 11
   fi
 }
 
