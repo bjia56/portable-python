@@ -361,7 +361,7 @@ jobs:
           release: ${{ steps.parse_release.outputs.release }}
           arch: ${{ matrix.arch }}
           prepare: |
-            pkg upgrade -y
+            pkg update && pkg upgrade -y
             pkg install -y cmake bash wget patch git zip python3 autoconf automake libtool gettext bison pkgconf gmake gperf patchelf texinfo
             chsh -s /usr/local/bin/bash root
 
@@ -446,7 +446,7 @@ jobs:
           release: ${{ steps.parse_release.outputs.release }}
           arch: ${{ matrix.arch }}
           prepare: |
-            pkg upgrade -y
+            pkg update && pkg upgrade -y
             pkg install -y bash
             chsh -s /usr/local/bin/bash root
 
