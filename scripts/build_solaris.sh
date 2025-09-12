@@ -152,7 +152,7 @@ cd ${BUILDDIR}
 wget --no-verbose -O bzip2.tar.gz https://github.com/commontk/bzip2/archive/391dddabd24aee4a06e10ab6636f26dd93c21308.tar.gz
 gtar --no-same-permissions --no-same-owner -xf bzip2*.tar.gz
 rm *.tar.gz
-cd commontk-bzip2*
+cd bzip2-*
 maybe_patch bzip2-1.0.8
 mkdir build
 cd build
