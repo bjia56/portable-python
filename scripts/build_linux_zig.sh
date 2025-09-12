@@ -255,7 +255,7 @@ echo "::endgroup::"
 echo "::group::bzip2"
 cd ${BUILDDIR}
 
-wget --no-verbose -O bzip2.tar.gz https://github.com/commontk/bzip2/tarball/master
+wget --no-verbose -O bzip2.tar.gz https://github.com/commontk/bzip2/archive/391dddabd24aee4a06e10ab6636f26dd93c21308.tar.gz
 tar -xf bzip2*.tar.gz
 rm *.tar.gz
 cd commontk-bzip2*

@@ -49,7 +49,7 @@ cp ${BINDEPS_ARCH}/lib* ${DEPSDIR}/openssl/lib/
 # for compatibility with old openssl so we don't need to conditionally copy
 mkdir ${DEPSDIR}/openssl/bin
 cp ${BINDEPS_ARCH}/lib* ${DEPSDIR}/openssl/bin/
-  
+
 cd ${BINDEPS_ARCH}
 install_license ${OPENSSL_LICENSE} openssl-${OPENSSL_VER}
 
@@ -60,7 +60,8 @@ echo "::endgroup::"
 echo "::group::bzip2"
 cd ${BUILDDIR}
 
-git clone https://github.com/commontk/bzip2.git --branch master --single-branch --depth 1
+git clone https://github.com/commontk/bzip2.git
+git -C bzip2 checkout 391dddabd24aee4a06e10ab6636f26dd93c21308
 mkdir ${DEPSDIR}/bzip2
 cd bzip2
 maybe_patch bzip2-1.0.8
