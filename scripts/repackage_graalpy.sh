@@ -65,11 +65,6 @@ function repackage_graal () {
   fi
 
   DL_FILENAME=graalpy${DISTRO_MODIFIER}${GRAALPY_VERSION}-${DL_PLATFORM}-${DL_ARCH}
-  if [[ "${DISTRIBUTION}" == *"community"* ]]; then
-    EXTRACTED_FILENAME=graalpy-community-${GRAALPY_VERSION}-${DL_PLATFORM}-${DL_ARCH}
-  else
-    EXTRACTED_FILENAME=graalpy-${GRAALPY_VERSION}-${DL_PLATFORM}-${DL_ARCH}
-  fi
   UPLOAD_FILENAME=graalpy${DISTRO_MODIFIER}${GRAALPY_VERSION}-${PLATFORM}-${ARCH}
 
   if [[ "${PLATFORM}" == "windows" ]]; then
@@ -82,7 +77,7 @@ function repackage_graal () {
     rm ${DL_FILENAME}.tar.gz
   fi
 
-  cd ${EXTRACTED_FILENAME}
+  cd graalpy-*
   if [[ "${DISTRIBUTION}" == *"jvm"* ]]; then
     if [[ "${DISTRIBUTION}" == *"community"* ]]; then
       ./libexec/graalpy-polyglot-get js-community
@@ -98,8 +93,10 @@ function repackage_graal () {
   fi
 
   cd ${WORKDIR}
-  if [[ "${EXTRACTED_FILENAME}" != "${UPLOAD_FILENAME}" ]]; then
-    mv ${EXTRACTED_FILENAME} ${UPLOAD_FILENAME}
+  # Get the actual extracted directory name
+  ACTUAL_EXTRACTED_DIR=$(ls -d graalpy-*)
+  if [[ "${ACTUAL_EXTRACTED_DIR}" != "${UPLOAD_FILENAME}" ]]; then
+    mv ${ACTUAL_EXTRACTED_DIR} ${UPLOAD_FILENAME}
   fi
 
   python3 -m pyclean -v ${UPLOAD_FILENAME}
@@ -109,6 +106,9 @@ function repackage_graal () {
   else
     zip ${WORKDIR}/${UPLOAD_FILENAME}.zip $(tar tf ${WORKDIR}/${UPLOAD_FILENAME}.tar.gz)
   fi
+
+  # Clean up the extracted directory
+  rm -rf ${UPLOAD_FILENAME}
 
   echo "::endgroup::"
 }
