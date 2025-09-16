@@ -29,7 +29,10 @@ export default class GraalPyInstaller implements IInstaller {
         if (parentMajor < 24 || (parentMajor === 24 && parentMinor < 1)) {
             return 10;
         }
-        return 11;
+        if (parentMajor < 25) {
+            return 11;
+        }
+        return 12;
     };
 
     constructor(private parent: IPortablePython) {}

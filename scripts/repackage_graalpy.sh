@@ -42,8 +42,10 @@ function get_version_code() {
     echo 10
   elif (( major == 24 && minor < 1 )); then
     echo 10
-  else
+  elif (( major < 25 )); then
     echo 11
+  else
+    echo 12
   fi
 }
 
