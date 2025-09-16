@@ -77,7 +77,7 @@ function repackage_graal () {
     rm ${DL_FILENAME}.tar.gz
   fi
 
-  cd graalpy-*
+  cd graalpy-*/
   if [[ "${DISTRIBUTION}" == *"jvm"* ]]; then
     if [[ "${DISTRIBUTION}" == *"community"* ]]; then
       ./libexec/graalpy-polyglot-get js-community
@@ -94,7 +94,7 @@ function repackage_graal () {
 
   cd ${WORKDIR}
   # Get the actual extracted directory name
-  ACTUAL_EXTRACTED_DIR=$(ls -d graalpy-*)
+  ACTUAL_EXTRACTED_DIR=$(ls -d graalpy-*/ | sed 's:/$::')
   if [[ "${ACTUAL_EXTRACTED_DIR}" != "${UPLOAD_FILENAME}" ]]; then
     mv ${ACTUAL_EXTRACTED_DIR} ${UPLOAD_FILENAME}
   fi
