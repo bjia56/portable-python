@@ -69,6 +69,7 @@ mkdir build
 cd build
 cmake \
   -G "Visual Studio 17 2022" -A ${CMAKE_ARCH} \
+  -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
   -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR}/bzip2 \
   ..
 cmake --build . --config Release -- /property:Configuration=Release
