@@ -1,6 +1,6 @@
 {
   "name": "@bjia56/portable-python",
-  "version": "0.1.157",
+  "version": "0.1.158",
   "description": "Portable Python",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -120,7 +120,7 @@
         "24.2.0": "graalpy-v24.2.0-build.0",
         "24.2.1": "graalpy-v24.2.1-build.0",
         "24.2.2": "graalpy-v24.2.2-build.0",
-        "25.0.0": "graalpy-v25.0.0-beta.0"
+        "25.0.0": "graalpy-v25.0.0-build.0"
       }
     },
     "pypy": {
