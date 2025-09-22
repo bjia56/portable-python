@@ -327,7 +327,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        release: [13, 14]
+        release: [13, 14, 15]
         arch: [x86_64, aarch64]
         distribution: [full, headless]
         exclude:
@@ -405,7 +405,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        release: [13, 14]
+        release: [13, 14, 15]
         arch: [x86_64, aarch64]
         distribution: [full, headless]
         exclude:

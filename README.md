@@ -42,7 +42,7 @@ Currently, CPython 3.9, 3.10, 3.11, 3.12, and 3.13 are built for the following t
 - Linux x86_64, i386, aarch64, arm <sup id="a1">[1](#f1)</sup>, riscv64, s390x, loongarch64, powerpc64le (glibc)
 - Windows x86_64 <sup id="a2">[2](#f2)</sup>
 - MacOS x86_64, arm64 <sup id="a3">[3](#f3)</sup>
-- FreeBSD 13, 14 x86_64
+- FreeBSD 13, 14, 15 x86_64
 - Solaris 11 x86_64
 - Cosmopolitan Libc <sup id="a4">[4](#f4)</sup>
 
