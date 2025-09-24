@@ -88,7 +88,7 @@ jobs:
 
       - name: Build
         run: |
-          ./scripts/build_linux_zig.sh ${{ matrix.arch }} ${{ inputs.python_version }} ${{ matrix.distribution }}
+          ./scripts/build_linux_zig.sh --arch ${{ matrix.arch }} --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }}
 
       - name: Interactive debugging
         if: ${{ always() && inputs.debug_interactive }}
@@ -162,7 +162,7 @@ jobs:
           shell: bash
           run: |
             set -e
-            ./scripts/launch_test.sh ${{ matrix.arch }} ${{ inputs.python_version }} ${{ matrix.distribution }} linux "${{ env.RUN_TESTS }}"
+            ./scripts/launch_test.sh --arch ${{ matrix.arch }} --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --os linux --run-tests "${{ env.RUN_TESTS }}"
 
   build_windows:
     name: Windows ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (build)
@@ -200,7 +200,7 @@ jobs:
         shell: bash
         run: |
           set -ex
-          ./scripts/build_windows.sh ${{ matrix.arch }} ${{ inputs.python_version }} ${{ matrix.distribution }}
+          ./scripts/build_windows.sh --arch ${{ matrix.arch }} --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }}
 
       - name: Interactive debugging
         uses: fawazahmed0/action-debug-vscode@v3
@@ -250,7 +250,7 @@ jobs:
       - name: Test python in clean environment
         shell: bash
         run: |
-          ./scripts/launch_test.sh ${{ matrix.arch }} ${{ inputs.python_version }} ${{ matrix.distribution }} windows "${{ env.RUN_TESTS }}"
+          ./scripts/launch_test.sh --arch ${{ matrix.arch }} --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --os windows --run-tests "${{ env.RUN_TESTS }}"
 
   build_macos:
     name: MacOS ${{ inputs.python_version }} universal2 ${{ matrix.distribution }} (build)
@@ -276,7 +276,7 @@ jobs:
       - name: Build
         run: |
           set -ex
-          ./scripts/build_macos.sh universal2 ${{ inputs.python_version }} ${{ matrix.distribution }}
+          ./scripts/build_macos.sh --arch universal2 --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }}
 
       - name: Interactive debugging
         uses: fawazahmed0/action-debug-vscode@v3
@@ -318,7 +318,7 @@ jobs:
       - name: Test python in clean environment
         shell: bash
         run: |
-          ./scripts/launch_test.sh universal2 ${{ inputs.python_version }} ${{ matrix.distribution }} darwin "${{ env.RUN_TESTS }}"
+          ./scripts/launch_test.sh --arch universal2 --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --os darwin --run-tests "${{ env.RUN_TESTS }}"
 
   build_freebsd:
     name: FreeBSD ${{ matrix.release }} ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (build)
@@ -376,7 +376,7 @@ jobs:
           export VERBOSE_CI="${{ env.VERBOSE_CI }}"
           export PORTABLE_PYTHON_BUILDSYSTEM_BRANCH="${{ env.PORTABLE_PYTHON_BUILDSYSTEM_BRANCH }}"
           export PLATFORM="freebsd${{ matrix.release }}"
-          bash ./scripts/build_freebsd.sh ${{ matrix.arch }} ${{ inputs.python_version }} ${{ matrix.distribution }}
+          bash ./scripts/build_freebsd.sh --arch ${{ matrix.arch }} --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }}
 
           cp *.zip ${{ github.workspace }}
           cp *.tar.gz ${{ github.workspace }}
@@ -453,7 +453,7 @@ jobs:
         run: |
           set -e
           cd ${{ github.workspace }}
-          bash ./scripts/launch_test.sh ${{ matrix.arch }} ${{ inputs.python_version }} ${{ matrix.distribution }} freebsd${{ matrix.release }} "${{ env.RUN_TESTS }}"
+          bash ./scripts/launch_test.sh --arch ${{ matrix.arch }} --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --os freebsd${{ matrix.release }} --run-tests "${{ env.RUN_TESTS }}"
 
   build_solaris:
     name: Solaris ${{ matrix.release }} ${{ inputs.python_version }} x86_64 ${{ matrix.distribution }} (build)
@@ -497,7 +497,7 @@ jobs:
           export VERBOSE_CI="${{ env.VERBOSE_CI }}"
           export PORTABLE_PYTHON_BUILDSYSTEM_BRANCH="${{ env.PORTABLE_PYTHON_BUILDSYSTEM_BRANCH }}"
           export PLATFORM="solaris${{ matrix.release }}"
-          bash ./scripts/build_solaris.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }}
+          bash ./scripts/build_solaris.sh --arch x86_64 --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }}
 
           cp *.zip ${{ github.workspace }}
           cp *.tar.gz ${{ github.workspace }}
@@ -558,7 +558,7 @@ jobs:
         run: |
           set -e
           cd ${{ github.workspace }}
-          bash ./scripts/launch_test.sh x86_64 ${{ inputs.python_version }} ${{ matrix.distribution }} solaris${{ matrix.release }} "${{ env.RUN_TESTS }}"
+          bash ./scripts/launch_test.sh --arch x86_64 --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --os solaris${{ matrix.release }} --run-tests "${{ env.RUN_TESTS }}"
 
   build_cosmo:
     name: Cosmopolitan ${{ inputs.python_version }} (build)
@@ -581,7 +581,7 @@ jobs:
 
       - name: Build
         run: |
-          ./scripts/build_cosmo.sh unknown ${{ inputs.python_version }}
+          ./scripts/build_cosmo.sh --arch unknown --version ${{ inputs.python_version }}
 
       - name: Interactive debugging
         if: ${{ always() && inputs.debug_interactive }}
@@ -643,7 +643,7 @@ jobs:
         shell: bash
         run: |
           export HOST_OS="${{ matrix.os }}"
-          ./scripts/launch_test.sh unknown ${{ inputs.python_version }} - cosmo "${{ env.RUN_TESTS }}"
+          ./scripts/launch_test.sh --arch unknown --version ${{ inputs.python_version }} --distribution - --os cosmo --run-tests "${{ env.RUN_TESTS }}"
 
       - name: Test in VM
         if: ${{ matrix.os == 'FreeBSD' }}
@@ -657,7 +657,7 @@ jobs:
           run: |
             cat > /tmp/test.sh <<EOF
               export HOST_OS="${{ matrix.os }}"
-              bash ./scripts/launch_test.sh unknown ${{ inputs.python_version }} - cosmo "${{ env.RUN_TESTS }}"
+              bash ./scripts/launch_test.sh --arch unknown --version ${{ inputs.python_version }} --distribution - --os cosmo --run-tests "${{ env.RUN_TESTS }}"
             EOF
             bash -e /tmp/test.sh
 
@@ -671,6 +671,6 @@ jobs:
           run: |
             cat > /tmp/test.sh <<EOF
               export HOST_OS="${{ matrix.os }}"
-              bash ./scripts/launch_test.sh unknown ${{ inputs.python_version }} - cosmo "${{ env.RUN_TESTS }}"
+              bash ./scripts/launch_test.sh --arch unknown --version ${{ inputs.python_version }} --distribution - --os cosmo --run-tests "${{ env.RUN_TESTS }}"
             EOF
             bash -e /tmp/test.sh
