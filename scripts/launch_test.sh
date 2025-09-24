@@ -2,13 +2,23 @@
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 
+# Check for getopt command availability, prefer ggetopt if available
+GETOPT_CMD="getopt"
+if command -v ggetopt >/dev/null 2>&1; then
+    GETOPT_CMD="ggetopt"
+elif ! command -v getopt >/dev/null 2>&1; then
+    echo "Error: getopt command is not available" >&2
+    echo "Please install util-linux or a compatible getopt implementation" >&2
+    exit 1
+fi
+
 # Parse command line arguments for launch_test.sh
 function parse_test_arguments() {
     OS=""
     RUN_TESTS=""
 
     # Use getopt for argument parsing
-    PARSED_ARGS=$(getopt -o a:v:d:o:r:h --long arch:,version:,distribution:,os:,run-tests:,help -n "$0" -- "$@")
+    PARSED_ARGS=$($GETOPT_CMD -o a:v:d:o:r:h --long arch:,version:,distribution:,os:,run-tests:,help -n "$0" -- "$@")
     if [ $? != 0 ]; then
         echo "Failed to parse arguments" >&2
         exit 1
