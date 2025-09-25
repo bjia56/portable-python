@@ -499,6 +499,7 @@ jobs:
           cp -r ${{ github.workspace }} $HOME/workspace
           cd $HOME/workspace
 
+          export PATH="/usr/gnu/bin:$PATH"
           export RUN_TESTS="${{ env.RUN_TESTS }}"
           export DEBUG_CI="${{ env.DEBUG_CI }}"
           export VERBOSE_CI="${{ env.VERBOSE_CI }}"
@@ -565,6 +566,7 @@ jobs:
         run: |
           set -e
           cd ${{ github.workspace }}
+          export PATH="/usr/gnu/bin:$PATH"
           bash ./scripts/launch_test.sh --arch x86_64 --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --os solaris${{ matrix.release }} --run-tests "${{ env.RUN_TESTS }}"
 
   build_cosmo:
