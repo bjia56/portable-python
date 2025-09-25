@@ -267,11 +267,13 @@ jobs:
 
       - name: Install tools
         run: |
-          brew install coreutils gpatch autoconf automake libtool ncurses
+          brew install coreutils gpatch autoconf automake libtool ncurses gnu-getopt
           # use gpatch's "patch" executable
           echo "/usr/local/opt/gpatch/libexec/gnubin" >> $GITHUB_PATH
           # use ncurses's "tic" executable
           echo "/usr/local/opt/ncurses/bin/" >> $GITHUB_PATH
+          # use gnu-getopt's "getopt" executable
+          echo "/usr/local/opt/gnu-getopt/bin/" >> $GITHUB_PATH
 
       - name: Build
         run: |
@@ -314,6 +316,11 @@ jobs:
         with:
           name: python-darwin-universal2-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: .
+
+      - name: Install tools
+        run: |
+          brew install gnu-getopt
+          echo "/usr/local/opt/gnu-getopt/bin/" >> $GITHUB_PATH
 
       - name: Test python in clean environment
         shell: bash
@@ -637,6 +644,12 @@ jobs:
         with:
           name: python-cosmo-unknown-${{ inputs.python_version }}
           path: .
+
+      - name: Install tools
+        if: ${{ matrix.os == 'MacOS' }}
+        run: |
+          brew install gnu-getopt
+          echo "/usr/local/opt/gnu-getopt/bin/" >> $GITHUB_PATH
 
       - name: Test python in clean environment
         if: ${{ !contains(matrix.os, 'BSD') }}
