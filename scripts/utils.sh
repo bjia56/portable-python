@@ -2,13 +2,6 @@
 
 set -e
 
-# Check for getopt command availability
-if ! command -v getopt >/dev/null 2>&1; then
-    echo "Error: getopt command is not available" >&2
-    echo "Please install util-linux or a compatible getopt implementation" >&2
-    exit 1
-fi
-
 CMAKE_BUILDSYSTEM_BRANCH=${PORTABLE_PYTHON_BUILDSYSTEM_BRANCH}
 echo "Selected portable-python-cmake-buildsystem branch: ${CMAKE_BUILDSYSTEM_BRANCH}"
 
