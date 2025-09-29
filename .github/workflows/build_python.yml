@@ -361,7 +361,7 @@ jobs:
           release: ${{ steps.parse_release.outputs.release }}
           arch: ${{ matrix.arch }}
           prepare: |
-            pkg install -y cmake bash wget patch git zip python3 autoconf automake libtool gettext bison pkgconf gmake gperf patchelf texinfo
+            pkg install -y cmake bash wget base64 patch git zip python3 autoconf automake libtool gettext bison pkgconf gmake gperf patchelf texinfo
             chsh -s /usr/local/bin/bash root
 
       - name: Build in VM
@@ -445,7 +445,7 @@ jobs:
           release: ${{ steps.parse_release.outputs.release }}
           arch: ${{ matrix.arch }}
           prepare: |
-            pkg install -y bash
+            pkg install -y bash base64
             chsh -s /usr/local/bin/bash root
 
       - name: Test in VM
@@ -653,7 +653,7 @@ jobs:
           usesh: true
           copyback: false
           prepare: |
-            pkg install -y bash
+            pkg install -y bash base64
           run: |
             cat > /tmp/test.sh <<EOF
               export HOST_OS="${{ matrix.os }}"
@@ -668,6 +668,8 @@ jobs:
           envs: 'RUN_TESTS DEBUG_CI VERBOSE_CI PORTABLE_PYTHON_BUILDSYSTEM_BRANCH'
           usesh: true
           copyback: false
+          prepare: |
+            /usr/sbin/pkg_add curl
           run: |
             cat > /tmp/test.sh <<EOF
               export HOST_OS="${{ matrix.os }}"
