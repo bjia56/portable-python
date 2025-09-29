@@ -2,13 +2,42 @@
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 
+# Download and setup gnu-getopt-multiplatform
+function setup_getopt() {
+    local getopt_dir="${SCRIPT_DIR}/../.getopt"
+    local getopt_binary="${getopt_dir}/getopt"
+
+    # Check if getopt is already downloaded
+    if [ -f "$getopt_binary" ]; then
+        return 0
+    fi
+
+    # Create directory for getopt
+    mkdir -p "$getopt_dir"
+
+    # Download getopt binary
+    echo "Downloading gnu-getopt-multiplatform..."
+    curl -s -S -f -L --retry 15 --retry-delay 0 --retry-all-errors \
+        -o "$getopt_binary" \
+        "https://github.com/bjia56/gnu-getopt-multiplatform/releases/download/v2.41.2.1/getopt"
+
+    # Make it executable
+    chmod +x "$getopt_binary"
+
+    echo "Downloaded getopt to $getopt_binary"
+}
+
+# Setup getopt before using it
+setup_getopt
+GETOPT_BINARY="${SCRIPT_DIR}/../.getopt/getopt"
+
 # Parse command line arguments for launch_test.sh
 function parse_test_arguments() {
     OS=""
     RUN_TESTS=""
 
     # Use getopt for argument parsing
-    PARSED_ARGS=$(getopt -o a:v:d:o:r:h --long arch:,version:,distribution:,os:,run-tests:,help -n "$0" -- "$@")
+    PARSED_ARGS=$("$GETOPT_BINARY" -o a:v:d:o:r:h --long arch:,version:,distribution:,os:,run-tests:,help -n "$0" -- "$@")
     if [ $? != 0 ]; then
         echo "Failed to parse arguments" >&2
         exit 1
