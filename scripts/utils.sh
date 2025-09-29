@@ -2,11 +2,8 @@
 
 set -e
 
-# Check for getopt command availability, prefer ggetopt if available
-GETOPT_CMD="getopt"
-if command -v ggetopt >/dev/null 2>&1; then
-    GETOPT_CMD="ggetopt"
-elif ! command -v getopt >/dev/null 2>&1; then
+# Check for getopt command availability
+if ! command -v getopt >/dev/null 2>&1; then
     echo "Error: getopt command is not available" >&2
     echo "Please install util-linux or a compatible getopt implementation" >&2
     exit 1
@@ -24,7 +21,7 @@ function parse_arguments() {
     DISTRIBUTION="full"  # Default to full distribution
 
     # Use getopt for argument parsing
-    PARSED_ARGS=$($GETOPT_CMD -o a:v:d:h --long arch:,version:,distribution:,help -n "$0" -- "$@")
+    PARSED_ARGS=$(getopt -o a:v:d:h --long arch:,version:,distribution:,help -n "$0" -- "$@")
     if [ $? != 0 ]; then
         echo "Failed to parse arguments" >&2
         exit 1
