@@ -368,7 +368,7 @@ jobs:
           release: ${{ steps.parse_release.outputs.release }}
           arch: ${{ matrix.arch }}
           prepare: |
-            pkg install -y cmake bash wget patch git zip python3 autoconf automake libtool gettext bison pkgconf gmake gperf patchelf texinfo getopt
+            pkg install -y cmake bash wget patch git zip python3 autoconf automake libtool gettext bison pkgconf gmake gperf patchelf texinfo
             chsh -s /usr/local/bin/bash root
 
       - name: Build in VM
@@ -383,7 +383,6 @@ jobs:
           export VERBOSE_CI="${{ env.VERBOSE_CI }}"
           export PORTABLE_PYTHON_BUILDSYSTEM_BRANCH="${{ env.PORTABLE_PYTHON_BUILDSYSTEM_BRANCH }}"
           export PLATFORM="freebsd${{ matrix.release }}"
-          export PATH="/usr/local/bin:$PATH"
           bash ./scripts/build_freebsd.sh --arch ${{ matrix.arch }} --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }}
 
           cp *.zip ${{ github.workspace }}
@@ -453,7 +452,7 @@ jobs:
           release: ${{ steps.parse_release.outputs.release }}
           arch: ${{ matrix.arch }}
           prepare: |
-            pkg install -y bash getopt
+            pkg install -y bash
             chsh -s /usr/local/bin/bash root
 
       - name: Test in VM
@@ -461,7 +460,6 @@ jobs:
         run: |
           set -e
           cd ${{ github.workspace }}
-          export PATH="/usr/local/bin:$PATH"
           bash ./scripts/launch_test.sh --arch ${{ matrix.arch }} --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --os freebsd${{ matrix.release }} --run-tests "${{ env.RUN_TESTS }}"
 
   build_solaris:
@@ -670,11 +668,10 @@ jobs:
           usesh: true
           copyback: false
           prepare: |
-            pkg install -y bash getopt
+            pkg install -y bash
           run: |
             cat > /tmp/test.sh <<EOF
               export HOST_OS="${{ matrix.os }}"
-              export PATH="/usr/local/bin:$PATH"
               bash ./scripts/launch_test.sh --arch unknown --version ${{ inputs.python_version }} --distribution - --os cosmo --run-tests "${{ env.RUN_TESTS }}"
             EOF
             bash -e /tmp/test.sh
