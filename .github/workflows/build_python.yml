@@ -162,6 +162,7 @@ jobs:
           shell: bash
           run: |
             set -e
+            apt update && apt install -y curl
             ./scripts/launch_test.sh --arch ${{ matrix.arch }} --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --os linux --run-tests "${{ env.RUN_TESTS }}"
 
   build_windows:
@@ -653,7 +654,7 @@ jobs:
           usesh: true
           copyback: false
           prepare: |
-            pkg install -y bash base64
+            pkg install -y bash base64 curl
           run: |
             cat > /tmp/test.sh <<EOF
               export HOST_OS="${{ matrix.os }}"
