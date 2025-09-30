@@ -17,7 +17,7 @@ function setup_getopt() {
 
     # Download getopt binary
     echo "Downloading gnu-getopt-multiplatform..."
-    curl -s -S -f -L --retry 15 --retry-delay 0 --retry-all-errors \
+    curl -s -S -f -L --retry 15 --retry-delay 0 \
         -o "$getopt_binary" \
         "https://github.com/bjia56/gnu-getopt-multiplatform/releases/download/v2.41.2.1/getopt"
 
