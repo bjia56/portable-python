@@ -446,7 +446,7 @@ jobs:
           release: ${{ steps.parse_release.outputs.release }}
           arch: ${{ matrix.arch }}
           prepare: |
-            pkg install -y bash base64
+            pkg install -y bash base64 curl
             chsh -s /usr/local/bin/bash root
 
       - name: Test in VM
