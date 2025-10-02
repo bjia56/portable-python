@@ -41,9 +41,11 @@ function parse_arguments() {
     ARCH=""
     PYTHON_FULL_VER=""
     DISTRIBUTION="full"  # Default to full distribution
+    DEPS_ONLY="false"    # Default to building everything
+    PYTHON_ONLY="false"  # Default to building everything
 
     # Use getopt for argument parsing
-    PARSED_ARGS=$("$GETOPT_BINARY" -o a:v:d:h --long arch:,version:,distribution:,help -n "$0" -- "$@")
+    PARSED_ARGS=$("$GETOPT_BINARY" -o a:v:d:h --long arch:,version:,distribution:,deps-only,python-only,help -n "$0" -- "$@")
     if [ $? != 0 ]; then
         echo "Failed to parse arguments" >&2
         exit 1
@@ -65,13 +67,23 @@ function parse_arguments() {
                 DISTRIBUTION="$2"
                 shift 2
                 ;;
+            --deps-only)
+                DEPS_ONLY="true"
+                shift
+                ;;
+            --python-only)
+                PYTHON_ONLY="true"
+                shift
+                ;;
             -h|--help)
-                echo "Usage: $0 -a|--arch ARCH -v|--version VERSION [-d|--distribution DISTRIBUTION]"
+                echo "Usage: $0 -a|--arch ARCH -v|--version VERSION [-d|--distribution DISTRIBUTION] [--deps-only] [--python-only]"
                 echo ""
                 echo "Options:"
                 echo "  -a, --arch ARCH              Target architecture (e.g., x86_64, aarch64, universal2, unknown)"
                 echo "  -v, --version VERSION        Python version (e.g., 3.11.10)"
                 echo "  -d, --distribution DIST      Distribution type: full or headless (default: full)"
+                echo "      --deps-only              Only build dependencies, not Python itself"
+                echo "      --python-only            Only build Python, skip building dependencies"
                 echo "  -h, --help                   Show this help message"
                 exit 0
                 ;;

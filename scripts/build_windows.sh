@@ -12,170 +12,170 @@ else
   BINDEPS_ARCH=arm64
 fi
 
-##############
-# Initialize #
-##############
-echo "::group::Initialize"
-cd ${BUILDDIR}
-
-git clone https://github.com/bjia56/portable-python-cmake-buildsystem.git --branch ${CMAKE_BUILDSYSTEM_BRANCH} --single-branch --depth 1
-
-echo "::endgroup::"
-###########
-# OpenSSL #
-###########
-echo "::group::OpenSSL"
-cd ${BUILDDIR}
-
-if (( ${PYTHON_MINOR} < 11 )); then
-  OPENSSL_VER=1.1.1u
-  OPENSSL_LICENSE=LICENSE
-else
-  OPENSSL_VER=3.0.15
-  OPENSSL_LICENSE=LICENSE.txt
-fi
-curl -L https://github.com/python/cpython-bin-deps/archive/refs/tags/openssl-bin-${OPENSSL_VER}.tar.gz --output cpython-bin-deps-openssl-bin-${OPENSSL_VER}.tar.gz
-tar -xf cpython-bin-deps-openssl-bin-${OPENSSL_VER}.tar.gz
-cd cpython-bin-deps-openssl-bin-${OPENSSL_VER}
-mkdir ${DEPSDIR}/openssl
-cp -r ${BINDEPS_ARCH}/include ${DEPSDIR}/openssl/include
-# cmake apparently wants this here?
-cp ${DEPSDIR}/openssl/include/applink.c ${DEPSDIR}/openssl/include/openssl/applink.c
-
-# required by cmake
-mkdir ${DEPSDIR}/openssl/lib
-cp ${BINDEPS_ARCH}/lib* ${DEPSDIR}/openssl/lib/
-
-# for compatibility with old openssl so we don't need to conditionally copy
-mkdir ${DEPSDIR}/openssl/bin
-cp ${BINDEPS_ARCH}/lib* ${DEPSDIR}/openssl/bin/
-
-cd ${BINDEPS_ARCH}
-install_license ${OPENSSL_LICENSE} openssl-${OPENSSL_VER}
-
-echo "::endgroup::"
-#########
-# bzip2 #
-#########
-echo "::group::bzip2"
-cd ${BUILDDIR}
-
-git clone https://github.com/commontk/bzip2.git
-git -C bzip2 checkout 391dddabd24aee4a06e10ab6636f26dd93c21308
-mkdir ${DEPSDIR}/bzip2
-cd bzip2
-maybe_patch bzip2-1.0.8
-mkdir build
-cd build
-cmake \
-  -G "Visual Studio 17 2022" -A ${CMAKE_ARCH} \
-  -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
-  -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR}/bzip2 \
-  ..
-cmake --build . --config Release -- /property:Configuration=Release
-cmake --build . --target INSTALL -- /property:Configuration=Release
-cd ..
-install_license ./LICENSE bzip2-1.0.8
-
-echo "::endgroup::"
-########
-# lzma #
-########
-echo "::group::lzma"
-cd ${BUILDDIR}
-
-download_verify_extract xz-5.4.5.tar.gz
-mkdir ${DEPSDIR}/xz
-cd xz-5.4.5
-maybe_patch
-mkdir build
-cd build
-cmake \
-  -G "Visual Studio 17 2022" -A ${CMAKE_ARCH} \
-  -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR}/xz \
-  ..
-cmake --build . --config Release -- /property:Configuration=Release
-cmake --build . --target INSTALL -- /property:Configuration=Release
-cd ..
-install_license
-
-echo "::endgroup::"
-###########
-# sqlite3 #
-###########
-echo "::group::sqlite3"
-cd ${BUILDDIR}
-
-download_and_verify sqlite-amalgamation-3430100.zip
-unzip -qq sqlite-amalgamation-3430100.zip
-cd sqlite-amalgamation-3430100
-maybe_patch
-cd ..
-mv sqlite-amalgamation-3430100 ${DEPSDIR}/sqlite3
-cd ${DEPSDIR}/sqlite3
-cl //c sqlite3.c
-lib sqlite3.obj
-
-echo "::endgroup::"
-########
-# zlib #
-########
-echo "::group::zlib"
-cd ${BUILDDIR}
-
-download_verify_extract zlib-1.3.1.tar.gz
-mkdir ${DEPSDIR}/zlib
-cd zlib-1.3.1
-maybe_patch
-mkdir build
-cd build
-cmake \
-  -G "Visual Studio 17 2022" -A ${CMAKE_ARCH} \
-  -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR}/zlib \
-  ..
-cmake --build . --config Release -- /property:Configuration=Release
-cmake --build . --target INSTALL -- /property:Configuration=Release
-cd ..
-install_license
-
-echo "::endgroup::"
-##########
-# libffi #
-##########
-echo "::group::libffi"
-cd ${BUILDDIR}
-
-curl -L https://github.com/python/cpython-bin-deps/archive/refs/tags/libffi-3.4.4.tar.gz --output cpython-bin-deps-libffi-3.4.4.tar.gz
-tar -xf cpython-bin-deps-libffi-3.4.4.tar.gz
-cd cpython-bin-deps-libffi-3.4.4
-mkdir ${DEPSDIR}/libffi
-cp -r ${BINDEPS_ARCH}/include ${DEPSDIR}/libffi/include
-mkdir ${DEPSDIR}/libffi/lib
-cp ${BINDEPS_ARCH}/libffi* ${DEPSDIR}/libffi/lib/
-install_license LICENSE libffi-3.4.4
-
-echo "::endgroup::"
-
-if [[ "${DISTRIBUTION}" != "headless" ]]; then
-  #########
-  # tcltk #
-  #########
-  echo "::group::tcltk"
+function build_deps () {
+  ###########
+  # OpenSSL #
+  ###########
+  echo "::group::OpenSSL"
   cd ${BUILDDIR}
 
-  curl -L https://github.com/python/cpython-bin-deps/archive/refs/tags/tcltk-8.6.14.0.tar.gz --output cpython-bin-deps-tcltk-8.6.14.0.tar.gz
-  tar -xf cpython-bin-deps-tcltk-8.6.14.0.tar.gz
-  cd cpython-bin-deps-tcltk-8.6.14.0
-  mkdir ${DEPSDIR}/tcltk
-  cp -r ${BINDEPS_ARCH}/include ${DEPSDIR}/tcltk/include
-  mkdir ${DEPSDIR}/tcltk/lib
-  cp -r ${BINDEPS_ARCH}/lib/* ${DEPSDIR}/tcltk/lib/
-  mkdir ${DEPSDIR}/tcltk/bin
-  cp ${BINDEPS_ARCH}/bin/*.dll ${DEPSDIR}/tcltk/bin
-  install_license ${BINDEPS_ARCH}/tcllicense.terms tcl-8.6.14.0
-  install_license ${BINDEPS_ARCH}/tklicense.terms tk-8.6.14.0
+  if (( ${PYTHON_MINOR} < 11 )); then
+    OPENSSL_VER=1.1.1u
+    OPENSSL_LICENSE=LICENSE
+  else
+    OPENSSL_VER=3.0.15
+    OPENSSL_LICENSE=LICENSE.txt
+  fi
+  curl -L https://github.com/python/cpython-bin-deps/archive/refs/tags/openssl-bin-${OPENSSL_VER}.tar.gz --output cpython-bin-deps-openssl-bin-${OPENSSL_VER}.tar.gz
+  tar -xf cpython-bin-deps-openssl-bin-${OPENSSL_VER}.tar.gz
+  cd cpython-bin-deps-openssl-bin-${OPENSSL_VER}
+  mkdir ${DEPSDIR}/openssl
+  cp -r ${BINDEPS_ARCH}/include ${DEPSDIR}/openssl/include
+  # cmake apparently wants this here?
+  cp ${DEPSDIR}/openssl/include/applink.c ${DEPSDIR}/openssl/include/openssl/applink.c
+
+  # required by cmake
+  mkdir ${DEPSDIR}/openssl/lib
+  cp ${BINDEPS_ARCH}/lib* ${DEPSDIR}/openssl/lib/
+
+  # for compatibility with old openssl so we don't need to conditionally copy
+  mkdir ${DEPSDIR}/openssl/bin
+  cp ${BINDEPS_ARCH}/lib* ${DEPSDIR}/openssl/bin/
+
+  cd ${BINDEPS_ARCH}
+  install_license ${OPENSSL_LICENSE} openssl-${OPENSSL_VER}
 
   echo "::endgroup::"
+  #########
+  # bzip2 #
+  #########
+  echo "::group::bzip2"
+  cd ${BUILDDIR}
+
+  git clone https://github.com/commontk/bzip2.git
+  git -C bzip2 checkout 391dddabd24aee4a06e10ab6636f26dd93c21308
+  mkdir ${DEPSDIR}/bzip2
+  cd bzip2
+  maybe_patch bzip2-1.0.8
+  mkdir build
+  cd build
+  cmake \
+    -G "Visual Studio 17 2022" -A ${CMAKE_ARCH} \
+    -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+    -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR}/bzip2 \
+    ..
+  cmake --build . --config Release -- /property:Configuration=Release
+  cmake --build . --target INSTALL -- /property:Configuration=Release
+  cd ..
+  install_license ./LICENSE bzip2-1.0.8
+
+  echo "::endgroup::"
+  ########
+  # lzma #
+  ########
+  echo "::group::lzma"
+  cd ${BUILDDIR}
+
+  download_verify_extract xz-5.4.5.tar.gz
+  mkdir ${DEPSDIR}/xz
+  cd xz-5.4.5
+  maybe_patch
+  mkdir build
+  cd build
+  cmake \
+    -G "Visual Studio 17 2022" -A ${CMAKE_ARCH} \
+    -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR}/xz \
+    ..
+  cmake --build . --config Release -- /property:Configuration=Release
+  cmake --build . --target INSTALL -- /property:Configuration=Release
+  cd ..
+  install_license
+
+  echo "::endgroup::"
+  ###########
+  # sqlite3 #
+  ###########
+  echo "::group::sqlite3"
+  cd ${BUILDDIR}
+
+  download_and_verify sqlite-amalgamation-3430100.zip
+  unzip -qq sqlite-amalgamation-3430100.zip
+  cd sqlite-amalgamation-3430100
+  maybe_patch
+  cd ..
+  mv sqlite-amalgamation-3430100 ${DEPSDIR}/sqlite3
+  cd ${DEPSDIR}/sqlite3
+  cl //c sqlite3.c
+  lib sqlite3.obj
+
+  echo "::endgroup::"
+  ########
+  # zlib #
+  ########
+  echo "::group::zlib"
+  cd ${BUILDDIR}
+
+  download_verify_extract zlib-1.3.1.tar.gz
+  mkdir ${DEPSDIR}/zlib
+  cd zlib-1.3.1
+  maybe_patch
+  mkdir build
+  cd build
+  cmake \
+    -G "Visual Studio 17 2022" -A ${CMAKE_ARCH} \
+    -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR}/zlib \
+    ..
+  cmake --build . --config Release -- /property:Configuration=Release
+  cmake --build . --target INSTALL -- /property:Configuration=Release
+  cd ..
+  install_license
+
+  echo "::endgroup::"
+  ##########
+  # libffi #
+  ##########
+  echo "::group::libffi"
+  cd ${BUILDDIR}
+
+  curl -L https://github.com/python/cpython-bin-deps/archive/refs/tags/libffi-3.4.4.tar.gz --output cpython-bin-deps-libffi-3.4.4.tar.gz
+  tar -xf cpython-bin-deps-libffi-3.4.4.tar.gz
+  cd cpython-bin-deps-libffi-3.4.4
+  mkdir ${DEPSDIR}/libffi
+  cp -r ${BINDEPS_ARCH}/include ${DEPSDIR}/libffi/include
+  mkdir ${DEPSDIR}/libffi/lib
+  cp ${BINDEPS_ARCH}/libffi* ${DEPSDIR}/libffi/lib/
+  install_license LICENSE libffi-3.4.4
+
+  echo "::endgroup::"
+
+  if [[ "${DISTRIBUTION}" != "headless" ]]; then
+    #########
+    # tcltk #
+    #########
+    echo "::group::tcltk"
+    cd ${BUILDDIR}
+
+    curl -L https://github.com/python/cpython-bin-deps/archive/refs/tags/tcltk-8.6.14.0.tar.gz --output cpython-bin-deps-tcltk-8.6.14.0.tar.gz
+    tar -xf cpython-bin-deps-tcltk-8.6.14.0.tar.gz
+    cd cpython-bin-deps-tcltk-8.6.14.0
+    mkdir ${DEPSDIR}/tcltk
+    cp -r ${BINDEPS_ARCH}/include ${DEPSDIR}/tcltk/include
+    mkdir ${DEPSDIR}/tcltk/lib
+    cp -r ${BINDEPS_ARCH}/lib/* ${DEPSDIR}/tcltk/lib/
+    mkdir ${DEPSDIR}/tcltk/bin
+    cp ${BINDEPS_ARCH}/bin/*.dll ${DEPSDIR}/tcltk/bin
+    install_license ${BINDEPS_ARCH}/tcllicense.terms tcl-8.6.14.0
+    install_license ${BINDEPS_ARCH}/tklicense.terms tk-8.6.14.0
+
+    echo "::endgroup::"
+  fi
+}
+
+if [[ "${PYTHON_ONLY}" == "false" ]]; then
+  build_deps
+fi
+if [[ "${DEPS_ONLY}" == "true" ]]; then
+  exit 0
 fi
 
 #########
@@ -193,6 +193,8 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
     -DTCL_LIBRARY:FILEPATH=${DEPSDIR}/tcltk/lib/tcl86t.lib
   )
 fi
+
+git clone https://github.com/bjia56/portable-python-cmake-buildsystem.git --branch ${CMAKE_BUILDSYSTEM_BRANCH} --single-branch --depth 1
 
 function build_python () {
   python_suffix=$1

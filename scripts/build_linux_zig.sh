@@ -103,449 +103,464 @@ else
     export ZIG_FLAGS="-target loongarch64-linux-gnu.2.36"
   elif [[ "${ARCH}" == "s390x" || "${ARCH}" == "powerpc64le" ]]; then
     export ZIG_FLAGS="-target ${ARCH}-linux-gnu.2.19"
+    if [[ "${ARCH}" == "powerpc64le" ]]; then
+      export LDFLAGS="${LDFLAGS} -lzigshim"
+    fi
   else
     export ZIG_FLAGS="-target ${ARCH}-linux-gnu.2.17"
   fi
   export CHOST=${ARCH}-linux-gnu
 fi
 
-cd ${WORKDIR}
+echo "::endgroup::"
 
-if [[ "${ARCH}" == "powerpc64le" ]]; then
-  # Compile the following manually and bundle them as libzigshim.a
-  # This is needed because the Zig compiler does not yet support powerpc64le's double double
-  # floating point format. https://github.com/ziglang/zig/issues/22081
+function build_deps () {
+  ###########
+  # zigshim #
+  ###########
+  if [[ "${ARCH}" == "powerpc64le" ]]; then
+    echo "::group::zigshim"
+    # Compile the following manually and bundle them as libzigshim.a
+    # This is needed because the Zig compiler does not yet support powerpc64le's double double
+    # floating point format. https://github.com/ziglang/zig/issues/22081
+    cd ${BUILDDIR}
+    ${CC} ${CFLAGS} -c -o gcc_qadd.o ${WORKDIR}/zigshim/gcc_qadd.c
+    ${CC} ${CFLAGS} -c -o gcc_qmul.o ${WORKDIR}/zigshim/gcc_qmul.c
+    ${CC} ${CFLAGS} -c -o gcc_qsub.o ${WORKDIR}/zigshim/gcc_qsub.c
+    ${CC} ${CFLAGS} -c -o gcc_qdiv.o ${WORKDIR}/zigshim/gcc_qdiv.c
+    ${AR} rcs libzigshim.a gcc_qadd.o gcc_qmul.o gcc_qsub.o gcc_qdiv.o
+    mkdir -p ${DEPSDIR}/lib
+    mv libzigshim.a ${DEPSDIR}/lib
+    echo "::endgroup::"
+  fi
+  ########
+  # zlib #
+  ########
+  echo "::group::zlib"
   cd ${BUILDDIR}
-  ${CC} ${CFLAGS} -c -o gcc_qadd.o ${WORKDIR}/zigshim/gcc_qadd.c
-  ${CC} ${CFLAGS} -c -o gcc_qmul.o ${WORKDIR}/zigshim/gcc_qmul.c
-  ${CC} ${CFLAGS} -c -o gcc_qsub.o ${WORKDIR}/zigshim/gcc_qsub.c
-  ${CC} ${CFLAGS} -c -o gcc_qdiv.o ${WORKDIR}/zigshim/gcc_qdiv.c
-  ${AR} rcs libzigshim.a gcc_qadd.o gcc_qmul.o gcc_qsub.o gcc_qdiv.o
-  mkdir -p ${DEPSDIR}/lib
-  mv libzigshim.a ${DEPSDIR}/lib
-  export LDFLAGS="${LDFLAGS} -lzigshim"
-fi
 
-echo "::endgroup::"
-########
-# zlib #
-########
-echo "::group::zlib"
-cd ${BUILDDIR}
+  download_verify_extract zlib-1.3.1.tar.gz
+  cd zlib*
+  maybe_patch
+  ./configure --prefix=${DEPSDIR}
+  make -j4
+  make install
+  install_license
 
-download_verify_extract zlib-1.3.1.tar.gz
-cd zlib*
-maybe_patch
-./configure --prefix=${DEPSDIR}
-make -j4
-make install
-install_license
+  echo "::endgroup::"
+  ###########
+  # OpenSSL #
+  ###########
+  echo "::group::OpenSSL"
+  cd ${BUILDDIR}
 
-echo "::endgroup::"
-###########
-# OpenSSL #
-###########
-echo "::group::OpenSSL"
-cd ${BUILDDIR}
+  if (( ${PYTHON_MINOR} < 11 )); then
+    download_verify_extract openssl-1.1.1w.tar.gz
+  else
+    download_verify_extract openssl-3.0.15.tar.gz
+  fi
+  cd openssl*
+  maybe_patch
+  if [[ "${ARCH}" == "arm" ]]; then
+    ./Configure linux-generic32 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+  elif [[ "${ARCH}" == "i386" ]]; then
+    CFLAGS="${CFLAGS} -fgnuc-version=0 -D__STDC_NO_ATOMICS__" ./Configure linux-x86 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+  elif [[ "${ARCH}" == "riscv64" ]]; then
+    CFLAGS="${CFLAGS} -fgnuc-version=0 -D__STDC_NO_ATOMICS__" ./Configure linux-generic64 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+  elif [[ "${ARCH}" == "loongarch64" ]]; then
+    ./Configure linux64-loongarch64 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+  elif [[ "${ARCH}" == "s390x" ]]; then
+    ./Configure linux64-s390x no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+  elif [[ "${ARCH}" == "powerpc64le" ]]; then
+    ./Configure linux-ppc64le no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+  else
+    ./Configure linux-${ARCH} no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+  fi
+  make -j4
+  make install_sw
+  install_license
 
-if (( ${PYTHON_MINOR} < 11 )); then
-  download_verify_extract openssl-1.1.1w.tar.gz
-else
-  download_verify_extract openssl-3.0.15.tar.gz
-fi
-cd openssl*
-maybe_patch
-if [[ "${ARCH}" == "arm" ]]; then
-  ./Configure linux-generic32 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
-elif [[ "${ARCH}" == "i386" ]]; then
-  CFLAGS="${CFLAGS} -fgnuc-version=0 -D__STDC_NO_ATOMICS__" ./Configure linux-x86 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
-elif [[ "${ARCH}" == "riscv64" ]]; then
-  CFLAGS="${CFLAGS} -fgnuc-version=0 -D__STDC_NO_ATOMICS__" ./Configure linux-generic64 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
-elif [[ "${ARCH}" == "loongarch64" ]]; then
-  ./Configure linux64-loongarch64 no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
-elif [[ "${ARCH}" == "s390x" ]]; then
-  ./Configure linux64-s390x no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
-elif [[ "${ARCH}" == "powerpc64le" ]]; then
-  ./Configure linux-ppc64le no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
-else
-  ./Configure linux-${ARCH} no-shared --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
-fi
-make -j4
-make install_sw
-install_license
+  echo "::endgroup::"
+  ##########
+  # libffi #
+  ##########
+  echo "::group::libffi"
+  cd ${BUILDDIR}
 
-echo "::endgroup::"
-##########
-# libffi #
-##########
-echo "::group::libffi"
-cd ${BUILDDIR}
+  download_verify_extract libffi-3.4.6.tar.gz
+  cd libffi*
+  maybe_patch
+  CFLAGS="${CFLAGS} -Wl,--undefined-version" ./configure --host=${CHOST} --prefix=${DEPSDIR}
+  make -j4
+  make install
+  install_license
 
-download_verify_extract libffi-3.4.6.tar.gz
-cd libffi*
-maybe_patch
-CFLAGS="${CFLAGS} -Wl,--undefined-version" ./configure --host=${CHOST} --prefix=${DEPSDIR}
-make -j4
-make install
-install_license
+  echo "::endgroup::"
+  ###########
+  # sqlite3 #
+  ###########
+  echo "::group::sqlite3"
+  cd ${BUILDDIR}
 
-echo "::endgroup::"
-###########
-# sqlite3 #
-###########
-echo "::group::sqlite3"
-cd ${BUILDDIR}
+  download_verify_extract sqlite-autoconf-3450000.tar.gz
+  cd sqlite*
+  maybe_patch
+  ./configure --host=${CHOST} --prefix=${DEPSDIR}
+  make -j4
+  make install
 
-download_verify_extract sqlite-autoconf-3450000.tar.gz
-cd sqlite*
-maybe_patch
-./configure --host=${CHOST} --prefix=${DEPSDIR}
-make -j4
-make install
+  echo "::endgroup::"
+  #########
+  # expat #
+  #########
+  echo "::group::expat"
+  cd ${BUILDDIR}
 
-echo "::endgroup::"
-#########
-# expat #
-#########
-echo "::group::expat"
-cd ${BUILDDIR}
+  download_verify_extract expat-2.6.2.tar.gz
+  cd expat*
+  maybe_patch
+  ./configure --host=${CHOST} --disable-shared --prefix=${DEPSDIR}
+  make -j4
+  make install
+  install_license
 
-download_verify_extract expat-2.6.2.tar.gz
-cd expat*
-maybe_patch
-./configure --host=${CHOST} --disable-shared --prefix=${DEPSDIR}
-make -j4
-make install
-install_license
+  echo "::endgroup::"
+  ###########
+  # ncurses #
+  ###########
+  echo "::group::ncurses"
+  cd ${BUILDDIR}
 
-echo "::endgroup::"
-###########
-# ncurses #
-###########
-echo "::group::ncurses"
-cd ${BUILDDIR}
+  download_verify_extract ncurses-6.4.tar.gz
+  cd ncurses*
+  maybe_patch
+  ./configure --host=${CHOST} --with-normal --without-progs --enable-overwrite --disable-stripping --enable-widec --with-termlib --disable-database --with-fallbacks=xterm,xterm-256color,screen-256color,linux,vt100 --prefix=${DEPSDIR}
+  make -j4
+  make install
+  install_license
 
-download_verify_extract ncurses-6.4.tar.gz
-cd ncurses*
-maybe_patch
-./configure --host=${CHOST} --with-normal --without-progs --enable-overwrite --disable-stripping --enable-widec --with-termlib --disable-database --with-fallbacks=xterm,xterm-256color,screen-256color,linux,vt100 --prefix=${DEPSDIR}
-make -j4
-make install
-install_license
+  echo "::endgroup::"
+  ############
+  # readline #
+  ############
+  echo "::group::readline"
+  cd ${BUILDDIR}
 
-echo "::endgroup::"
-############
-# readline #
-############
-echo "::group::readline"
-cd ${BUILDDIR}
+  download_verify_extract readline-8.2.tar.gz
+  cd readline*
+  maybe_patch
+  ./configure --with-curses --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
+  make -j4
+  make install
+  install_license
 
-download_verify_extract readline-8.2.tar.gz
-cd readline*
-maybe_patch
-./configure --with-curses --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
-make -j4
-make install
-install_license
+  echo "::endgroup::"
+  #########
+  # bzip2 #
+  #########
+  echo "::group::bzip2"
+  cd ${BUILDDIR}
 
-echo "::endgroup::"
-#########
-# bzip2 #
-#########
-echo "::group::bzip2"
-cd ${BUILDDIR}
+  wget --no-verbose -O bzip2.tar.gz https://github.com/commontk/bzip2/archive/391dddabd24aee4a06e10ab6636f26dd93c21308.tar.gz
+  tar -xf bzip2*.tar.gz
+  rm *.tar.gz
+  cd bzip2-*
+  maybe_patch bzip2-1.0.8
+  mkdir build
+  cd build
+  cmake -DCMAKE_SYSTEM_PROCESSOR=${ARCH} -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
+  make -j4
+  make install
+  cd ..
+  install_license ./LICENSE bzip2-1.0.8
 
-wget --no-verbose -O bzip2.tar.gz https://github.com/commontk/bzip2/archive/391dddabd24aee4a06e10ab6636f26dd93c21308.tar.gz
-tar -xf bzip2*.tar.gz
-rm *.tar.gz
-cd bzip2-*
-maybe_patch bzip2-1.0.8
-mkdir build
-cd build
-cmake -DCMAKE_SYSTEM_PROCESSOR=${ARCH} -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
-make -j4
-make install
-cd ..
-install_license ./LICENSE bzip2-1.0.8
+  echo "::endgroup::"
+  ######
+  # xz #
+  ######
+  echo "::group::xz"
+  cd ${BUILDDIR}
 
-echo "::endgroup::"
-######
-# xz #
-######
-echo "::group::xz"
-cd ${BUILDDIR}
+  download_verify_extract xz-5.4.5.tar.gz
+  cd xz*
+  maybe_patch
+  mkdir build
+  cd build
+  cmake -DCMAKE_SYSTEM_PROCESSOR=${ARCH} -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
+  make -j4
+  make install
+  cd ..
+  install_license
 
-download_verify_extract xz-5.4.5.tar.gz
-cd xz*
-maybe_patch
-mkdir build
-cd build
-cmake -DCMAKE_SYSTEM_PROCESSOR=${ARCH} -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
-make -j4
-make install
-cd ..
-install_license
+  echo "::endgroup::"
+  ##########
+  # Brotli #
+  ##########
+  echo "::group::Brotli"
+  cd ${BUILDDIR}
 
-echo "::endgroup::"
-##########
-# Brotli #
-##########
-echo "::group::Brotli"
-cd ${BUILDDIR}
+  download_verify_extract brotli-1.1.0.tar.gz
+  cd brotli*
+  maybe_patch
+  mkdir build
+  cd build
+  cmake -DCMAKE_SYSTEM_PROCESSOR=${ARCH} -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
+  make -j4
+  make install
+  cd ..
+  install_license
 
-download_verify_extract brotli-1.1.0.tar.gz
-cd brotli*
-maybe_patch
-mkdir build
-cd build
-cmake -DCMAKE_SYSTEM_PROCESSOR=${ARCH} -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} ..
-make -j4
-make install
-cd ..
-install_license
+  echo "::endgroup::"
+  ########
+  # uuid #
+  ########
+  echo "::group::uuid"
+  cd ${BUILDDIR}
 
-echo "::endgroup::"
-########
-# uuid #
-########
-echo "::group::uuid"
-cd ${BUILDDIR}
+  download_verify_extract util-linux-2.39.3.tar.gz
+  cd util-linux*
+  maybe_patch libuuid-2.39.3
+  ./autogen.sh
+  ./configure --host=${CHOST} --disable-all-programs --enable-libuuid --prefix=${DEPSDIR}
+  make -j4
+  make install
+  install_license ./Documentation/licenses/COPYING.BSD-3-Clause libuuid-2.39.3
 
-download_verify_extract util-linux-2.39.3.tar.gz
-cd util-linux*
-maybe_patch libuuid-2.39.3
-./autogen.sh
-./configure --host=${CHOST} --disable-all-programs --enable-libuuid --prefix=${DEPSDIR}
-make -j4
-make install
-install_license ./Documentation/licenses/COPYING.BSD-3-Clause libuuid-2.39.3
+  echo "::endgroup::"
+  ########
+  # gdbm #
+  ########
+  echo "::group::gdbm"
+  cd ${BUILDDIR}
 
-echo "::endgroup::"
-########
-# gdbm #
-########
-echo "::group::gdbm"
-cd ${BUILDDIR}
+  download_verify_extract gdbm-1.24.tar.gz
+  cd gdbm*
+  maybe_patch
+  ./configure --host=${CHOST} --enable-libgdbm-compat --prefix=${DEPSDIR}
+  make -j4
+  make install
+  install_license
 
-download_verify_extract gdbm-1.24.tar.gz
-cd gdbm*
-maybe_patch
-./configure --host=${CHOST} --enable-libgdbm-compat --prefix=${DEPSDIR}
-make -j4
-make install
-install_license
+  echo "::endgroup::"
+  ###########
+  # libxml2 #
+  ###########
+  echo "::group::libxml2"
+  cd ${BUILDDIR}
 
-echo "::endgroup::"
-###########
-# libxml2 #
-###########
-echo "::group::libxml2"
-cd ${BUILDDIR}
+  download_verify_extract libxml2-2.12.4.tar.xz
+  cd libxml2*
+  maybe_patch
+  ./configure --host=${CHOST} --enable-static --disable-shared --without-python --prefix=${DEPSDIR}
+  make -j4
+  make install
+  install_license ./Copyright
 
-download_verify_extract libxml2-2.12.4.tar.xz
-cd libxml2*
-maybe_patch
-./configure --host=${CHOST} --enable-static --disable-shared --without-python --prefix=${DEPSDIR}
-make -j4
-make install
-install_license ./Copyright
+  echo "::endgroup::"
+  ############
+  # libpng16 #
+  ############
+  echo "::group::libpng16"
+  cd ${BUILDDIR}
 
-echo "::endgroup::"
-############
-# libpng16 #
-############
-echo "::group::libpng16"
-cd ${BUILDDIR}
+  download_verify_extract libpng-1.6.41.tar.gz
+  cd libpng*
+  maybe_patch
+  ./configure --host=${CHOST} --with-zlib-prefix=${DEPSDIR} --disable-tools --prefix=${DEPSDIR}
+  make -j4
+  make install
+  install_license
 
-download_verify_extract libpng-1.6.41.tar.gz
-cd libpng*
-maybe_patch
-./configure --host=${CHOST} --with-zlib-prefix=${DEPSDIR} --disable-tools --prefix=${DEPSDIR}
-make -j4
-make install
-install_license
+  echo "::endgroup::"
+  #############
+  # libgcrypt #
+  #############
+  echo "::group::libgcrypt"
+  cd ${BUILDDIR}
 
-echo "::endgroup::"
-#############
-# libgcrypt #
-#############
-echo "::group::libgcrypt"
-cd ${BUILDDIR}
+  download_verify_extract libgpg-error-1.50.tar.bz2
+  cd libgpg-error*
+  maybe_patch
+  ./configure --host=${CHOST} --prefix=${DEPSDIR}
+  make -j4
+  make install
+  install_license ./COPYING.LIB
 
-download_verify_extract libgpg-error-1.50.tar.bz2
-cd libgpg-error*
-maybe_patch
-./configure --host=${CHOST} --prefix=${DEPSDIR}
-make -j4
-make install
-install_license ./COPYING.LIB
+  cd ${BUILDDIR}
 
-cd ${BUILDDIR}
+  download_verify_extract libgcrypt-1.11.0.tar.bz2
+  cd libgcrypt*
+  maybe_patch
+  LDFLAGS="${LDFLAGS} -Wl,--undefined-version" ./configure --disable-asm --host=${CHOST} --prefix=${DEPSDIR}
+  make -j4
+  make install
+  install_license ./COPYING.LIB
 
-download_verify_extract libgcrypt-1.11.0.tar.bz2
-cd libgcrypt*
-maybe_patch
-LDFLAGS="${LDFLAGS} -Wl,--undefined-version" ./configure --disable-asm --host=${CHOST} --prefix=${DEPSDIR}
-make -j4
-make install
-install_license ./COPYING.LIB
+  echo "::endgroup::"
+  ###########
+  # libxslt #
+  ###########
+  echo "::group::libxslt"
+  cd ${BUILDDIR}
 
-echo "::endgroup::"
-###########
-# libxslt #
-###########
-echo "::group::libxslt"
-cd ${BUILDDIR}
+  download_verify_extract libxslt-1.1.39.tar.xz
+  cd libxslt*
+  maybe_patch
+  CFLAGS="${CFLAGS} -I${DEPSDIR}/include/libxml2" ./configure --host=${CHOST} --with-libxml-prefix=${DEPSDIR} --without-python --prefix=${DEPSDIR}
+  make -j4
+  make install
+  install_license
 
-download_verify_extract libxslt-1.1.39.tar.xz
-cd libxslt*
-maybe_patch
-CFLAGS="${CFLAGS} -I${DEPSDIR}/include/libxml2" ./configure --host=${CHOST} --with-libxml-prefix=${DEPSDIR} --without-python --prefix=${DEPSDIR}
-make -j4
-make install
-install_license
+  echo "::endgroup::"
+  ############
+  # freetype #
+  ############
+  echo "::group::freetype"
+  cd ${BUILDDIR}
 
-echo "::endgroup::"
-############
-# freetype #
-############
-echo "::group::freetype"
-cd ${BUILDDIR}
+  download_verify_extract freetype-2.13.2.tar.gz
+  cd freetype*
+  maybe_patch
+  ./configure --host=${CHOST} --disable-shared --prefix=${DEPSDIR}
+  make -j4
+  make install
+  install_license ./docs/FTL.TXT
 
-download_verify_extract freetype-2.13.2.tar.gz
-cd freetype*
-maybe_patch
-./configure --host=${CHOST} --disable-shared --prefix=${DEPSDIR}
-make -j4
-make install
-install_license ./docs/FTL.TXT
+  echo "::endgroup::"
+  ##############
+  # fontconfig #
+  ##############
+  echo "::group::fontconfig"
+  cd ${BUILDDIR}
 
-echo "::endgroup::"
-##############
-# fontconfig #
-##############
-echo "::group::fontconfig"
-cd ${BUILDDIR}
+  download_verify_extract fontconfig-2.15.0.tar.gz
+  cd fontconfig*
+  maybe_patch
+  if [[ "${ARCH}" == "loongarch64" ]]; then
+    # remove this once upstream fontconfig updates config.*
+    cp /usr/share/misc/config.* .
+  fi
+  LDFLAGS="${LDFLAGS} -lxml2" ./configure --host=${CHOST} --enable-static --disable-shared --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
+  make -j4
+  make install
+  install_license
 
-download_verify_extract fontconfig-2.15.0.tar.gz
-cd fontconfig*
-maybe_patch
-if [[ "${ARCH}" == "loongarch64" ]]; then
-  # remove this once upstream fontconfig updates config.*
-  cp /usr/share/misc/config.* .
-fi
-LDFLAGS="${LDFLAGS} -lxml2" ./configure --host=${CHOST} --enable-static --disable-shared --enable-libxml2 --disable-cache-build --prefix=${DEPSDIR}
-make -j4
-make install
-install_license
+  echo "::endgroup::"
 
-echo "::endgroup::"
+  if [[ "${DISTRIBUTION}" != "headless" ]]; then
+    #######
+    # X11 #
+    #######
+    #echo "::group::X11"
+    #cd ${BUILDDIR}
 
-if [[ "${DISTRIBUTION}" != "headless" ]]; then
-  #######
-  # X11 #
-  #######
-  #echo "::group::X11"
-  #cd ${BUILDDIR}
+    function build_x11_lib_core() {
+      echo "::group::$1"
+      cd ${BUILDDIR}
 
-  function build_x11_lib_core() {
-    echo "::group::$1"
+      pkg=$1
+      ext_flags="$2"
+      file=$pkg.tar.gz
+      download_verify_extract $file
+      cd $pkg
+      maybe_patch
+      autoreconf -vfi
+      ./configure $ext_flags --host=${CHOST} --prefix=${DEPSDIR}
+      make -j4
+      make install
+
+      echo "::endgroup::"
+    }
+
+    function build_x11_lib () {
+      build_x11_lib_core "$1" "$2"
+      install_license
+    }
+
+    build_x11_lib_core xorgproto-2023.2
+    build_x11_lib xproto-7.0.31
+    build_x11_lib xextproto-7.3.0
+    build_x11_lib kbproto-1.0.7
+    build_x11_lib inputproto-2.3.2
+    build_x11_lib renderproto-0.11.1
+    build_x11_lib scrnsaverproto-1.2.2
+    build_x11_lib xcb-proto-1.16.0
+    build_x11_lib libpthread-stubs-0.5
+    build_x11_lib xtrans-1.5.0
+    build_x11_lib libXau-1.0.11
+    build_x11_lib libxcb-1.16
+    build_x11_lib libXdmcp-1.1.2
+    build_x11_lib libX11-1.8.7 --enable-malloc0returnsnull
+    build_x11_lib libXext-1.3.5 --enable-malloc0returnsnull
+    build_x11_lib libICE-1.0.7
+    build_x11_lib libSM-1.2.2
+    build_x11_lib libXrender-0.9.11 --enable-malloc0returnsnull
+    build_x11_lib libXft-2.3.8
+    build_x11_lib libXScrnSaver-1.2.4 --enable-malloc0returnsnull
+
+    #echo "::endgroup::"
+    #######
+    # tcl #
+    #######
+    echo "::group::tcl"
     cd ${BUILDDIR}
 
-    pkg=$1
-    ext_flags="$2"
-    file=$pkg.tar.gz
-    download_verify_extract $file
-    cd $pkg
+    download_verify_extract tcl8.6.13-src.tar.gz
+    cd tcl*
     maybe_patch
-    autoreconf -vfi
-    ./configure $ext_flags --host=${CHOST} --prefix=${DEPSDIR}
+    cd unix
+    LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
     make -j4
     make install
+    cd ..
+    install_license ./license.terms
 
     echo "::endgroup::"
-  }
+    ######
+    # tk #
+    ######
+    echo "::group::tk"
+    cd ${BUILDDIR}
 
-  function build_x11_lib () {
-    build_x11_lib_core "$1" "$2"
-    install_license
-  }
+    download_verify_extract tk8.6.13-src.tar.gz
+    cd tk*
+    maybe_patch
+    cd unix
+    LDFLAGS="${LDFLAGS} -lxml2 -lxcb -lXau" ./configure --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
+    make -j4
+    make install
+    cd ..
+    install_license ./license.terms
 
-  build_x11_lib_core xorgproto-2023.2
-  build_x11_lib xproto-7.0.31
-  build_x11_lib xextproto-7.3.0
-  build_x11_lib kbproto-1.0.7
-  build_x11_lib inputproto-2.3.2
-  build_x11_lib renderproto-0.11.1
-  build_x11_lib scrnsaverproto-1.2.2
-  build_x11_lib xcb-proto-1.16.0
-  build_x11_lib libpthread-stubs-0.5
-  build_x11_lib xtrans-1.5.0
-  build_x11_lib libXau-1.0.11
-  build_x11_lib libxcb-1.16
-  build_x11_lib libXdmcp-1.1.2
-  build_x11_lib libX11-1.8.7 --enable-malloc0returnsnull
-  build_x11_lib libXext-1.3.5 --enable-malloc0returnsnull
-  build_x11_lib libICE-1.0.7
-  build_x11_lib libSM-1.2.2
-  build_x11_lib libXrender-0.9.11 --enable-malloc0returnsnull
-  build_x11_lib libXft-2.3.8
-  build_x11_lib libXScrnSaver-1.2.4 --enable-malloc0returnsnull
+    echo "::endgroup::"
+  fi
 
-  #echo "::endgroup::"
-  #######
-  # tcl #
-  #######
-  echo "::group::tcl"
-  cd ${BUILDDIR}
+  #############
+  # mpdecimal #
+  #############
+  if [[ "${ARCH}" == "arm" ]]; then
+    echo "::group::mpdecimal"
+    cd ${BUILDDIR}
 
-  download_verify_extract tcl8.6.13-src.tar.gz
-  cd tcl*
-  maybe_patch
-  cd unix
-  LDFLAGS="${LDFLAGS} -lxml2" ./configure --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
-  make -j4
-  make install
-  cd ..
-  install_license ./license.terms
+    download_verify_extract mpdecimal-2.5.0.tar.gz
+    cd mpdecimal*
+    maybe_patch
+    ./configure --disable-cxx --host=${CHOST} --prefix=${DEPSDIR}
+    make -j4
+    make install
+    install_license ./LICENSE.txt
 
-  echo "::endgroup::"
-  ######
-  # tk #
-  ######
-  echo "::group::tk"
-  cd ${BUILDDIR}
+    echo "::endgroup::"
+  fi
+}
 
-  download_verify_extract tk8.6.13-src.tar.gz
-  cd tk*
-  maybe_patch
-  cd unix
-  LDFLAGS="${LDFLAGS} -lxml2 -lxcb -lXau" ./configure --disable-shared --host=${CHOST} --prefix=${DEPSDIR}
-  make -j4
-  make install
-  cd ..
-  install_license ./license.terms
-
-  echo "::endgroup::"
+if [[ "${PYTHON_ONLY}" == "false" ]]; then
+  build_deps
+fi
+if [[ "${DEPS_ONLY}" == "true" ]]; then
+  exit 0
 fi
 
-#############
-# mpdecimal #
-#############
-if [[ "${ARCH}" == "arm" ]]; then
-  echo "::group::mpdecimal"
-  cd ${BUILDDIR}
-
-  download_verify_extract mpdecimal-2.5.0.tar.gz
-  cd mpdecimal*
-  maybe_patch
-  ./configure --disable-cxx --host=${CHOST} --prefix=${DEPSDIR}
-  make -j4
-  make install
-  install_license ./LICENSE.txt
-
-  echo "::endgroup::"
-fi
 ##########
 # Python #
 ##########
