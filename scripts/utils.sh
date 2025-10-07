@@ -236,6 +236,6 @@ if [[ "${VERBOSE_CI}" == "true" ]]; then
   cmake_verbose_flags+=(--trace-expand --debug-find)
 fi
 
-mkdir ${BUILDDIR}
-mkdir ${DEPSDIR}
-mkdir ${LICENSEDIR}
+mkdir -p ${BUILDDIR}
+mkdir -p ${DEPSDIR}
+mkdir -p ${LICENSEDIR}
