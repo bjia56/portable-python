@@ -21,270 +21,279 @@ export CXXFLAGS="${CPPFLAGS}"
 export LDFLAGS="-L${DEPSDIR}/lib"
 export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig:${DEPSDIR}/share/pkgconfig"
 
-git clone https://github.com/bjia56/portable-python-cmake-buildsystem.git --branch ${CMAKE_BUILDSYSTEM_BRANCH} --single-branch --depth 1
-
-echo "::endgroup::"
-###########
-# ncurses #
-###########
-echo "::group::ncurses"
-cd ${BUILDDIR}
-
-download_verify_extract ncurses-6.4.tar.gz
-cd ncurses*
-maybe_patch
-CC=clang CXX=clang++ CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" CXXFLAGS="${CXXFLAGS} -arch x86_64 -arch arm64" ./configure --with-normal --without-progs --enable-overwrite --disable-stripping --enable-widec --with-termlib --disable-database --with-fallbacks=xterm,xterm-256color,screen-256color,linux,vt100 --prefix=${DEPSDIR}
-make -j4
-make install.libs
-install_license
-
-echo "::endgroup::"
-############
-# readline #
-############
-echo "::group::readline"
-cd ${BUILDDIR}
-
-download_verify_extract readline-8.2.tar.gz
-cd readline*
-maybe_patch
-CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --with-curses --disable-shared --prefix=${DEPSDIR}
-make -j4
-make install
-install_license
-
 echo "::endgroup::"
 
-if [[ "${DISTRIBUTION}" != "headless" ]]; then
-  #######
-  # tcl #
-  #######
-  echo "::group::tcl"
+function build_deps () {
+  ###########
+  # ncurses #
+  ###########
+  echo "::group::ncurses"
   cd ${BUILDDIR}
 
-  download_verify_extract tcl8.6.13-src.tar.gz
-  cd tcl*
+  download_verify_extract ncurses-6.4.tar.gz
+  cd ncurses*
   maybe_patch
-  cd unix
-  CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --disable-shared --enable-aqua --prefix=${DEPSDIR}
+  CC=clang CXX=clang++ CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" CXXFLAGS="${CXXFLAGS} -arch x86_64 -arch arm64" ./configure --with-normal --without-progs --enable-overwrite --disable-stripping --enable-widec --with-termlib --disable-database --with-fallbacks=xterm,xterm-256color,screen-256color,linux,vt100 --prefix=${DEPSDIR}
+  make -j4
+  make install.libs
+  install_license
+
+  echo "::endgroup::"
+  ############
+  # readline #
+  ############
+  echo "::group::readline"
+  cd ${BUILDDIR}
+
+  download_verify_extract readline-8.2.tar.gz
+  cd readline*
+  maybe_patch
+  CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --with-curses --disable-shared --prefix=${DEPSDIR}
+  make -j4
+  make install
+  install_license
+
+  echo "::endgroup::"
+
+  if [[ "${DISTRIBUTION}" != "headless" ]]; then
+    #######
+    # tcl #
+    #######
+    echo "::group::tcl"
+    cd ${BUILDDIR}
+
+    download_verify_extract tcl8.6.13-src.tar.gz
+    cd tcl*
+    maybe_patch
+    cd unix
+    CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --disable-shared --enable-aqua --prefix=${DEPSDIR}
+    make -j${NPROC}
+    make install
+    cd ..
+    install_license ./license.terms
+
+    echo "::endgroup::"
+    ######
+    # tk #
+    ######
+    echo "::group::tk"
+    cd ${BUILDDIR}
+
+    download_verify_extract tk8.6.13-src.tar.gz
+    cd tk*
+    maybe_patch
+    cd unix
+    CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --disable-shared --enable-aqua --prefix=${DEPSDIR}
+    make -j${NPROC}
+    make install
+    cd ..
+    install_license ./license.terms
+
+    echo "::endgroup::"
+  fi
+
+  ###########
+  # OpenSSL #
+  ###########
+  echo "::group::OpenSSL"
+  cd ${BUILDDIR}
+
+  if (( ${PYTHON_MINOR} < 11 )); then
+    download_verify_extract openssl-1.1.1w.tar.gz
+  else
+    download_verify_extract openssl-3.0.15.tar.gz
+  fi
+  cd openssl*
+  maybe_patch
+  CC=${WORKDIR}/scripts/cc ./Configure enable-rc5 zlib no-asm no-shared darwin64-x86_64-cc --prefix=${DEPSDIR}
+  make -j${NPROC}
+  make install_sw
+  install_license
+
+  file ${DEPSDIR}/lib/libcrypto.a
+  file ${DEPSDIR}/lib/libssl.a
+
+  echo "::endgroup::"
+  #########
+  # bzip2 #
+  #########
+  echo "::group::bzip2"
+  cd ${BUILDDIR}
+
+  git clone https://github.com/commontk/bzip2.git
+  git -C bzip2 checkout 391dddabd24aee4a06e10ab6636f26dd93c21308
+  cd bzip2
+  maybe_patch bzip2-1.0.8
+  mkdir build
+  cd build
+  cmake \
+    -G "Unix Makefiles" \
+    -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+    "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
+    -DCMAKE_OSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET} \
+    -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} \
+    ..
   make -j${NPROC}
   make install
   cd ..
-  install_license ./license.terms
+  install_license ./LICENSE bzip2-1.0.8
+
+  file ${DEPSDIR}/lib/libbz2.a
 
   echo "::endgroup::"
-  ######
-  # tk #
-  ######
-  echo "::group::tk"
+  ########
+  # lzma #
+  ########
+  echo "::group::lzma"
   cd ${BUILDDIR}
 
-  download_verify_extract tk8.6.13-src.tar.gz
-  cd tk*
+  download_verify_extract xz-5.4.5.tar.gz
+  cd xz*
   maybe_patch
-  cd unix
-  CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --disable-shared --enable-aqua --prefix=${DEPSDIR}
+  mkdir build
+  cd build
+  cmake \
+    -G "Unix Makefiles" \
+    "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
+    -DCMAKE_OSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET} \
+    -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} \
+    ..
   make -j${NPROC}
   make install
   cd ..
-  install_license ./license.terms
+  install_license
+
+  file ${DEPSDIR}/lib/liblzma.a
 
   echo "::endgroup::"
+  ###########
+  # sqlite3 #
+  ###########
+  echo "::group::sqlite3"
+  cd ${WORKDIR}
+
+  download_verify_extract sqlite-autoconf-3450000.tar.gz
+  cd sqlite-autoconf-3450000
+  maybe_patch
+  CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64"  ./configure --prefix ${DEPSDIR}
+  make -j${NPROC}
+  make install
+
+  file ${DEPSDIR}/lib/libsqlite3.a
+
+  echo "::endgroup::"
+  ########
+  # zlib #
+  ########
+  echo "::group::zlib"
+  cd ${BUILDDIR}
+
+  download_verify_extract zlib-1.3.1.tar.gz
+  cd zlib-1.3.1
+  maybe_patch
+  mkdir build
+  cd build
+  cmake \
+    -G "Unix Makefiles" \
+    "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
+    -DCMAKE_OSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET} \
+    -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} \
+    ..
+  make -j${NPROC}
+  make install
+  cd ..
+  install_license
+
+  file ${DEPSDIR}/lib/libz.a
+
+  echo "::endgroup::"
+  #########
+  # expat #
+  #########
+  echo "::group::expat"
+  cd ${BUILDDIR}
+
+  download_verify_extract expat-2.6.2.tar.gz
+  cd expat*
+  maybe_patch
+  CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64"  ./configure --disable-shared --prefix=${DEPSDIR}
+  make -j${NPROC}
+  make install
+  install_license
+
+  file ${DEPSDIR}/lib/libexpat.a
+
+  echo "::endgroup::"
+  ########
+  # gdbm #
+  ########
+  echo "::group::gdbm"
+  cd ${BUILDDIR}
+
+  download_verify_extract gdbm-1.23.tar.gz
+  cd gdbm*
+  maybe_patch
+  CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --enable-libgdbm-compat --without-readline --prefix=${DEPSDIR}
+  make -j${NPROC}
+  make install
+  install_license
+
+  echo "::endgroup::"
+  ##########
+  # libffi #
+  ##########
+  echo "::group::libffi"
+  cd ${BUILDDIR}
+
+  download_verify_extract libffi-3.4.6.tar.gz
+  cd libffi-3.4.6
+  maybe_patch
+  cd ..
+  cp -r libffi-3.4.6 libffi-3.4.6-arm64
+  cd libffi-3.4.6
+  CC="/usr/bin/cc" ./configure --prefix ${DEPSDIR}
+  make -j${NPROC}
+  make install
+  cd ${BUILDDIR}
+  mkdir libffi-arm64-out
+  cd libffi-3.4.6-arm64
+  CC="/usr/bin/cc" CFLAGS="${CFLAGS} -target arm64-apple-macos11" ./configure --prefix ${BUILDDIR}/libffi-arm64-out --build=aarch64-apple-darwin --host=aarch64
+  make -j${NPROC}
+  make install
+  install_license
+
+  cd ${BUILDDIR}
+  lipo -create -output libffi.a ${DEPSDIR}/lib/libffi.a ${BUILDDIR}/libffi-arm64-out/lib/libffi.a
+  mv libffi.a ${DEPSDIR}/lib/libffi.a
+
+  file ${DEPSDIR}/lib/libffi.a
+
+  echo "::endgroup::"
+  ########
+  # uuid #
+  ########
+  echo "::group::uuid"
+  cd ${BUILDDIR}
+
+  download_verify_extract util-linux-2.39.3.tar.gz
+  cd util-linux*
+  maybe_patch libuuid-2.39.3
+  ./autogen.sh
+  CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --disable-all-programs --enable-libuuid --prefix=${DEPSDIR}
+  make -j${NPROC}
+  make install
+  install_license ./Documentation/licenses/COPYING.BSD-3-Clause libuuid-2.39.3
+
+  echo "::endgroup::"
+}
+
+if [[ "${PYTHON_ONLY}" == "false" ]]; then
+  build_deps
+fi
+if [[ "${DEPS_ONLY}" == "true" ]]; then
+  exit 0
 fi
 
-###########
-# OpenSSL #
-###########
-echo "::group::OpenSSL"
-cd ${BUILDDIR}
-
-if (( ${PYTHON_MINOR} < 11 )); then
-  download_verify_extract openssl-1.1.1w.tar.gz
-else
-  download_verify_extract openssl-3.0.15.tar.gz
-fi
-cd openssl*
-maybe_patch
-CC=${WORKDIR}/scripts/cc ./Configure enable-rc5 zlib no-asm no-shared darwin64-x86_64-cc --prefix=${DEPSDIR}
-make -j${NPROC}
-make install_sw
-install_license
-
-file ${DEPSDIR}/lib/libcrypto.a
-file ${DEPSDIR}/lib/libssl.a
-
-echo "::endgroup::"
-#########
-# bzip2 #
-#########
-echo "::group::bzip2"
-cd ${BUILDDIR}
-
-git clone https://github.com/commontk/bzip2.git
-git -C bzip2 checkout 391dddabd24aee4a06e10ab6636f26dd93c21308
-cd bzip2
-maybe_patch bzip2-1.0.8
-mkdir build
-cd build
-cmake \
-  -G "Unix Makefiles" \
-  -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
-  "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
-  -DCMAKE_OSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET} \
-  -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} \
-  ..
-make -j${NPROC}
-make install
-cd ..
-install_license ./LICENSE bzip2-1.0.8
-
-file ${DEPSDIR}/lib/libbz2.a
-
-echo "::endgroup::"
-########
-# lzma #
-########
-echo "::group::lzma"
-cd ${BUILDDIR}
-
-download_verify_extract xz-5.4.5.tar.gz
-cd xz*
-maybe_patch
-mkdir build
-cd build
-cmake \
-  -G "Unix Makefiles" \
-  "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
-  -DCMAKE_OSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET} \
-  -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} \
-  ..
-make -j${NPROC}
-make install
-cd ..
-install_license
-
-file ${DEPSDIR}/lib/liblzma.a
-
-echo "::endgroup::"
-###########
-# sqlite3 #
-###########
-echo "::group::sqlite3"
-cd ${WORKDIR}
-
-download_verify_extract sqlite-autoconf-3450000.tar.gz
-cd sqlite-autoconf-3450000
-maybe_patch
-CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64"  ./configure --prefix ${DEPSDIR}
-make -j${NPROC}
-make install
-
-file ${DEPSDIR}/lib/libsqlite3.a
-
-echo "::endgroup::"
-########
-# zlib #
-########
-echo "::group::zlib"
-cd ${BUILDDIR}
-
-download_verify_extract zlib-1.3.1.tar.gz
-cd zlib-1.3.1
-maybe_patch
-mkdir build
-cd build
-cmake \
-  -G "Unix Makefiles" \
-  "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
-  -DCMAKE_OSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET} \
-  -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} \
-  ..
-make -j${NPROC}
-make install
-cd ..
-install_license
-
-file ${DEPSDIR}/lib/libz.a
-
-echo "::endgroup::"
-#########
-# expat #
-#########
-echo "::group::expat"
-cd ${BUILDDIR}
-
-download_verify_extract expat-2.6.2.tar.gz
-cd expat*
-maybe_patch
-CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64"  ./configure --disable-shared --prefix=${DEPSDIR}
-make -j${NPROC}
-make install
-install_license
-
-file ${DEPSDIR}/lib/libexpat.a
-
-echo "::endgroup::"
-########
-# gdbm #
-########
-echo "::group::gdbm"
-cd ${BUILDDIR}
-
-download_verify_extract gdbm-1.23.tar.gz
-cd gdbm*
-maybe_patch
-CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --enable-libgdbm-compat --without-readline --prefix=${DEPSDIR}
-make -j${NPROC}
-make install
-install_license
-
-echo "::endgroup::"
-##########
-# libffi #
-##########
-echo "::group::libffi"
-cd ${BUILDDIR}
-
-download_verify_extract libffi-3.4.6.tar.gz
-cd libffi-3.4.6
-maybe_patch
-cd ..
-cp -r libffi-3.4.6 libffi-3.4.6-arm64
-cd libffi-3.4.6
-CC="/usr/bin/cc" ./configure --prefix ${DEPSDIR}
-make -j${NPROC}
-make install
-cd ${BUILDDIR}
-mkdir libffi-arm64-out
-cd libffi-3.4.6-arm64
-CC="/usr/bin/cc" CFLAGS="${CFLAGS} -target arm64-apple-macos11" ./configure --prefix ${BUILDDIR}/libffi-arm64-out --build=aarch64-apple-darwin --host=aarch64
-make -j${NPROC}
-make install
-install_license
-
-cd ${BUILDDIR}
-lipo -create -output libffi.a ${DEPSDIR}/lib/libffi.a ${BUILDDIR}/libffi-arm64-out/lib/libffi.a
-mv libffi.a ${DEPSDIR}/lib/libffi.a
-
-file ${DEPSDIR}/lib/libffi.a
-
-echo "::endgroup::"
-########
-# uuid #
-########
-echo "::group::uuid"
-cd ${BUILDDIR}
-
-download_verify_extract util-linux-2.39.3.tar.gz
-cd util-linux*
-maybe_patch libuuid-2.39.3
-./autogen.sh
-CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --disable-all-programs --enable-libuuid --prefix=${DEPSDIR}
-make -j${NPROC}
-make install
-install_license ./Documentation/licenses/COPYING.BSD-3-Clause libuuid-2.39.3
-
-echo "::endgroup::"
 #########
 # Build #
 #########
@@ -300,6 +309,8 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
     -DTCL_LIBRARY:FILEPATH=${DEPSDIR}/lib/libtcl8.6.a
   )
 fi
+
+git clone https://github.com/bjia56/portable-python-cmake-buildsystem.git --branch ${CMAKE_BUILDSYSTEM_BRANCH} --single-branch --depth 1
 
 function build_python () {
   python_suffix=$1

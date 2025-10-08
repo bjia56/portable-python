@@ -24,168 +24,179 @@ export CXXFLAGS="${CPPFLAGS} -fexceptions"
 export LDFLAGS="-L${DEPSDIR}/lib"
 export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig:${DEPSDIR}/share/pkgconfig"
 
-mkdir -p ${DEPSDIR}/lib/.aarch64
-
-cd $(dirname $(dirname $(which cosmocc)))
-install_license
-
 echo "::endgroup::"
-########
-# zlib #
-########
-echo "::group::zlib"
-cd ${BUILDDIR}
 
-download_verify_extract zlib-1.3.1.tar.gz
-cd zlib*
-maybe_patch
-./configure --prefix=${DEPSDIR} --static
-make -j4
-make install
-cp .aarch64/libz.a ${DEPSDIR}/lib/.aarch64
-install_license
+function build_deps () {
+  mkdir -p ${DEPSDIR}/lib/.aarch64
 
-echo "::endgroup::"
-###########
-# OpenSSL #
-###########
-echo "::group::OpenSSL"
-cd ${BUILDDIR}
+  cd $(dirname $(dirname $(which cosmocc)))
+  install_license
 
-if (( ${PYTHON_MINOR} < 11 )); then
-  download_verify_extract openssl-1.1.1w.tar.gz
-else
-  download_verify_extract openssl-3.0.15.tar.gz
+  ########
+  # zlib #
+  ########
+  echo "::group::zlib"
+  cd ${BUILDDIR}
+
+  download_verify_extract zlib-1.3.1.tar.gz
+  cd zlib*
+  maybe_patch
+  ./configure --prefix=${DEPSDIR} --static
+  make -j4
+  make install
+  cp .aarch64/libz.a ${DEPSDIR}/lib/.aarch64
+  install_license
+
+  echo "::endgroup::"
+  ###########
+  # OpenSSL #
+  ###########
+  echo "::group::OpenSSL"
+  cd ${BUILDDIR}
+
+  if (( ${PYTHON_MINOR} < 11 )); then
+    download_verify_extract openssl-1.1.1w.tar.gz
+  else
+    download_verify_extract openssl-3.0.15.tar.gz
+  fi
+  cd openssl*
+  maybe_patch
+  ./Configure linux-generic64 no-asm no-shared no-dso no-engine --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
+  make -j4
+  make install_sw
+  cp .aarch64/lib*.a ${DEPSDIR}/lib/.aarch64
+  install_license
+
+  echo "::endgroup::"
+  ###########
+  # sqlite3 #
+  ###########
+  echo "::group::sqlite3"
+  cd ${BUILDDIR}
+
+  download_verify_extract sqlite-autoconf-3450000.tar.gz
+  cd sqlite*
+  maybe_patch
+  ./configure --prefix=${DEPSDIR} --disable-shared
+  make -j4
+  make install
+  cp .libs/.aarch64/libsqlite3.a ${DEPSDIR}/lib/.aarch64
+
+  echo "::endgroup::"
+  #########
+  # expat #
+  #########
+  echo "::group::expat"
+  cd ${BUILDDIR}
+
+  download_verify_extract expat-2.6.2.tar.gz
+  cd expat*
+  maybe_patch
+  ./configure --disable-shared --prefix=${DEPSDIR}
+  make -j4
+  make install
+  cp lib/.libs/.aarch64/libexpat.a ${DEPSDIR}/lib/.aarch64
+  install_license
+
+  echo "::endgroup::"
+  ###########
+  # ncurses #
+  ###########
+  echo "::group::ncurses"
+  cd ${BUILDDIR}
+
+  download_verify_extract ncurses-6.4.tar.gz
+  cd ncurses*
+  maybe_patch
+  CFLAGS="${CFLAGS} -std=c89" ./configure --with-normal --without-progs --enable-overwrite --disable-stripping --enable-widec --with-termlib --disable-database --with-fallbacks=xterm,xterm-256color,screen-256color,linux,vt100 --prefix=${DEPSDIR}
+  make -j4
+  make install
+  cp lib/.aarch64/lib*.a ${DEPSDIR}/lib/.aarch64
+  install_license
+
+  echo "::endgroup::"
+  ############
+  # readline #
+  ############
+  echo "::group::readline"
+  cd ${BUILDDIR}
+
+  download_verify_extract readline-8.2.tar.gz
+  cd readline*
+  maybe_patch
+  ./configure --with-curses --disable-shared --prefix=${DEPSDIR}
+  make -j4
+  make install
+  cp .aarch64/lib*.a ${DEPSDIR}/lib/.aarch64
+  install_license
+
+  echo "::endgroup::"
+  #########
+  # bzip2 #
+  #########
+  echo "::group::bzip2"
+  cd ${BUILDDIR}
+
+  wget --no-verbose -O bzip2.tar.gz https://github.com/commontk/bzip2/archive/391dddabd24aee4a06e10ab6636f26dd93c21308.tar.gz
+  tar -xf bzip2*.tar.gz
+  rm *.tar.gz
+  cd bzip2-*
+  maybe_patch bzip2-1.0.8
+  mkdir build
+  cd build
+  cmake .. -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DCMAKE_C_COMPILER=${CC} -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_CXX_FLAGS="${CXXFLAGS}" -DCMAKE_AR=${AR}
+  make -j4
+  make install
+  cp .aarch64/libbz2.a ${DEPSDIR}/lib/.aarch64
+  cd ..
+  install_license ./LICENSE bzip2-1.0.8
+
+  echo "::endgroup::"
+  ######
+  # xz #
+  ######
+  echo "::group::xz"
+  cd ${BUILDDIR}
+
+  download_verify_extract xz-5.4.5.tar.gz
+  cd xz*
+  maybe_patch
+  mkdir build
+  cd build
+  cmake .. -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DCMAKE_C_COMPILER=${CC} -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_CXX_FLAGS="${CXXFLAGS}" -DCMAKE_AR=${AR}
+  make -j4
+  make install
+  cp .aarch64/liblzma.a ${DEPSDIR}/lib/.aarch64
+  cd ..
+  install_license
+
+  echo "::endgroup::"
+  ########
+  # gdbm #
+  ########
+  echo "::group::gdbm"
+  cd ${BUILDDIR}
+
+  download_verify_extract gdbm-1.23.tar.gz
+  cd gdbm*
+  maybe_patch
+  ./configure --enable-libgdbm-compat --disable-shared --prefix=${DEPSDIR}
+  make -j4
+  make install
+  cp src/.libs/.aarch64/libgdbm.a ${DEPSDIR}/lib/.aarch64
+  cp compat/.libs/.aarch64/libgdbm_compat.a ${DEPSDIR}/lib/.aarch64
+  install_license
+
+  echo "::endgroup::"
+}
+
+if [[ "${PYTHON_ONLY}" == "false" ]]; then
+  build_deps
 fi
-cd openssl*
-maybe_patch
-./Configure linux-generic64 no-asm no-shared no-dso no-engine --prefix=${DEPSDIR} --openssldir=${DEPSDIR}
-make -j4
-make install_sw
-cp .aarch64/lib*.a ${DEPSDIR}/lib/.aarch64
-install_license
+if [[ "${DEPS_ONLY}" == "true" ]]; then
+  exit 0
+fi
 
-echo "::endgroup::"
-###########
-# sqlite3 #
-###########
-echo "::group::sqlite3"
-cd ${BUILDDIR}
-
-download_verify_extract sqlite-autoconf-3450000.tar.gz
-cd sqlite*
-maybe_patch
-./configure --prefix=${DEPSDIR} --disable-shared
-make -j4
-make install
-cp .libs/.aarch64/libsqlite3.a ${DEPSDIR}/lib/.aarch64
-
-echo "::endgroup::"
-#########
-# expat #
-#########
-echo "::group::expat"
-cd ${BUILDDIR}
-
-download_verify_extract expat-2.6.2.tar.gz
-cd expat*
-maybe_patch
-./configure --disable-shared --prefix=${DEPSDIR}
-make -j4
-make install
-cp lib/.libs/.aarch64/libexpat.a ${DEPSDIR}/lib/.aarch64
-install_license
-
-echo "::endgroup::"
-###########
-# ncurses #
-###########
-echo "::group::ncurses"
-cd ${BUILDDIR}
-
-download_verify_extract ncurses-6.4.tar.gz
-cd ncurses*
-maybe_patch
-CFLAGS="${CFLAGS} -std=c89" ./configure --with-normal --without-progs --enable-overwrite --disable-stripping --enable-widec --with-termlib --disable-database --with-fallbacks=xterm,xterm-256color,screen-256color,linux,vt100 --prefix=${DEPSDIR}
-make -j4
-make install
-cp lib/.aarch64/lib*.a ${DEPSDIR}/lib/.aarch64
-install_license
-
-echo "::endgroup::"
-############
-# readline #
-############
-echo "::group::readline"
-cd ${BUILDDIR}
-
-download_verify_extract readline-8.2.tar.gz
-cd readline*
-maybe_patch
-./configure --with-curses --disable-shared --prefix=${DEPSDIR}
-make -j4
-make install
-cp .aarch64/lib*.a ${DEPSDIR}/lib/.aarch64
-install_license
-
-echo "::endgroup::"
-#########
-# bzip2 #
-#########
-echo "::group::bzip2"
-cd ${BUILDDIR}
-
-wget --no-verbose -O bzip2.tar.gz https://github.com/commontk/bzip2/archive/391dddabd24aee4a06e10ab6636f26dd93c21308.tar.gz
-tar -xf bzip2*.tar.gz
-rm *.tar.gz
-cd bzip2-*
-maybe_patch bzip2-1.0.8
-mkdir build
-cd build
-cmake .. -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DCMAKE_C_COMPILER=${CC} -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_CXX_FLAGS="${CXXFLAGS}" -DCMAKE_AR=${AR}
-make -j4
-make install
-cp .aarch64/libbz2.a ${DEPSDIR}/lib/.aarch64
-cd ..
-install_license ./LICENSE bzip2-1.0.8
-
-echo "::endgroup::"
-######
-# xz #
-######
-echo "::group::xz"
-cd ${BUILDDIR}
-
-download_verify_extract xz-5.4.5.tar.gz
-cd xz*
-maybe_patch
-mkdir build
-cd build
-cmake .. -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR} -DCMAKE_C_COMPILER=${CC} -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_CXX_FLAGS="${CXXFLAGS}" -DCMAKE_AR=${AR}
-make -j4
-make install
-cp .aarch64/liblzma.a ${DEPSDIR}/lib/.aarch64
-cd ..
-install_license
-
-echo "::endgroup::"
-########
-# gdbm #
-########
-echo "::group::gdbm"
-cd ${BUILDDIR}
-
-download_verify_extract gdbm-1.23.tar.gz
-cd gdbm*
-maybe_patch
-./configure --enable-libgdbm-compat --disable-shared --prefix=${DEPSDIR}
-make -j4
-make install
-cp src/.libs/.aarch64/libgdbm.a ${DEPSDIR}/lib/.aarch64
-cp compat/.libs/.aarch64/libgdbm_compat.a ${DEPSDIR}/lib/.aarch64
-install_license
-
-echo "::endgroup::"
 ##########
 # Python #
 ##########

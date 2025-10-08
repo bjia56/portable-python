@@ -58,8 +58,8 @@ env:
   solaris_release_map: '{"11": "11.4"}'
 
 jobs:
-  build_linux:
-    name: Linux ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (build)
+  build_deps_linux:
+    name: Linux ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (build deps)
     if: ${{ contains(inputs.platforms, 'linux') }}
     runs-on: ubuntu-24.04
     strategy:
@@ -86,9 +86,61 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Build
+      - name: Build dependencies
         run: |
-          ./scripts/build_linux_zig.sh --arch ${{ matrix.arch }} --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }}
+          ./scripts/build_linux_zig.sh --arch ${{ matrix.arch }} --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --deps-only
+
+      - name: Interactive debugging
+        if: ${{ always() && inputs.debug_interactive }}
+        uses: fawazahmed0/action-debug-vscode@v3
+
+      - name: Upload dependency artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: deps-linux-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
+          include-hidden-files: true
+          path: |
+            ./deps/
+            ./licenses/
+
+  build_linux:
+    name: Linux ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (build)
+    if: ${{ contains(inputs.platforms, 'linux') }}
+    needs: build_deps_linux
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x86_64, i386, aarch64, arm, riscv64, s390x, loongarch64, powerpc64le]
+        distribution: [full, headless]
+        exclude:
+          - arch: ${{ !contains(inputs.platforms, 'linux-x86_64') && 'x86_64' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'linux-i386') && 'i386' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'linux-aarch64') && 'aarch64' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'linux-arm') && 'arm' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'linux-riscv64') && 'riscv64' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'linux-loongarch64') && 'loongarch64' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'linux-s390x') && 's390x' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'linux-powerpc64le') && 'powerpc64le' || '' }}
+
+    steps:
+      - name: Set up zig
+        uses: mlugg/setup-zig@v2
+        with:
+          version: 0.14.0
+
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Download dependency artifacts
+        uses: actions/download-artifact@v5
+        with:
+          name: deps-linux-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
+          path: .
+
+      - name: Build Python
+        run: |
+          ./scripts/build_linux_zig.sh --arch ${{ matrix.arch }} --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --python-only
 
       - name: Interactive debugging
         if: ${{ always() && inputs.debug_interactive }}
@@ -165,8 +217,8 @@ jobs:
             apt update && apt install -y curl
             ./scripts/launch_test.sh --arch ${{ matrix.arch }} --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --os linux --run-tests "${{ env.RUN_TESTS }}"
 
-  build_windows:
-    name: Windows ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (build)
+  build_deps_windows:
+    name: Windows ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (build deps)
     if: ${{ contains(inputs.platforms, 'windows') }}
     runs-on: ${{ matrix.arch == 'x86_64' && 'windows-2022' || 'windows-11-arm' }}
     strategy:
@@ -197,11 +249,69 @@ jobs:
         run: |
           Rename-Item c:\strawberry strawberry2
 
-      - name: Build
+      - name: Build dependencies
         shell: bash
         run: |
           set -ex
-          ./scripts/build_windows.sh --arch ${{ matrix.arch }} --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }}
+          ./scripts/build_windows.sh --arch ${{ matrix.arch }} --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --deps-only
+
+      - name: Interactive debugging
+        uses: fawazahmed0/action-debug-vscode@v3
+        if: ${{ always() && inputs.debug_interactive }}
+
+      - name: Upload dependency artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: deps-windows-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
+          include-hidden-files: true
+          path: |
+            ./deps/
+            ./licenses/
+
+  build_windows:
+    name: Windows ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (build)
+    if: ${{ contains(inputs.platforms, 'windows') }}
+    needs: build_deps_windows
+    runs-on: ${{ matrix.arch == 'x86_64' && 'windows-2022' || 'windows-11-arm' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x86_64, aarch64]
+        distribution: [full, headless]
+        exclude:
+          - arch: ${{ !contains(inputs.platforms, 'windows-x86_64') && 'x86_64' || '' }}
+          - arch: ${{ !contains(inputs.platforms, 'windows-aarch64') && 'aarch64' || '' }}
+
+    steps:
+      - name: Set git to use LF
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Configure build
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch == 'x86_64' && 'amd64' || 'amd64_arm64' }}
+
+      - name: Remove Strawberry
+        shell: pwsh
+        run: |
+          Rename-Item c:\strawberry strawberry2
+
+      - name: Download dependency artifacts
+        uses: actions/download-artifact@v5
+        with:
+          name: deps-windows-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
+          path: .
+
+      - name: Build Python
+        shell: bash
+        run: |
+          set -ex
+          ./scripts/build_windows.sh --arch ${{ matrix.arch }} --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --python-only
 
       - name: Interactive debugging
         uses: fawazahmed0/action-debug-vscode@v3
@@ -253,8 +363,8 @@ jobs:
         run: |
           ./scripts/launch_test.sh --arch ${{ matrix.arch }} --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --os windows --run-tests "${{ env.RUN_TESTS }}"
 
-  build_macos:
-    name: MacOS ${{ inputs.python_version }} universal2 ${{ matrix.distribution }} (build)
+  build_deps_macos:
+    name: MacOS ${{ inputs.python_version }} universal2 ${{ matrix.distribution }} (build deps)
     if: ${{ contains(inputs.platforms, 'macos') }}
     runs-on: macos-13
     strategy:
@@ -274,10 +384,56 @@ jobs:
           # use ncurses's "tic" executable
           echo "/usr/local/opt/ncurses/bin/" >> $GITHUB_PATH
 
-      - name: Build
+      - name: Build dependencies
         run: |
           set -ex
-          ./scripts/build_macos.sh --arch universal2 --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }}
+          ./scripts/build_macos.sh --arch universal2 --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --deps-only
+
+      - name: Interactive debugging
+        uses: fawazahmed0/action-debug-vscode@v3
+        if: ${{ always() && inputs.debug_interactive }}
+
+      - name: Upload dependency artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: deps-darwin-universal2-${{ matrix.distribution }}-${{ inputs.python_version }}
+          include-hidden-files: true
+          path: |
+            ./deps/
+            ./licenses/
+
+  build_macos:
+    name: MacOS ${{ inputs.python_version }} universal2 ${{ matrix.distribution }} (build)
+    if: ${{ contains(inputs.platforms, 'macos') }}
+    needs: build_deps_macos
+    runs-on: macos-13
+    strategy:
+      fail-fast: false
+      matrix:
+        distribution: [full, headless]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install tools
+        run: |
+          brew install coreutils gpatch autoconf automake libtool ncurses
+          # use gpatch's "patch" executable
+          echo "/usr/local/opt/gpatch/libexec/gnubin" >> $GITHUB_PATH
+          # use ncurses's "tic" executable
+          echo "/usr/local/opt/ncurses/bin/" >> $GITHUB_PATH
+
+      - name: Download dependency artifacts
+        uses: actions/download-artifact@v5
+        with:
+          name: deps-darwin-universal2-${{ matrix.distribution }}-${{ inputs.python_version }}
+          path: .
+
+      - name: Build Python
+        run: |
+          set -ex
+          ./scripts/build_macos.sh --arch universal2 --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --python-only
 
       - name: Interactive debugging
         uses: fawazahmed0/action-debug-vscode@v3
@@ -321,8 +477,8 @@ jobs:
         run: |
           ./scripts/launch_test.sh --arch universal2 --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --os darwin --run-tests "${{ env.RUN_TESTS }}"
 
-  build_freebsd:
-    name: FreeBSD ${{ matrix.release }} ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (build)
+  build_deps_freebsd:
+    name: FreeBSD ${{ matrix.release }} ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (build deps)
     if: ${{ contains(inputs.platforms, 'freebsd') }}
     runs-on: ubuntu-latest
     strategy:
@@ -365,9 +521,11 @@ jobs:
             pkg install -y cmake bash wget base64 patch git zip python3 autoconf automake libtool gettext bison pkgconf gmake gperf patchelf texinfo
             chsh -s /usr/local/bin/bash root
 
-      - name: Build in VM
+      - name: Build dependencies in VM
         shell: freebsd {0}
         run: |
+          set -e
+
           # Avoid building on the NFS mount
           cp -r ${{ github.workspace }} $HOME/workspace
           cd $HOME/workspace
@@ -377,7 +535,90 @@ jobs:
           export VERBOSE_CI="${{ env.VERBOSE_CI }}"
           export PORTABLE_PYTHON_BUILDSYSTEM_BRANCH="${{ env.PORTABLE_PYTHON_BUILDSYSTEM_BRANCH }}"
           export PLATFORM="freebsd${{ matrix.release }}"
-          bash ./scripts/build_freebsd.sh --arch ${{ matrix.arch }} --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }}
+          bash ./scripts/build_freebsd.sh --arch ${{ matrix.arch }} --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --deps-only
+
+          cp -r deps ${{ github.workspace }}
+          cp -r licenses ${{ github.workspace }}
+
+      - name: Interactive debugging
+        if: ${{ always() && inputs.debug_interactive }}
+        uses: fawazahmed0/action-debug-vscode@v3
+
+      - name: Upload dependency artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: deps-freebsd${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
+          include-hidden-files: true
+          path: |
+            ./deps/
+            ./licenses/
+
+  build_freebsd:
+    name: FreeBSD ${{ matrix.release }} ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (build)
+    if: ${{ contains(inputs.platforms, 'freebsd') }}
+    needs: build_deps_freebsd
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        release: [13, 14, 15]
+        arch: [x86_64, aarch64]
+        distribution: [full, headless]
+        exclude:
+          - release: ${{ !contains(inputs.platforms, 'freebsd13-x86_64') && '13' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd13-x86_64') && 'x86_64' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd14-x86_64') && '14' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd14-x86_64') && 'x86_64' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd15-x86_64') && '15' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd15-x86_64') && 'x86_64' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd13-aarch64') && '13' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd13-aarch64') && 'aarch64' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd14-aarch64') && '14' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd14-aarch64') && 'aarch64' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd15-aarch64') && '15' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd15-aarch64') && 'aarch64' || '' }}
+
+    steps:
+      - name: Parse release
+        id: parse_release
+        run: |
+          RELEASE=$(echo ${{ toJSON(env.freebsd_release_map) }} | jq -r '.["${{ matrix.release }}"]')
+          echo "release=$RELEASE" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Download dependency artifacts
+        uses: actions/download-artifact@v5
+        with:
+          name: deps-freebsd${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
+          path: .
+
+      - name: Start VM
+        uses: vmactions/freebsd-vm@v1
+        with:
+          sync: nfs
+          release: ${{ steps.parse_release.outputs.release }}
+          arch: ${{ matrix.arch }}
+          prepare: |
+            pkg install -y cmake bash wget base64 patch git zip python3 autoconf automake libtool gettext bison pkgconf gmake gperf patchelf texinfo
+            chsh -s /usr/local/bin/bash root
+
+      - name: Build Python in VM
+        shell: freebsd {0}
+        run: |
+          set -e
+
+          # Avoid building on the NFS mount
+          cp -r ${{ github.workspace }} $HOME/workspace
+          cd $HOME/workspace
+
+          export RUN_TESTS="${{ env.RUN_TESTS }}"
+          export DEBUG_CI="${{ env.DEBUG_CI }}"
+          export VERBOSE_CI="${{ env.VERBOSE_CI }}"
+          export PORTABLE_PYTHON_BUILDSYSTEM_BRANCH="${{ env.PORTABLE_PYTHON_BUILDSYSTEM_BRANCH }}"
+          export PLATFORM="freebsd${{ matrix.release }}"
+          bash ./scripts/build_freebsd.sh --arch ${{ matrix.arch }} --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --python-only
 
           cp *.zip ${{ github.workspace }}
           cp *.tar.gz ${{ github.workspace }}
@@ -456,8 +697,8 @@ jobs:
           cd ${{ github.workspace }}
           bash ./scripts/launch_test.sh --arch ${{ matrix.arch }} --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --os freebsd${{ matrix.release }} --run-tests "${{ env.RUN_TESTS }}"
 
-  build_solaris:
-    name: Solaris ${{ matrix.release }} ${{ inputs.python_version }} x86_64 ${{ matrix.distribution }} (build)
+  build_deps_solaris:
+    name: Solaris ${{ matrix.release }} ${{ inputs.python_version }} x86_64 ${{ matrix.distribution }} (build deps)
     if: ${{ contains(inputs.platforms, 'solaris') }}
     runs-on: ubuntu-latest
     strategy:
@@ -486,9 +727,11 @@ jobs:
           prepare: |
             pkg install --accept cmake git autoconf automake libtool bison gperf gcc pkg-config pip
 
-      - name: Build in VM
+      - name: Build dependencies in VM
         shell: solaris {0}
         run: |
+          set -e
+
           # Avoid building on the NFS mount
           cp -r ${{ github.workspace }} $HOME/workspace
           cd $HOME/workspace
@@ -498,7 +741,76 @@ jobs:
           export VERBOSE_CI="${{ env.VERBOSE_CI }}"
           export PORTABLE_PYTHON_BUILDSYSTEM_BRANCH="${{ env.PORTABLE_PYTHON_BUILDSYSTEM_BRANCH }}"
           export PLATFORM="solaris${{ matrix.release }}"
-          bash ./scripts/build_solaris.sh --arch x86_64 --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }}
+          bash ./scripts/build_solaris.sh --arch x86_64 --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --deps-only
+
+          cp -r deps ${{ github.workspace }}
+          cp -r licenses ${{ github.workspace }}
+
+      - name: Interactive debugging
+        if: ${{ always() && inputs.debug_interactive }}
+        uses: fawazahmed0/action-debug-vscode@v3
+
+      - name: Upload dependency artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: deps-solaris${{ matrix.release }}-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
+          include-hidden-files: true
+          path: |
+            ./deps/
+            ./licenses/
+
+  build_solaris:
+    name: Solaris ${{ matrix.release }} ${{ inputs.python_version }} x86_64 ${{ matrix.distribution }} (build)
+    if: ${{ contains(inputs.platforms, 'solaris') }}
+    needs: build_deps_solaris
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        release: [11]
+        distribution: [full, headless]
+        exclude:
+          - release: ${{ !contains(inputs.platforms, 'solaris11-x86_64') && '11' || '' }}
+
+    steps:
+      - name: Parse release
+        id: parse_release
+        run: |
+          RELEASE=$(echo ${{ toJSON(env.solaris_release_map) }} | jq -r '.["${{ matrix.release }}"]')
+          echo "release=$RELEASE" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Download dependency artifacts
+        uses: actions/download-artifact@v5
+        with:
+          name: deps-solaris${{ matrix.release }}-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
+          path: .
+
+      - name: Start VM
+        uses: vmactions/solaris-vm@v1
+        with:
+          sync: nfs
+          release: ${{ steps.parse_release.outputs.release }}
+          prepare: |
+            pkg install --accept cmake git autoconf automake libtool bison gperf gcc pkg-config pip
+
+      - name: Build Python in VM
+        shell: solaris {0}
+        run: |
+          set -e
+
+          # Avoid building on the NFS mount
+          cp -r ${{ github.workspace }} $HOME/workspace
+          cd $HOME/workspace
+
+          export RUN_TESTS="${{ env.RUN_TESTS }}"
+          export DEBUG_CI="${{ env.DEBUG_CI }}"
+          export VERBOSE_CI="${{ env.VERBOSE_CI }}"
+          export PORTABLE_PYTHON_BUILDSYSTEM_BRANCH="${{ env.PORTABLE_PYTHON_BUILDSYSTEM_BRANCH }}"
+          export PLATFORM="solaris${{ matrix.release }}"
+          bash ./scripts/build_solaris.sh --arch x86_64 --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --python-only
 
           cp *.zip ${{ github.workspace }}
           cp *.tar.gz ${{ github.workspace }}
@@ -561,8 +873,8 @@ jobs:
           cd ${{ github.workspace }}
           bash ./scripts/launch_test.sh --arch x86_64 --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --os solaris${{ matrix.release }} --run-tests "${{ env.RUN_TESTS }}"
 
-  build_cosmo:
-    name: Cosmopolitan ${{ inputs.python_version }} (build)
+  build_deps_cosmo:
+    name: Cosmopolitan ${{ inputs.python_version }} (build deps)
     if: ${{ contains(inputs.platforms, 'cosmo') }}
     runs-on: ubuntu-latest
 
@@ -580,9 +892,52 @@ jobs:
         with:
           version: ${{ env.cosmocc_version }}
 
-      - name: Build
+      - name: Build dependencies
         run: |
-          ./scripts/build_cosmo.sh --arch unknown --version ${{ inputs.python_version }}
+          ./scripts/build_cosmo.sh --arch unknown --version ${{ inputs.python_version }} --deps-only
+
+      - name: Interactive debugging
+        if: ${{ always() && inputs.debug_interactive }}
+        uses: fawazahmed0/action-debug-vscode@v3
+
+      - name: Upload dependency artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: deps-cosmo-unknown-${{ inputs.python_version }}
+          include-hidden-files: true
+          path: |
+            ./deps/
+            ./licenses/
+
+  build_cosmo:
+    name: Cosmopolitan ${{ inputs.python_version }} (build)
+    if: ${{ contains(inputs.platforms, 'cosmo') }}
+    needs: build_deps_cosmo
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Load cosmocc version
+        run: |
+          version=$(cat .github/cosmocc_version.txt)
+          echo "cosmocc_version=${version}" >> "$GITHUB_ENV"
+
+      - name: Set up cosmocc
+        uses: bjia56/setup-cosmocc@v0.0.5
+        with:
+          version: ${{ env.cosmocc_version }}
+
+      - name: Download dependency artifacts
+        uses: actions/download-artifact@v5
+        with:
+          name: deps-cosmo-unknown-${{ inputs.python_version }}
+          path: .
+
+      - name: Build Python
+        run: |
+          ./scripts/build_cosmo.sh --arch unknown --version ${{ inputs.python_version }} --python-only
 
       - name: Interactive debugging
         if: ${{ always() && inputs.debug_interactive }}
@@ -656,6 +1011,7 @@ jobs:
           prepare: |
             pkg install -y bash base64 curl
           run: |
+            set -e
             cat > /tmp/test.sh <<EOF
               export HOST_OS="${{ matrix.os }}"
               bash ./scripts/launch_test.sh --arch unknown --version ${{ inputs.python_version }} --distribution - --os cosmo --run-tests "${{ env.RUN_TESTS }}"
@@ -672,6 +1028,7 @@ jobs:
           prepare: |
             /usr/sbin/pkg_add curl
           run: |
+            set -e
             cat > /tmp/test.sh <<EOF
               export HOST_OS="${{ matrix.os }}"
               bash ./scripts/launch_test.sh --arch unknown --version ${{ inputs.python_version }} --distribution - --os cosmo --run-tests "${{ env.RUN_TESTS }}"
