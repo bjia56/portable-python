@@ -98,6 +98,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: deps-linux-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
+          include-hidden-files: true
           path: |
             ./deps/
             ./licenses/
@@ -262,6 +263,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: deps-windows-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
+          include-hidden-files: true
           path: |
             ./deps/
             ./licenses/
@@ -395,6 +397,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: deps-darwin-universal2-${{ matrix.distribution }}-${{ inputs.python_version }}
+          include-hidden-files: true
           path: |
             ./deps/
             ./licenses/
@@ -545,6 +548,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: deps-freebsd${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
+          include-hidden-files: true
           path: |
             ./deps/
             ./licenses/
@@ -750,6 +754,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: deps-solaris${{ matrix.release }}-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
+          include-hidden-files: true
           path: |
             ./deps/
             ./licenses/
@@ -899,6 +904,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: deps-cosmo-unknown-${{ inputs.python_version }}
+          include-hidden-files: true
           path: |
             ./deps/
             ./licenses/
