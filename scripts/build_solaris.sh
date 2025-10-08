@@ -26,8 +26,7 @@ export PATH="/usr/local/bin:${PATH}"
 echo "::group::autoconf"
 cd ${BUILDDIR}
 
-wget https://ftp.gnu.org/gnu/autoconf/autoconf-2.70.tar.gz
-gtar --no-same-permissions --no-same-owner -xf autoconf-2.70.tar.gz
+download_verify_extract autoconf-2.70.tar.gz
 cd autoconf-2.70
 maybe_patch
 ./configure
