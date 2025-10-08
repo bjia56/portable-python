@@ -521,6 +521,8 @@ jobs:
       - name: Build dependencies in VM
         shell: freebsd {0}
         run: |
+          set -e
+
           # Avoid building on the NFS mount
           cp -r ${{ github.workspace }} $HOME/workspace
           cd $HOME/workspace
@@ -601,6 +603,8 @@ jobs:
       - name: Build Python in VM
         shell: freebsd {0}
         run: |
+          set -e
+
           # Avoid building on the NFS mount
           cp -r ${{ github.workspace }} $HOME/workspace
           cd $HOME/workspace
@@ -722,6 +726,8 @@ jobs:
       - name: Build dependencies in VM
         shell: solaris {0}
         run: |
+          set -e
+
           # Avoid building on the NFS mount
           cp -r ${{ github.workspace }} $HOME/workspace
           cd $HOME/workspace
@@ -788,6 +794,8 @@ jobs:
       - name: Build Python in VM
         shell: solaris {0}
         run: |
+          set -e
+
           # Avoid building on the NFS mount
           cp -r ${{ github.workspace }} $HOME/workspace
           cd $HOME/workspace
@@ -997,6 +1005,7 @@ jobs:
           prepare: |
             pkg install -y bash base64 curl
           run: |
+            set -e
             cat > /tmp/test.sh <<EOF
               export HOST_OS="${{ matrix.os }}"
               bash ./scripts/launch_test.sh --arch unknown --version ${{ inputs.python_version }} --distribution - --os cosmo --run-tests "${{ env.RUN_TESTS }}"
@@ -1013,6 +1022,7 @@ jobs:
           prepare: |
             /usr/sbin/pkg_add curl
           run: |
+            set -e
             cat > /tmp/test.sh <<EOF
               export HOST_OS="${{ matrix.os }}"
               bash ./scripts/launch_test.sh --arch unknown --version ${{ inputs.python_version }} --distribution - --os cosmo --run-tests "${{ env.RUN_TESTS }}"
