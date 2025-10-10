@@ -518,7 +518,7 @@ jobs:
           release: ${{ steps.parse_release.outputs.release }}
           arch: ${{ matrix.arch }}
           prepare: |
-            pkg install -y cmake bash wget base64 patch git zip python3 autoconf automake libtool gettext bison pkgconf gmake gperf patchelf texinfo
+            pkg install -y cmake-core bash wget base64 patch git zip python3 autoconf automake libtool gettext bison pkgconf gmake gperf patchelf texinfo
             chsh -s /usr/local/bin/bash root
 
       - name: Build dependencies in VM
@@ -601,7 +601,7 @@ jobs:
           release: ${{ steps.parse_release.outputs.release }}
           arch: ${{ matrix.arch }}
           prepare: |
-            pkg install -y cmake bash wget base64 patch git zip python3 autoconf automake libtool gettext bison pkgconf gmake gperf patchelf texinfo
+            pkg install -y cmake-core bash wget base64 patch git zip python3 autoconf automake libtool gettext bison pkgconf gmake gperf patchelf texinfo
             chsh -s /usr/local/bin/bash root
 
       - name: Build Python in VM
