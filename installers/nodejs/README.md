@@ -40,9 +40,9 @@ console.log(child_process.execSync(`${pythonExe} --version`).toString());
 
 Currently, CPython 3.9, 3.10, 3.11, 3.12, and 3.13 are built for the following targets:
 - Linux x86_64, i386, aarch64, arm <sup id="a1">[1](#f1)</sup>, riscv64, s390x, loongarch64, powerpc64le (glibc)
-- Windows x86_64 <sup id="a2">[2](#f2)</sup>
+- Windows x86_64, aarch64 <sup id="a2">[2](#f2)</sup>
 - MacOS x86_64, arm64 <sup id="a3">[3](#f3)</sup>
-- FreeBSD 13, 14 x86_64
+- FreeBSD 13, 14, 15 x86_64
 - Solaris 11 x86_64
 - Cosmopolitan Libc <sup id="a4">[4](#f4)</sup>
 
@@ -66,7 +66,7 @@ PyPy and GraalPy distributions are also available as repackaged versions of offi
 
 <sub><b id="f1">1</b> The arm builds target armv6, specifically the configuration of the Raspberry Pi 1. Current arm builds do not work properly on old glibc (despite the glibc 2.17 target), but a recent version of Raspbian like Debian bullseye should provide a new enough glibc to work. [↩](#a1)</sub>
 
-<sub><b id="f2">2</b> Windows distributions require a minimum of Windows 10. [↩](#a2)</sub>
+<sub><b id="f2">2</b> Windows x86_64 distributions require a minimum of Windows 10, while aarch64 distributions require a minimum of Windows 11. [↩](#a2)</sub>
 
 <sub><b id="f3">3</b> MacOS distributions are provided as universal2, which will work on both x86_64 and arm64. The minimum MacOS version is 10.9 on x86_64 and 11.0 on arm64. [↩](#a3)</sub>
 
