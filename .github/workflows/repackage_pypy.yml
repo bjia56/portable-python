@@ -66,7 +66,7 @@ jobs:
             ./scripts/repackage_pypy.sh ${{ matrix.arch }} ${{ inputs.pypy_version }} linux
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: pypy-linux-${{ matrix.arch }}-${{ inputs.pypy_version }}
           path: ./pypy*.zip
@@ -92,7 +92,7 @@ jobs:
           ./scripts/repackage_pypy.sh x86_64 ${{ inputs.pypy_version }} windows
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: pypy-windows-x86_64-${{ inputs.pypy_version }}
           path: ./pypy*.zip
@@ -121,7 +121,7 @@ jobs:
           ./scripts/repackage_pypy.sh ${{ matrix.arch }} ${{ inputs.pypy_version }} darwin
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: pypy-darwin-${{ matrix.arch }}-${{ inputs.pypy_version }}
           path: ./pypy*.zip
