@@ -42,7 +42,7 @@ jobs:
         run: git fetch --tags origin
 
       - name: Download artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           pattern: python-*
           path: /tmp/python/
