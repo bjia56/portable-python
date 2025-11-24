@@ -84,7 +84,7 @@ jobs:
           version: 0.14.0
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Build dependencies
         run: |
@@ -130,7 +130,7 @@ jobs:
           version: 0.14.0
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Download dependency artifacts
         uses: actions/download-artifact@v6
@@ -193,7 +193,7 @@ jobs:
           echo "platform=$PLATFORM" >> "$GITHUB_OUTPUT"
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Download artifact
         uses: actions/download-artifact@v6
@@ -237,7 +237,7 @@ jobs:
           git config --global core.eol lf
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Configure build
         uses: ilammy/msvc-dev-cmd@v1
@@ -289,7 +289,7 @@ jobs:
           git config --global core.eol lf
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Configure build
         uses: ilammy/msvc-dev-cmd@v1
@@ -350,7 +350,7 @@ jobs:
           git config --global core.eol lf
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Download artifact
         uses: actions/download-artifact@v6
@@ -374,7 +374,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Install tools
         run: |
@@ -414,7 +414,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Install tools
         run: |
@@ -464,7 +464,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Download artifact
         uses: actions/download-artifact@v6
@@ -509,7 +509,7 @@ jobs:
           echo "release=$RELEASE" >> "$GITHUB_OUTPUT"
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Start VM
         uses: vmactions/freebsd-vm@v1
@@ -586,7 +586,7 @@ jobs:
           echo "release=$RELEASE" >> "$GITHUB_OUTPUT"
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Download dependency artifacts
         uses: actions/download-artifact@v6
@@ -672,7 +672,7 @@ jobs:
           echo "release=$RELEASE" >> "$GITHUB_OUTPUT"
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Download artifact
         uses: actions/download-artifact@v6
@@ -717,7 +717,7 @@ jobs:
           echo "release=$RELEASE" >> "$GITHUB_OUTPUT"
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Start VM
         uses: vmactions/solaris-vm@v1
@@ -780,7 +780,7 @@ jobs:
           echo "release=$RELEASE" >> "$GITHUB_OUTPUT"
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Download dependency artifacts
         uses: actions/download-artifact@v6
@@ -852,7 +852,7 @@ jobs:
           echo "release=$RELEASE" >> "$GITHUB_OUTPUT"
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Download artifact
         uses: actions/download-artifact@v6
@@ -880,7 +880,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Load cosmocc version
         run: |
@@ -917,7 +917,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Load cosmocc version
         run: |
@@ -986,7 +986,7 @@ jobs:
         uses: bjia56/setup-cosmocc@v0.0.5
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Download artifact
         uses: actions/download-artifact@v6
