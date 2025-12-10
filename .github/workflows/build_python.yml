@@ -366,7 +366,7 @@ jobs:
   build_deps_macos:
     name: MacOS ${{ inputs.python_version }} universal2 ${{ matrix.distribution }} (build deps)
     if: ${{ contains(inputs.platforms, 'macos') }}
-    runs-on: macos-13
+    runs-on: macos-15-intel
     strategy:
       fail-fast: false
       matrix:
@@ -406,7 +406,7 @@ jobs:
     name: MacOS ${{ inputs.python_version }} universal2 ${{ matrix.distribution }} (build)
     if: ${{ contains(inputs.platforms, 'macos') }}
     needs: build_deps_macos
-    runs-on: macos-13
+    runs-on: macos-15-intel
     strategy:
       fail-fast: false
       matrix:
@@ -455,7 +455,7 @@ jobs:
   test_macos:
     name: MacOS ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (test)
     needs: build_macos
-    runs-on: ${{ matrix.arch == 'x86_64' && 'macos-13' || 'macos-14' }}
+    runs-on: ${{ matrix.arch == 'x86_64' && 'macos-15-intel' || 'macos-14' }}
     strategy:
       fail-fast: false
       matrix:
