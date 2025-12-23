@@ -53,7 +53,7 @@ function build_deps () {
   echo "::group::libffi"
   cd ${BUILDDIR}
 
-  download_verify_extract libffi-3.4.6.tar.gz
+  download_verify_extract libffi-3.5.2.tar.gz
   cd libffi*
   maybe_patch
   ./configure --disable-shared --prefix=${DEPSDIR}
