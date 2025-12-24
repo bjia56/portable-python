@@ -17,7 +17,10 @@ if [[ "${PLATFORM}" == "darwin" ]]; then
   source venv/bin/activate
 fi
 
-python3 -m pip install pyclean
+curl -o /tmp/pyclean -L https://github.com/bjia56/pyclean-standalone/releases/download/v3.4.0.0/pyclean
+chmod +x /tmp/pyclean
+sudo mv /tmp/pyclean /usr/local/bin/pyclean
+
 WORKDIR=$(pwd)
 
 function get_version_code() {
@@ -98,7 +101,7 @@ function repackage_pypy () {
   cd ${WORKDIR}
   mv ${DL_FILENAME} ${UPLOAD_FILENAME}
 
-  python3 -m pyclean -v ${UPLOAD_FILENAME}
+  /usr/local/bin/pyclean -v ${UPLOAD_FILENAME}
   tar -czf ${WORKDIR}/${UPLOAD_FILENAME}.tar.gz ${UPLOAD_FILENAME}
   if [[ "${PLATFORM}" == "windows" ]]; then
     7z.exe a ${WORKDIR}/${UPLOAD_FILENAME}.zip ${UPLOAD_FILENAME}

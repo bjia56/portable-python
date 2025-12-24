@@ -16,12 +16,10 @@ if [[ "${PLATFORM}" == "darwin" ]]; then
   DL_PLATFORM=macos
 fi
 
-if [[ "${PLATFORM}" != "windows" ]]; then
-  python3 -m venv venv
-  source venv/bin/activate
-fi
+curl -o /tmp/pyclean -L https://github.com/bjia56/pyclean-standalone/releases/download/v3.4.0.0/pyclean
+chmod +x /tmp/pyclean
+sudo mv /tmp/pyclean /usr/local/bin/pyclean
 
-python3 -m pip install pyclean
 WORKDIR=$(pwd)
 
 function get_version_code() {
@@ -99,7 +97,7 @@ function repackage_graal () {
     mv ${ACTUAL_EXTRACTED_DIR} ${UPLOAD_FILENAME}
   fi
 
-  python3 -m pyclean -v ${UPLOAD_FILENAME}
+  /usr/local/bin/pyclean -v ${UPLOAD_FILENAME}
   tar -czf ${WORKDIR}/${UPLOAD_FILENAME}.tar.gz ${UPLOAD_FILENAME}
   if [[ "${PLATFORM}" == "windows" ]]; then
     7z.exe a ${WORKDIR}/${UPLOAD_FILENAME}.zip ${UPLOAD_FILENAME}

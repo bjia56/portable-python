@@ -312,6 +312,10 @@ fi
 
 git clone https://github.com/bjia56/portable-python-cmake-buildsystem.git --branch ${CMAKE_BUILDSYSTEM_BRANCH} --single-branch --depth 1
 
+wget -O /tmp/pyclean https://github.com/bjia56/pyclean-standalone/releases/download/v3.4.0.0/pyclean
+chmod +x /tmp/pyclean
+sudo mv /tmp/pyclean /usr/local/bin/pyclean
+
 function build_python () {
   python_suffix=$1
   cmake_python_features=$2
@@ -409,8 +413,7 @@ function build_python () {
   echo "::group::Compress output ${python_distro_ver}"
   cd ${BUILDDIR}
 
-  python3 -m pip install pyclean --break-system-packages
-  python3 -m pyclean -v ${python_install_dir}
+  /usr/local/bin/pyclean -v ${python_install_dir}
   mv ${python_install_dir} python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}
   tar -czf ${WORKDIR}/python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}.tar.gz python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}
   zip ${WORKDIR}/python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}.zip $(tar tf ${WORKDIR}/python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}.tar.gz)
