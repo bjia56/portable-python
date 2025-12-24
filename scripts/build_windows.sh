@@ -197,8 +197,7 @@ fi
 git clone https://github.com/bjia56/portable-python-cmake-buildsystem.git --branch ${CMAKE_BUILDSYSTEM_BRANCH} --single-branch --depth 1
 
 curl -o /tmp/pyclean -L https://github.com/bjia56/pyclean-standalone/releases/download/v3.4.0.0/pyclean
-chmod +x /tmp/pyclean
-sudo mv /tmp/pyclean /usr/local/bin/pyclean
+mv /tmp/pyclean /usr/local/bin/pyclean
 
 function build_python () {
   python_suffix=$1
