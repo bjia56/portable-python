@@ -18,7 +18,7 @@ fi
 
 WORKDIR=$(pwd)
 
-curl -o ${WORKDIR}/pyclean -L https://github.com/bjia56/pyclean-standalone/releases/download/v3.4.0.0/pyclean
+curl -o ${WORKDIR}/pyclean -L https://github.com/bjia56/pyclean-standalone/releases/download/v3.4.0.1/pyclean
 chmod +x ${WORKDIR}/pyclean
 
 function get_version_code() {

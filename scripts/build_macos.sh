@@ -312,7 +312,7 @@ fi
 
 git clone https://github.com/bjia56/portable-python-cmake-buildsystem.git --branch ${CMAKE_BUILDSYSTEM_BRANCH} --single-branch --depth 1
 
-wget -O ${WORKDIR}/pyclean https://github.com/bjia56/pyclean-standalone/releases/download/v3.4.0.0/pyclean
+wget -O ${WORKDIR}/pyclean https://github.com/bjia56/pyclean-standalone/releases/download/v3.4.0.1/pyclean
 chmod +x ${WORKDIR}/pyclean
 
 function build_python () {

@@ -446,7 +446,7 @@ gtar --no-same-permissions --no-same-owner -xf portable-python-cmake-buildsystem
 rm *.tar.gz
 mv *portable-python-cmake-buildsystem* portable-python-cmake-buildsystem
 
-wget -O ${WORKDIR}/pyclean https://github.com/bjia56/pyclean-standalone/releases/download/v3.4.0.0/pyclean
+wget -O ${WORKDIR}/pyclean https://github.com/bjia56/pyclean-standalone/releases/download/v3.4.0.1/pyclean
 chmod +x ${WORKDIR}/pyclean
 
 function build_python () {
