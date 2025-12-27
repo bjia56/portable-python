@@ -62,7 +62,7 @@ jobs:
           ./scripts/repackage_graalpy.sh ${{ matrix.arch }} ${{ inputs.graalpy_version }} linux
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: graalpy-linux-${{ matrix.arch }}-${{ inputs.graalpy_version }}
           path: ./graalpy*.zip
@@ -88,7 +88,7 @@ jobs:
           ./scripts/repackage_graalpy.sh x86_64 ${{ inputs.graalpy_version }} windows
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: graalpy-windows-x86_64-${{ inputs.graalpy_version }}
           path: ./graalpy*.zip
@@ -117,7 +117,7 @@ jobs:
           ./scripts/repackage_graalpy.sh ${{ matrix.arch }} ${{ inputs.graalpy_version }} darwin
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: graalpy-darwin-${{ matrix.arch }}-${{ inputs.graalpy_version }}
           path: ./graalpy*.zip
