@@ -84,7 +84,7 @@ jobs:
           version: 0.14.0
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Build dependencies
         run: |
@@ -95,7 +95,7 @@ jobs:
         uses: fawazahmed0/action-debug-vscode@v3
 
       - name: Upload dependency artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: deps-linux-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           include-hidden-files: true
@@ -130,10 +130,10 @@ jobs:
           version: 0.14.0
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Download dependency artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: deps-linux-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: .
@@ -147,14 +147,14 @@ jobs:
         uses: fawazahmed0/action-debug-vscode@v3
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: python-linux-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
         if: ${{ always()  && inputs.debug }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: build-python-linux-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./*python*.tar.gz
@@ -193,10 +193,10 @@ jobs:
           echo "platform=$PLATFORM" >> "$GITHUB_OUTPUT"
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Download artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: python-linux-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: .
@@ -237,7 +237,7 @@ jobs:
           git config --global core.eol lf
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Configure build
         uses: ilammy/msvc-dev-cmd@v1
@@ -260,7 +260,7 @@ jobs:
         if: ${{ always() && inputs.debug_interactive }}
 
       - name: Upload dependency artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: deps-windows-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           include-hidden-files: true
@@ -289,7 +289,7 @@ jobs:
           git config --global core.eol lf
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Configure build
         uses: ilammy/msvc-dev-cmd@v1
@@ -302,7 +302,7 @@ jobs:
           Rename-Item c:\strawberry strawberry2
 
       - name: Download dependency artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: deps-windows-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: .
@@ -318,13 +318,13 @@ jobs:
         if: ${{ always() && inputs.debug_interactive }}
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: python-windows-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: ${{ always() && inputs.debug }}
         with:
           name: build-python-windows-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
@@ -350,10 +350,10 @@ jobs:
           git config --global core.eol lf
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Download artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: python-windows-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: .
@@ -366,7 +366,7 @@ jobs:
   build_deps_macos:
     name: MacOS ${{ inputs.python_version }} universal2 ${{ matrix.distribution }} (build deps)
     if: ${{ contains(inputs.platforms, 'macos') }}
-    runs-on: macos-13
+    runs-on: macos-15-intel
     strategy:
       fail-fast: false
       matrix:
@@ -374,7 +374,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Install tools
         run: |
@@ -394,7 +394,7 @@ jobs:
         if: ${{ always() && inputs.debug_interactive }}
 
       - name: Upload dependency artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: deps-darwin-universal2-${{ matrix.distribution }}-${{ inputs.python_version }}
           include-hidden-files: true
@@ -406,7 +406,7 @@ jobs:
     name: MacOS ${{ inputs.python_version }} universal2 ${{ matrix.distribution }} (build)
     if: ${{ contains(inputs.platforms, 'macos') }}
     needs: build_deps_macos
-    runs-on: macos-13
+    runs-on: macos-15-intel
     strategy:
       fail-fast: false
       matrix:
@@ -414,7 +414,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Install tools
         run: |
@@ -425,7 +425,7 @@ jobs:
           echo "/usr/local/opt/ncurses/bin/" >> $GITHUB_PATH
 
       - name: Download dependency artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: deps-darwin-universal2-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: .
@@ -440,13 +440,13 @@ jobs:
         if: ${{ always() && inputs.debug_interactive }}
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: python-darwin-universal2-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: ${{ always() && inputs.debug }}
         with:
           name: build-python-darwin-universal2-${{ matrix.distribution }}-${{ inputs.python_version }}
@@ -455,7 +455,7 @@ jobs:
   test_macos:
     name: MacOS ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (test)
     needs: build_macos
-    runs-on: ${{ matrix.arch == 'x86_64' && 'macos-13' || 'macos-14' }}
+    runs-on: ${{ matrix.arch == 'x86_64' && 'macos-15-intel' || 'macos-14' }}
     strategy:
       fail-fast: false
       matrix:
@@ -464,10 +464,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Download artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: python-darwin-universal2-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: .
@@ -515,7 +515,7 @@ jobs:
           echo "release=$RELEASE" >> "$GITHUB_OUTPUT"
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Start VM
         uses: vmactions/freebsd-vm@v1
@@ -551,7 +551,7 @@ jobs:
         uses: fawazahmed0/action-debug-vscode@v3
 
       - name: Upload dependency artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: deps-freebsd${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           include-hidden-files: true
@@ -598,10 +598,10 @@ jobs:
           echo "release=$RELEASE" >> "$GITHUB_OUTPUT"
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Download dependency artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: deps-freebsd${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: .
@@ -640,14 +640,14 @@ jobs:
         uses: fawazahmed0/action-debug-vscode@v3
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: python-freebsd${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
         if: ${{ always() && inputs.debug }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: build-python-freebsd${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./*python*.tar.gz
@@ -690,10 +690,10 @@ jobs:
           echo "release=$RELEASE" >> "$GITHUB_OUTPUT"
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Download artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: python-freebsd${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: .
@@ -735,7 +735,7 @@ jobs:
           echo "release=$RELEASE" >> "$GITHUB_OUTPUT"
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Start VM
         uses: vmactions/solaris-vm@v1
@@ -769,7 +769,7 @@ jobs:
         uses: fawazahmed0/action-debug-vscode@v3
 
       - name: Upload dependency artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: deps-solaris${{ matrix.release }}-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
           include-hidden-files: true
@@ -798,10 +798,10 @@ jobs:
           echo "release=$RELEASE" >> "$GITHUB_OUTPUT"
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Download dependency artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: deps-solaris${{ matrix.release }}-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: .
@@ -838,14 +838,14 @@ jobs:
         uses: fawazahmed0/action-debug-vscode@v3
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: python-solaris${{ matrix.release }}-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
         if: ${{ always() && inputs.debug }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: build-python-solaris${{ matrix.release }}-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./*python*.tar.gz
@@ -870,10 +870,10 @@ jobs:
           echo "release=$RELEASE" >> "$GITHUB_OUTPUT"
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Download artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: python-solaris${{ matrix.release }}-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: .
@@ -898,7 +898,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Load cosmocc version
         run: |
@@ -919,7 +919,7 @@ jobs:
         uses: fawazahmed0/action-debug-vscode@v3
 
       - name: Upload dependency artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: deps-cosmo-unknown-${{ inputs.python_version }}
           include-hidden-files: true
@@ -935,7 +935,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Load cosmocc version
         run: |
@@ -948,7 +948,7 @@ jobs:
           version: ${{ env.cosmocc_version }}
 
       - name: Download dependency artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: deps-cosmo-unknown-${{ inputs.python_version }}
           path: .
@@ -962,14 +962,14 @@ jobs:
         uses: fawazahmed0/action-debug-vscode@v3
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: python-cosmo-unknown-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
         if: ${{ always()  && inputs.debug }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: build-python-cosmo-unknown-${{ inputs.python_version }}
           path: ./*python*.tar.gz
@@ -1004,10 +1004,10 @@ jobs:
         uses: bjia56/setup-cosmocc@v0.0.5
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Download artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: python-cosmo-unknown-${{ inputs.python_version }}
           path: .

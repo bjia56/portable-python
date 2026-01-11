@@ -50,7 +50,7 @@ jobs:
           echo "platform=$PLATFORM" >> "$GITHUB_OUTPUT"
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -62,7 +62,7 @@ jobs:
           ./scripts/repackage_graalpy.sh ${{ matrix.arch }} ${{ inputs.graalpy_version }} linux
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: graalpy-linux-${{ matrix.arch }}-${{ inputs.graalpy_version }}
           path: ./graalpy*.zip
@@ -79,7 +79,7 @@ jobs:
           git config --global core.eol lf
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Repackage
         shell: bash
@@ -88,7 +88,7 @@ jobs:
           ./scripts/repackage_graalpy.sh x86_64 ${{ inputs.graalpy_version }} windows
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: graalpy-windows-x86_64-${{ inputs.graalpy_version }}
           path: ./graalpy*.zip
@@ -103,13 +103,13 @@ jobs:
         arch: [x86_64, aarch64]
         include:
           - arch: x86_64
-            runner: macos-13
+            runner: macos-15-intel
           - arch: aarch64
             runner: macos-14
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Repackage
         run: |
@@ -117,7 +117,7 @@ jobs:
           ./scripts/repackage_graalpy.sh ${{ matrix.arch }} ${{ inputs.graalpy_version }} darwin
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: graalpy-darwin-${{ matrix.arch }}-${{ inputs.graalpy_version }}
           path: ./graalpy*.zip

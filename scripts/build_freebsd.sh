@@ -53,7 +53,7 @@ function build_deps () {
   echo "::group::libffi"
   cd ${BUILDDIR}
 
-  download_verify_extract libffi-3.4.6.tar.gz
+  download_verify_extract libffi-3.5.2.tar.gz
   cd libffi*
   maybe_patch
   ./configure --disable-shared --prefix=${DEPSDIR}
@@ -413,6 +413,9 @@ tar --no-same-permissions --no-same-owner -xf portable-python-cmake-buildsystem.
 rm *.tar.gz
 mv *portable-python-cmake-buildsystem* portable-python-cmake-buildsystem
 
+wget -O ${WORKDIR}/pyclean https://github.com/bjia56/pyclean-standalone/releases/download/v3.4.0.1/pyclean
+chmod +x ${WORKDIR}/pyclean
+
 function build_python () {
   python_suffix=$1
   cmake_python_features=$2
@@ -515,9 +518,7 @@ function build_python () {
   echo "::group::Compress output ${python_distro_ver}"
   cd ${BUILDDIR}
 
-  python3 -m ensurepip
-  python3 -m pip install pyclean
-  python3 -m pyclean -v ${python_install_dir}
+  ${WORKDIR}/pyclean -v ${python_install_dir}
   mv ${python_install_dir} python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}
   tar -czf ${WORKDIR}/python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}.tar.gz python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}
   zip ${WORKDIR}/python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}.zip $(tar tf ${WORKDIR}/python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}.tar.gz)

@@ -245,18 +245,18 @@ function build_deps () {
   echo "::group::libffi"
   cd ${BUILDDIR}
 
-  download_verify_extract libffi-3.4.6.tar.gz
-  cd libffi-3.4.6
+  download_verify_extract libffi-3.5.2.tar.gz
+  cd libffi-3.5.2
   maybe_patch
   cd ..
-  cp -r libffi-3.4.6 libffi-3.4.6-arm64
-  cd libffi-3.4.6
+  cp -r libffi-3.5.2 libffi-3.5.2-arm64
+  cd libffi-3.5.2
   CC="/usr/bin/cc" ./configure --prefix ${DEPSDIR}
   make -j${NPROC}
   make install
   cd ${BUILDDIR}
   mkdir libffi-arm64-out
-  cd libffi-3.4.6-arm64
+  cd libffi-3.5.2-arm64
   CC="/usr/bin/cc" CFLAGS="${CFLAGS} -target arm64-apple-macos11" ./configure --prefix ${BUILDDIR}/libffi-arm64-out --build=aarch64-apple-darwin --host=aarch64
   make -j${NPROC}
   make install
@@ -311,6 +311,9 @@ if [[ "${DISTRIBUTION}" != "headless" ]]; then
 fi
 
 git clone https://github.com/bjia56/portable-python-cmake-buildsystem.git --branch ${CMAKE_BUILDSYSTEM_BRANCH} --single-branch --depth 1
+
+wget -O ${WORKDIR}/pyclean https://github.com/bjia56/pyclean-standalone/releases/download/v3.4.0.1/pyclean
+chmod +x ${WORKDIR}/pyclean
 
 function build_python () {
   python_suffix=$1
@@ -409,8 +412,7 @@ function build_python () {
   echo "::group::Compress output ${python_distro_ver}"
   cd ${BUILDDIR}
 
-  python3 -m pip install pyclean
-  python3 -m pyclean -v ${python_install_dir}
+  ${WORKDIR}/pyclean -v ${python_install_dir}
   mv ${python_install_dir} python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}
   tar -czf ${WORKDIR}/python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}.tar.gz python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}
   zip ${WORKDIR}/python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}.zip $(tar tf ${WORKDIR}/python-${DISTRIBUTION}-${python_distro_ver}-${PLATFORM}-${ARCH}.tar.gz)
