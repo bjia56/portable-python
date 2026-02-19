@@ -56,7 +56,7 @@ jobs:
         uses: docker/setup-qemu-action@v3
 
       - name: Repackage
-        uses: addnab/docker-run-action@v3
+        uses: bjia56/docker-run-action@v4
         with:
           image: ${{ steps.parse_image.outputs.image }}
           options: --platform ${{ steps.parse_platform.outputs.platform }} -v ${{ github.workspace }}:/work --workdir /work
