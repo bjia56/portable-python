@@ -480,7 +480,7 @@ jobs:
   build_deps_freebsd:
     name: FreeBSD ${{ matrix.release }} ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (build deps)
     if: ${{ contains(inputs.platforms, 'freebsd') }}
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix:
