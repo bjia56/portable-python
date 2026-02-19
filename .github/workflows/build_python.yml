@@ -214,6 +214,13 @@ jobs:
           shell: bash
           run: |
             set -e
+
+            if [ "${{ matrix.arch }}" = "loongarch64" ]; then
+              # loongarch64 image is outdated, need to pull new apt key
+              apt -o Acquire::AllowInsecureRepositories=true -o Acquire::AllowDowngradeToInsecureRepositories=true update
+              apt-get -o APT::Get::AllowUnauthenticated=true install debian-ports-archive-keyring
+            fi
+
             apt update && apt install -y curl
             ./scripts/launch_test.sh --arch ${{ matrix.arch }} --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --os linux --run-tests "${{ env.RUN_TESTS }}"
 
