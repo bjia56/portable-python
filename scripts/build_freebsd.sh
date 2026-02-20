@@ -10,7 +10,7 @@ export LDFLAGS="-L${DEPSDIR}/lib"
 export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig:${DEPSDIR}/share/pkgconfig"
 export AL_OPTS="-I/usr/local/share/aclocal -I${DEPSDIR}/share/aclocal"
 
-function build_deps () {
+function build_headless_deps () {
   mkdir -p ${DEPSDIR}/share/aclocal
 
   ########
@@ -292,99 +292,112 @@ function build_deps () {
   install_license
 
   echo "::endgroup::"
+}
 
-  if [[ "${DISTRIBUTION}" != "headless" ]]; then
-    #######
-    # X11 #
-    #######
-
-    function build_x11_lib_core() {
-      echo "::group::$1"
-      cd ${BUILDDIR}
-
-      pkg=$1
-      ext_flags="$2"
-      file=$pkg.tar.gz
-      download_verify_extract $file
-      cd $pkg
-      maybe_patch
-      autoreconf -vfi ${AL_OPTS}
-      ./configure --enable-static --disable-shared $ext_flags --prefix=${DEPSDIR}
-      gmake -j4
-      gmake install
-
-      echo "::endgroup::"
-    }
-
-    function build_x11_lib () {
-      build_x11_lib_core "$1" "$2"
-      install_license
-    }
-
-    build_x11_lib_core util-macros-1.20.1
-    build_x11_lib_core xorgproto-2023.2
-    build_x11_lib xproto-7.0.31
-    build_x11_lib xextproto-7.3.0
-    build_x11_lib kbproto-1.0.7
-    build_x11_lib inputproto-2.3.2
-    build_x11_lib renderproto-0.11.1
-    build_x11_lib scrnsaverproto-1.2.2
-    build_x11_lib xcb-proto-1.16.0
-    build_x11_lib libpthread-stubs-0.5
-    build_x11_lib xtrans-1.5.0
-    build_x11_lib libXau-1.0.11
-    build_x11_lib libxcb-1.16
-    build_x11_lib libXdmcp-1.1.2
-    build_x11_lib libX11-1.8.7
-    build_x11_lib libXext-1.3.5
-    build_x11_lib libICE-1.0.7
-    build_x11_lib libSM-1.2.2
-    build_x11_lib libXrender-0.9.11
-    build_x11_lib libXft-2.3.8
-    build_x11_lib libXScrnSaver-1.2.4
-
-    #echo "::endgroup::"
-    #######
-    # tcl #
-    #######
-    echo "::group::tcl"
-    cd ${BUILDDIR}
-
-    download_verify_extract tcl8.6.13-src.tar.gz
-    cd tcl*
-    maybe_patch
-    cd unix
-    ./configure --enable-static --disable-shared --prefix=${DEPSDIR}
-    gmake -j4
-    gmake install
-    cd ..
-    install_license ./license.terms
-
-    echo "::endgroup::"
-    ######
-    # tk #
-    ######
-    echo "::group::tk"
-    cd ${BUILDDIR}
-
-    download_verify_extract tk8.6.13-src.tar.gz
-    cd tk*
-    maybe_patch
-    cd unix
-    LDFLAGS="${LDFLAGS} -lxml2 -lxcb -lXau" ./configure --enable-static --disable-shared --prefix=${DEPSDIR}
-    gmake -j4
-    gmake install
-    cd ..
-    install_license ./license.terms
-
-    echo "::endgroup::"
+function build_ui_deps () {
+  if [[ "${DISTRIBUTION}" == "headless" ]]; then
+    return
   fi
+
+  #######
+  # X11 #
+  #######
+
+  function build_x11_lib_core() {
+    echo "::group::$1"
+    cd ${BUILDDIR}
+
+    pkg=$1
+    ext_flags="$2"
+    file=$pkg.tar.gz
+    download_verify_extract $file
+    cd $pkg
+    maybe_patch
+    autoreconf -vfi ${AL_OPTS}
+    ./configure --enable-static --disable-shared $ext_flags --prefix=${DEPSDIR}
+    gmake -j4
+    gmake install
+
+    echo "::endgroup::"
+  }
+
+  function build_x11_lib () {
+    build_x11_lib_core "$1" "$2"
+    install_license
+  }
+
+  build_x11_lib_core util-macros-1.20.1
+  build_x11_lib_core xorgproto-2023.2
+  build_x11_lib xproto-7.0.31
+  build_x11_lib xextproto-7.3.0
+  build_x11_lib kbproto-1.0.7
+  build_x11_lib inputproto-2.3.2
+  build_x11_lib renderproto-0.11.1
+  build_x11_lib scrnsaverproto-1.2.2
+  build_x11_lib xcb-proto-1.16.0
+  build_x11_lib libpthread-stubs-0.5
+  build_x11_lib xtrans-1.5.0
+  build_x11_lib libXau-1.0.11
+  build_x11_lib libxcb-1.16
+  build_x11_lib libXdmcp-1.1.2
+  build_x11_lib libX11-1.8.7
+  build_x11_lib libXext-1.3.5
+  build_x11_lib libICE-1.0.7
+  build_x11_lib libSM-1.2.2
+  build_x11_lib libXrender-0.9.11
+  build_x11_lib libXft-2.3.8
+  build_x11_lib libXScrnSaver-1.2.4
+
+  #echo "::endgroup::"
+  #######
+  # tcl #
+  #######
+  echo "::group::tcl"
+  cd ${BUILDDIR}
+
+  download_verify_extract tcl8.6.13-src.tar.gz
+  cd tcl*
+  maybe_patch
+  cd unix
+  ./configure --enable-static --disable-shared --prefix=${DEPSDIR}
+  gmake -j4
+  gmake install
+  cd ..
+  install_license ./license.terms
+
+  echo "::endgroup::"
+  ######
+  # tk #
+  ######
+  echo "::group::tk"
+  cd ${BUILDDIR}
+
+  download_verify_extract tk8.6.13-src.tar.gz
+  cd tk*
+  maybe_patch
+  cd unix
+  LDFLAGS="${LDFLAGS} -lxml2 -lxcb -lXau" ./configure --enable-static --disable-shared --prefix=${DEPSDIR}
+  gmake -j4
+  gmake install
+  cd ..
+  install_license ./license.terms
+
+  echo "::endgroup::"
 }
 
 if [[ "${PYTHON_ONLY}" == "false" ]]; then
-  build_deps
+  if [[ "${HEADLESS_DEPS_ONLY}" == "true" ]]; then
+    build_headless_deps
+  fi
+  if [[ "${UI_DEPS_ONLY}" == "true" ]]; then
+    build_ui_deps
+  fi
+  if [[ "${HEADLESS_DEPS_ONLY}" == "false" && "${UI_DEPS_ONLY}" == "false" ]]; then
+    build_headless_deps
+    build_ui_deps
+  fi
 fi
-if [[ "${DEPS_ONLY}" == "true" ]]; then
+if [[ "${HEADLESS_DEPS_ONLY}" == "true" || "${UI_DEPS_ONLY}" == "true" ]]; then
   exit 0
 fi
 

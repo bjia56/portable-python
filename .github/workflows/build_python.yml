@@ -484,10 +484,10 @@ jobs:
         run: |
           ./scripts/launch_test.sh --arch universal2 --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --os darwin --run-tests "${{ env.RUN_TESTS }}"
 
-  build_deps_freebsd:
-    name: FreeBSD ${{ matrix.release }} ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (build deps)
+  build_headless_deps_freebsd:
+    name: FreeBSD ${{ matrix.release }} ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (build headless deps)
     if: ${{ contains(inputs.platforms, 'freebsd') }}
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -528,7 +528,7 @@ jobs:
             pkg install -y cmake-core bash wget base64 patch git zip python3 autoconf automake libtool gettext bison pkgconf gmake gperf patchelf texinfo
             chsh -s /usr/local/bin/bash root
 
-      - name: Build dependencies in VM
+      - name: Build headless dependencies in VM
         shell: freebsd {0}
         run: |
           set -e
@@ -542,7 +542,7 @@ jobs:
           export VERBOSE_CI="${{ env.VERBOSE_CI }}"
           export PORTABLE_PYTHON_BUILDSYSTEM_BRANCH="${{ env.PORTABLE_PYTHON_BUILDSYSTEM_BRANCH }}"
           export PLATFORM="freebsd${{ matrix.release }}"
-          bash ./scripts/build_freebsd.sh --arch ${{ matrix.arch }} --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --deps-only
+          bash ./scripts/build_freebsd.sh --arch ${{ matrix.arch }} --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --headless-deps-only
 
           cp -r deps ${{ github.workspace }}
           cp -r licenses ${{ github.workspace }}
@@ -551,10 +551,95 @@ jobs:
         if: ${{ always() && inputs.debug_interactive }}
         uses: fawazahmed0/action-debug-vscode@v3
 
-      - name: Upload dependency artifacts
+      - name: Upload headless dependency artifacts
         uses: actions/upload-artifact@v6
         with:
-          name: deps-freebsd${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
+          name: headless-deps-freebsd${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
+          include-hidden-files: true
+          path: |
+            ./deps/
+            ./licenses/
+
+  build_ui_deps_freebsd:
+    name: FreeBSD ${{ matrix.release }} ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (build UI deps)
+    if: ${{ contains(inputs.platforms, 'freebsd') }}
+    needs: build_headless_deps_freebsd
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        release: [13, 14, 15]
+        arch: [x86_64, aarch64]
+        distribution: [full]
+        exclude:
+          - release: ${{ !contains(inputs.platforms, 'freebsd13-x86_64') && '13' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd13-x86_64') && 'x86_64' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd14-x86_64') && '14' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd14-x86_64') && 'x86_64' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd15-x86_64') && '15' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd15-x86_64') && 'x86_64' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd13-aarch64') && '13' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd13-aarch64') && 'aarch64' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd14-aarch64') && '14' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd14-aarch64') && 'aarch64' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd15-aarch64') && '15' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd15-aarch64') && 'aarch64' || '' }}
+
+    steps:
+      - name: Parse release
+        id: parse_release
+        run: |
+          RELEASE=$(echo ${{ toJSON(env.freebsd_release_map) }} | jq -r '.["${{ matrix.release }}"]')
+          echo "release=$RELEASE" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Download headless dependency artifacts
+        uses: actions/download-artifact@v7
+        with:
+          name: headless-deps-freebsd${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
+          path: .
+
+      - name: Start VM
+        uses: vmactions/freebsd-vm@v1
+        with:
+          sync: nfs
+          release: ${{ steps.parse_release.outputs.release }}
+          arch: ${{ matrix.arch }}
+          prepare: |
+            pkg install -y cmake-core bash wget base64 patch git zip python3 autoconf automake libtool gettext bison pkgconf gmake gperf patchelf texinfo
+            chsh -s /usr/local/bin/bash root
+
+      - name: Build UI dependencies in VM
+        shell: freebsd {0}
+        run: |
+          set -e
+
+          # Avoid building on the NFS mount
+          cp -r ${{ github.workspace }} $HOME/workspace
+          cd $HOME/workspace
+
+          export RUN_TESTS="${{ env.RUN_TESTS }}"
+          export DEBUG_CI="${{ env.DEBUG_CI }}"
+          export VERBOSE_CI="${{ env.VERBOSE_CI }}"
+          export PORTABLE_PYTHON_BUILDSYSTEM_BRANCH="${{ env.PORTABLE_PYTHON_BUILDSYSTEM_BRANCH }}"
+          export PLATFORM="freebsd${{ matrix.release }}"
+          bash ./scripts/build_freebsd.sh --arch ${{ matrix.arch }} --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --ui-deps-only
+
+          rm -rf ${{ github.workspace }}/deps
+          rm -rf ${{ github.workspace }}/licenses
+          cp -r deps ${{ github.workspace }}
+          cp -r licenses ${{ github.workspace }}
+
+      - name: Interactive debugging
+        if: ${{ always() && inputs.debug_interactive }}
+        uses: fawazahmed0/action-debug-vscode@v3
+
+      - name: Upload UI dependency artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: ui-deps-freebsd${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           include-hidden-files: true
           path: |
             ./deps/
@@ -563,7 +648,7 @@ jobs:
   build_freebsd:
     name: FreeBSD ${{ matrix.release }} ${{ inputs.python_version }} ${{ matrix.arch }} ${{ matrix.distribution }} (build)
     if: ${{ contains(inputs.platforms, 'freebsd') }}
-    needs: build_deps_freebsd
+    needs: [build_headless_deps_freebsd, build_ui_deps_freebsd]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -595,10 +680,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Download dependency artifacts
+      - name: Download UI dependency artifacts
         uses: actions/download-artifact@v7
         with:
-          name: deps-freebsd${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
+          name: ui-deps-freebsd${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: .
 
       - name: Start VM

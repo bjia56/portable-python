@@ -26,7 +26,7 @@ export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig:${DEPSDIR}/share/pkgconfig"
 
 echo "::endgroup::"
 
-function build_deps () {
+function build_headless_deps () {
   mkdir -p ${DEPSDIR}/lib/.aarch64
 
   cd $(dirname $(dirname $(which cosmocc)))
@@ -191,9 +191,12 @@ function build_deps () {
 }
 
 if [[ "${PYTHON_ONLY}" == "false" ]]; then
-  build_deps
+  # cosmo has no UI dependencies; --ui-deps-only is a no-op
+  if [[ "${HEADLESS_DEPS_ONLY}" == "true" || "${UI_DEPS_ONLY}" == "false" ]]; then
+    build_headless_deps
+  fi
 fi
-if [[ "${DEPS_ONLY}" == "true" ]]; then
+if [[ "${HEADLESS_DEPS_ONLY}" == "true" || "${UI_DEPS_ONLY}" == "true" ]]; then
   exit 0
 fi
 
