@@ -680,10 +680,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Download UI dependency artifacts
+      - name: Download dependency artifacts
         uses: actions/download-artifact@v7
         with:
-          name: ui-deps-freebsd${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
+          name: ${{ matrix.distribution == 'full' && format('ui-deps-freebsd{0}-{1}-{2}-{3}', matrix.release, matrix.arch, matrix.distribution, inputs.python_version) || format('headless-deps-freebsd{0}-{1}-{2}-{3}', matrix.release, matrix.arch, matrix.distribution, inputs.python_version) }}
           path: .
 
       - name: Start VM
