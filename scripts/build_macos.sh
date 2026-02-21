@@ -232,6 +232,11 @@ function build_headless_deps () {
   file ${DEPSDIR}/lib/libffi.a
 
   echo "::endgroup::"
+}
+
+function build_headless_deps_pt2 () {
+  # uuid's headers conflict with tcl build, so we build it after tcl and tk
+
   ########
   # uuid #
   ########
@@ -298,9 +303,13 @@ if [[ "${PYTHON_ONLY}" == "false" ]]; then
   if [[ "${UI_DEPS_ONLY}" == "true" ]]; then
     build_ui_deps
   fi
+  if [[ "${HEADLESS_DEPS_ONLY}" == "true" ]]; then
+    build_headless_deps_pt2
+  fi
   if [[ "${HEADLESS_DEPS_ONLY}" == "false" && "${UI_DEPS_ONLY}" == "false" ]]; then
     build_headless_deps
     build_ui_deps
+    build_headless_deps_pt2
   fi
 fi
 if [[ "${HEADLESS_DEPS_ONLY}" == "true" || "${UI_DEPS_ONLY}" == "true" ]]; then
