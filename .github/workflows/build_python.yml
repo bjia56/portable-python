@@ -9,7 +9,7 @@ on:
       platforms:
         required: true
         type: string
-        default: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,linux-loongarch64,linux-s390x,linux-powerpc64le,macos,windows-x86_64,windows-aarch64,cosmo,freebsd13-x86_64,freebsd14-x86_64,freebsd15-x86_64,freebsd13-aarch64,freebsd14-aarch64,freebsd15-aarch64,solaris11-x86_64"
+        default: "linux-x86_64,linux-aarch64,linux-i386,linux-arm,linux-riscv64,linux-loongarch64,linux-s390x,linux-powerpc64le,macos,windows-x86_64,windows-aarch64,cosmo,freebsd13-x86_64,freebsd14-x86_64,freebsd15-x86_64,freebsd13-aarch64,freebsd14-aarch64,freebsd15-aarch64,freebsd13-riscv64,freebsd14-riscv64,freebsd15-riscv64,solaris11-x86_64"
       buildsystem_branch:
         required: false
         type: string
@@ -54,7 +54,7 @@ env:
   PORTABLE_PYTHON_BUILDSYSTEM_BRANCH: ${{ inputs.buildsystem_branch || 'portable-python' }}
   image_map: '{"x86_64": "amd64/ubuntu:18.04", "i386": "i386/ubuntu:18.04", "aarch64": "arm64v8/ubuntu:18.04", "arm": "arm32v7/debian:bullseye", "riscv64": "riscv64/debian:sid", "loongarch64": "loongarch64/debian:sid", "s390x": "s390x/debian:bookworm", "powerpc64le": "ppc64le/ubuntu:18.04"}'
   platform_map: '{"x86_64": "linux/amd64", "i386": "linux/386", "aarch64": "linux/arm64/v8", "arm": "linux/arm/v7", "riscv64": "linux/riscv64", "loongarch64": "linux/loong64", "s390x": "linux/s390x", "powerpc64le": "linux/ppc64le"}'
-  freebsd_release_map: '{"15": "15.0", "14": "14.1", "13": "13.3"}'
+  freebsd_release_map: '{"15": "15.0", "14": "14.2", "13": "13.5"}'
   solaris_release_map: '{"11": "11.4"}'
 
 jobs:
@@ -492,7 +492,7 @@ jobs:
       fail-fast: false
       matrix:
         release: [13, 14, 15]
-        arch: [x86_64, aarch64]
+        arch: [x86_64, aarch64, riscv64]
         distribution: [full, headless]
         exclude:
           - release: ${{ !contains(inputs.platforms, 'freebsd13-x86_64') && '13' || '' }}
@@ -507,6 +507,12 @@ jobs:
             arch: ${{ !contains(inputs.platforms, 'freebsd14-aarch64') && 'aarch64' || '' }}
           - release: ${{ !contains(inputs.platforms, 'freebsd15-aarch64') && '15' || '' }}
             arch: ${{ !contains(inputs.platforms, 'freebsd15-aarch64') && 'aarch64' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd13-riscv64') && '13' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd13-riscv64') && 'riscv64' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd14-riscv64') && '14' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd14-riscv64') && 'riscv64' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd15-riscv64') && '15' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd15-riscv64') && 'riscv64' || '' }}
 
     steps:
       - name: Parse release
@@ -654,7 +660,7 @@ jobs:
       fail-fast: false
       matrix:
         release: [13, 14, 15]
-        arch: [x86_64, aarch64]
+        arch: [x86_64, aarch64, riscv64]
         distribution: [full, headless]
         exclude:
           - release: ${{ !contains(inputs.platforms, 'freebsd13-x86_64') && '13' || '' }}
@@ -669,6 +675,12 @@ jobs:
             arch: ${{ !contains(inputs.platforms, 'freebsd14-aarch64') && 'aarch64' || '' }}
           - release: ${{ !contains(inputs.platforms, 'freebsd15-aarch64') && '15' || '' }}
             arch: ${{ !contains(inputs.platforms, 'freebsd15-aarch64') && 'aarch64' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd13-riscv64') && '13' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd13-riscv64') && 'riscv64' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd14-riscv64') && '14' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd14-riscv64') && 'riscv64' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd15-riscv64') && '15' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd15-riscv64') && 'riscv64' || '' }}
 
     steps:
       - name: Parse release
@@ -740,7 +752,7 @@ jobs:
       fail-fast: false
       matrix:
         release: [13, 14, 15]
-        arch: [x86_64, aarch64]
+        arch: [x86_64, aarch64, riscv64]
         distribution: [full, headless]
         exclude:
           - release: ${{ !contains(inputs.platforms, 'freebsd13-x86_64') && '13' || '' }}
@@ -755,6 +767,12 @@ jobs:
             arch: ${{ !contains(inputs.platforms, 'freebsd14-aarch64') && 'aarch64' || '' }}
           - release: ${{ !contains(inputs.platforms, 'freebsd15-aarch64') && '15' || '' }}
             arch: ${{ !contains(inputs.platforms, 'freebsd15-aarch64') && 'aarch64' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd13-riscv64') && '13' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd13-riscv64') && 'riscv64' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd14-riscv64') && '14' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd14-riscv64') && 'riscv64' || '' }}
+          - release: ${{ !contains(inputs.platforms, 'freebsd15-riscv64') && '15' || '' }}
+            arch: ${{ !contains(inputs.platforms, 'freebsd15-riscv64') && 'riscv64' || '' }}
 
     steps:
       - name: Parse release
