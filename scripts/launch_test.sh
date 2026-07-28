@@ -177,6 +177,7 @@ function run_test () {
         unzip ${FULL_DISTRO}.zip
         cd ${FULL_DISTRO}
         chmod +x ./bin/python.com
+        chmod +x ./bin/python.standalone.com
       fi
       PYTHON_EXE=python.com
       ;;
@@ -193,6 +194,29 @@ function run_test () {
   fi
 
   echo "::endgroup::"
+
+  if [[ "${OS}" == "cosmo" ]]; then
+    echo "::group::Standalone Python ${python_distro_ver}"
+
+    # move the single-file build out of the extracted distribution so it
+    # has no sibling files, proving it's actually standalone
+    STANDALONE_DIR=$(mktemp -d)
+    cp ${WORKDIR}/${FULL_DISTRO}/bin/python.standalone.com ${STANDALONE_DIR}/
+    cd ${STANDALONE_DIR}
+    chmod +x ./python.standalone.com
+
+    ./python.standalone.com --version
+    ./python.standalone.com -m sysconfig
+    ./python.standalone.com ${WORKDIR}/scripts/test.py
+    ./python.standalone.com -m pip
+
+    if [[ "${RUN_TESTS}" == "true" ]]; then
+      ./python.standalone.com -m test -v -ulargefile,network,decimal,cpu,subprocess,urlfetch,tzdata --timeout 60
+    fi
+
+    cd ${WORKDIR}
+    echo "::endgroup::"
+  fi
 }
 
 run_test
