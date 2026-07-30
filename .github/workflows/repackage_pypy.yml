@@ -50,13 +50,13 @@ jobs:
           echo "platform=$PLATFORM" >> "$GITHUB_OUTPUT"
 
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v4
+        uses: docker/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8 # v4.2.0
 
       - name: Repackage
-        uses: bjia56/docker-run-action@v4
+        uses: bjia56/docker-run-action@236d236350e679915a31b458521f2d885c1cde06 # v4
         with:
           image: ${{ steps.parse_image.outputs.image }}
           options: --platform ${{ steps.parse_platform.outputs.platform }} -v ${{ github.workspace }}:/work --workdir /work
@@ -66,7 +66,7 @@ jobs:
             ./scripts/repackage_pypy.sh ${{ matrix.arch }} ${{ inputs.pypy_version }} linux
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: pypy-linux-${{ matrix.arch }}-${{ inputs.pypy_version }}
           path: ./pypy*.zip
@@ -83,7 +83,7 @@ jobs:
           git config --global core.eol lf
 
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
       - name: Repackage
         shell: bash
@@ -92,7 +92,7 @@ jobs:
           ./scripts/repackage_pypy.sh x86_64 ${{ inputs.pypy_version }} windows
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: pypy-windows-x86_64-${{ inputs.pypy_version }}
           path: ./pypy*.zip
@@ -113,7 +113,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
       - name: Repackage
         run: |
@@ -121,7 +121,7 @@ jobs:
           ./scripts/repackage_pypy.sh ${{ matrix.arch }} ${{ inputs.pypy_version }} darwin
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: pypy-darwin-${{ matrix.arch }}-${{ inputs.pypy_version }}
           path: ./pypy*.zip

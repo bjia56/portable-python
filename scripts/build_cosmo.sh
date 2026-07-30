@@ -108,7 +108,7 @@ function build_headless_deps () {
   download_verify_extract ncurses-6.4.tar.gz
   cd ncurses*
   maybe_patch
-  CFLAGS="${CFLAGS} -std=c89" ./configure --with-normal --without-progs --enable-overwrite --disable-stripping --enable-widec --with-termlib --disable-database --with-fallbacks=xterm,xterm-256color,screen-256color,linux,vt100 --prefix=${DEPSDIR}
+  CFLAGS="${CFLAGS} -std=c89" ./configure --with-normal --without-progs --without-cxx-binding --enable-overwrite --disable-stripping --enable-widec --with-termlib --disable-database --with-fallbacks=xterm,xterm-256color,screen-256color,linux,vt100 --prefix=${DEPSDIR}
   make -j4
   make install
   cp lib/.aarch64/lib*.a ${DEPSDIR}/lib/.aarch64
