@@ -209,7 +209,7 @@ function build_headless_deps () {
   download_verify_extract gdbm-1.23.tar.gz
   cd gdbm*
   maybe_patch
-  ./configure --enable-libgdbm-compat --disable-shared --prefix=${DEPSDIR}
+  CFLAGS="${CFLAGS} -std=gnu17" ./configure --enable-libgdbm-compat --disable-shared --prefix=${DEPSDIR}
   gmake -j4
   gmake install
   install_license
@@ -254,7 +254,7 @@ function build_headless_deps () {
   download_verify_extract libgpg-error-1.47.tar.bz2
   cd libgpg-error*
   maybe_patch
-  ./configure --enable-static --disable-shared --prefix=${DEPSDIR}
+  CFLAGS="${CFLAGS} -std=gnu17" ./configure --enable-static --disable-shared --prefix=${DEPSDIR}
   gmake -j4
   gmake install
   install_license ./COPYING.LIB
