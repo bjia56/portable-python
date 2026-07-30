@@ -335,14 +335,11 @@ function build_python () {
 
   cd ${python_install_dir}
 
-  # remove archives - they can't be used to build native extensions anyways
-  rm -rf ./lib/.aarch64/
-  rm -f ./lib/libpython*.a
-
   # bundle lib/ and licenses/ into a copy of python.com's own zip store
   # so it runs standalone with no sibling files
+  # archives excluded - they can't be used to build native extensions anyways
   cp ./bin/python.com ./bin/python.standalone.com
-  zip -qr9 ./bin/python.standalone.com lib licenses
+  zip -qr9 ./bin/python.standalone.com lib licenses -x "lib/.aarch64/*" "lib/libpython*.a"
   cd ${BUILDDIR}
 
   mv ${python_install_dir} python-${python_distro_ver}-${PLATFORM}-${ARCH}
