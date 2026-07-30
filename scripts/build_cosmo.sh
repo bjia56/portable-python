@@ -333,9 +333,14 @@ function build_python () {
 
   ${WORKDIR}/pyclean -v ${python_install_dir}
 
+  cd ${python_install_dir}
+
+  # remove archives - they can't be used to build native extensions anyways
+  rm -rf ./lib/.aarch64/
+  rm -f ./lib/libpython*.a
+
   # bundle lib/ and licenses/ into a copy of python.com's own zip store
   # so it runs standalone with no sibling files
-  cd ${python_install_dir}
   cp ./bin/python.com ./bin/python.standalone.com
   zip -qr9 ./bin/python.standalone.com lib licenses
   cd ${BUILDDIR}
