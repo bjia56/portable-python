@@ -1106,7 +1106,7 @@ jobs:
 
       - name: Test in VM
         if: ${{ matrix.os == 'NetBSD' }}
-        uses: vmactions/netbsd-vm@bf34bcd909bb50856f934a67d09a8fbe2b966a1b # v1.4.4
+        uses: vmactions/netbsd-vm@e7ac71b97abbe8437cec8859a5acf72dfa6a8be0 # v1.4.5
         with:
           envs: 'RUN_TESTS DEBUG_CI VERBOSE_CI PORTABLE_PYTHON_BUILDSYSTEM_BRANCH'
           usesh: true
