@@ -188,6 +188,69 @@ function build_headless_deps () {
   install_license
 
   echo "::endgroup::"
+  ##########
+  # libffi #
+  ##########
+  echo "::group::libffi"
+  cd ${BUILDDIR}
+
+  download_verify_extract libffi-3.5.2.tar.gz
+  cd libffi*
+  maybe_patch
+  install_license
+
+  COSMOCC_BIN=$(dirname $(which cosmocc))
+  LIBFFI_CONFIG_ARGS="--disable-shared --enable-static --without-pic --disable-exec-static-tramp CFLAGS=-Os"
+
+  mkdir build-x86_64
+  cd build-x86_64
+  CC=${COSMOCC_BIN}/x86_64-unknown-cosmo-cc \
+    CXX=${COSMOCC_BIN}/x86_64-unknown-cosmo-c++ \
+    AR=${COSMOCC_BIN}/x86_64-linux-cosmo-ar \
+    RANLIB=${COSMOCC_BIN}/x86_64-linux-cosmo-ranlib \
+    ../configure --prefix=${DEPSDIR}/libffi-x86_64 --build=x86_64-linux-gnu --host=x86_64-linux-gnu ${LIBFFI_CONFIG_ARGS}
+  make -j4
+  make install
+  cd ..
+
+  mkdir build-aarch64
+  cd build-aarch64
+  CC=${COSMOCC_BIN}/aarch64-unknown-cosmo-cc \
+    CXX=${COSMOCC_BIN}/aarch64-unknown-cosmo-c++ \
+    AR=${COSMOCC_BIN}/aarch64-linux-cosmo-ar \
+    RANLIB=${COSMOCC_BIN}/aarch64-linux-cosmo-ranlib \
+    ../configure --prefix=${DEPSDIR}/libffi-aarch64 --build=x86_64-linux-gnu --host=aarch64-linux-gnu ${LIBFFI_CONFIG_ARGS}
+  make -j4
+  make install
+  cd ..
+
+  # combine these into dispatch headers, selectively chosen by arch macro
+  cp ${DEPSDIR}/libffi-x86_64/include/ffi.h ${DEPSDIR}/include/ffi-x86_64.h
+  cp ${DEPSDIR}/libffi-x86_64/include/ffitarget.h ${DEPSDIR}/include/ffitarget-x86_64.h
+  cp ${DEPSDIR}/libffi-aarch64/include/ffi.h ${DEPSDIR}/include/ffi-aarch64.h
+  cp ${DEPSDIR}/libffi-aarch64/include/ffitarget.h ${DEPSDIR}/include/ffitarget-aarch64.h
+
+  cat > ${DEPSDIR}/include/ffi.h << 'FFI_H_EOF'
+#if defined(__aarch64__)
+#include "ffi-aarch64.h"
+#else
+#include "ffi-x86_64.h"
+#endif
+FFI_H_EOF
+
+  cat > ${DEPSDIR}/include/ffitarget.h << 'FFITARGET_H_EOF'
+#if defined(__aarch64__)
+#include "ffitarget-aarch64.h"
+#else
+#include "ffitarget-x86_64.h"
+#endif
+FFITARGET_H_EOF
+
+  cp ${DEPSDIR}/libffi-x86_64/lib/libffi.a ${DEPSDIR}/lib/libffi.a
+  cp ${DEPSDIR}/libffi-aarch64/lib/libffi.a ${DEPSDIR}/lib/.aarch64/libffi.a
+  rm -rf ${DEPSDIR}/libffi-x86_64 ${DEPSDIR}/libffi-aarch64
+
+  echo "::endgroup::"
 }
 
 if [[ "${PYTHON_ONLY}" == "false" ]]; then
@@ -247,7 +310,10 @@ function build_python () {
     -DBUILD_TESTING=${INSTALL_TEST} \
     -DINSTALL_TEST=${INSTALL_TEST} \
     -DINSTALL_MANUAL=OFF \
-    -DENABLE_CTYPES=OFF \
+    -DENABLE_CTYPES=ON \
+    -DUSE_SYSTEM_LibFFI=ON \
+    -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+    -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.a \
     -DOPENSSL_INCLUDE_DIR:PATH=${DEPSDIR}/include \
     -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/libssl.a;${DEPSDIR}/lib/libcrypto.a" \
     -DEXPAT_INCLUDE_DIRS:PATH=${DEPSDIR}/include \
