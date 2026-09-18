@@ -215,6 +215,11 @@ jobs:
           run: |
             set -e
 
+            if [ "${{ matrix.arch }}" = "arm" ]; then
+              sed -i '/security/d' /etc/apt/sources.list 2>/dev/null || true
+              find /etc/apt/sources.list.d -name '*.list' -exec sed -i '/security/d' {} \; 2>/dev/null || true
+            fi
+
             apt update && apt install -y curl
             ./scripts/launch_test.sh --arch ${{ matrix.arch }} --version ${{ inputs.python_version }} --distribution ${{ matrix.distribution }} --os linux --run-tests "${{ env.RUN_TESTS }}"
 
