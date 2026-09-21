@@ -518,7 +518,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Start VM
-        uses: vmactions/freebsd-vm@83b151f58c6047089f4c80eb5ba2039d158ce093 # v1.5.3
+        uses: vmactions/freebsd-vm@4469451fe39bee80be4066836c5170362e9349f3 # v1.5.7
         with:
           sync: nfs
           release: ${{ steps.parse_release.outputs.release }}
@@ -601,7 +601,7 @@ jobs:
           path: .
 
       - name: Start VM
-        uses: vmactions/freebsd-vm@83b151f58c6047089f4c80eb5ba2039d158ce093 # v1.5.3
+        uses: vmactions/freebsd-vm@4469451fe39bee80be4066836c5170362e9349f3 # v1.5.7
         with:
           sync: nfs
           release: ${{ steps.parse_release.outputs.release }}
@@ -686,7 +686,7 @@ jobs:
           path: .
 
       - name: Start VM
-        uses: vmactions/freebsd-vm@83b151f58c6047089f4c80eb5ba2039d158ce093 # v1.5.3
+        uses: vmactions/freebsd-vm@4469451fe39bee80be4066836c5170362e9349f3 # v1.5.7
         with:
           sync: nfs
           release: ${{ steps.parse_release.outputs.release }}
@@ -772,7 +772,7 @@ jobs:
           path: .
 
       - name: Start VM
-        uses: vmactions/freebsd-vm@83b151f58c6047089f4c80eb5ba2039d158ce093 # v1.5.3
+        uses: vmactions/freebsd-vm@4469451fe39bee80be4066836c5170362e9349f3 # v1.5.7
         with:
           sync: nfs
           release: ${{ steps.parse_release.outputs.release }}
@@ -1094,7 +1094,7 @@ jobs:
 
       - name: Test in VM
         if: ${{ matrix.os == 'FreeBSD' }}
-        uses: vmactions/freebsd-vm@83b151f58c6047089f4c80eb5ba2039d158ce093 # v1.5.3
+        uses: vmactions/freebsd-vm@4469451fe39bee80be4066836c5170362e9349f3 # v1.5.7
         with:
           envs: 'RUN_TESTS DEBUG_CI VERBOSE_CI PORTABLE_PYTHON_BUILDSYSTEM_BRANCH'
           usesh: true
