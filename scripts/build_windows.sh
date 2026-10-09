@@ -12,6 +12,13 @@ else
   BINDEPS_ARCH=arm64
 fi
 
+# Pick the CMake generator matching the Visual Studio exposed by msvc-dev-cmd
+case "${VisualStudioVersion}" in
+  18.*) CMAKE_GENERATOR="Visual Studio 18 2026" ;;
+  *)    CMAKE_GENERATOR="Visual Studio 17 2022" ;;
+esac
+echo "Using CMake generator: ${CMAKE_GENERATOR}"
+
 function build_headless_deps () {
   ###########
   # OpenSSL #
@@ -60,7 +67,7 @@ function build_headless_deps () {
   mkdir build
   cd build
   cmake \
-    -G "Visual Studio 17 2022" -A ${CMAKE_ARCH} \
+    -G "${CMAKE_GENERATOR}" -A ${CMAKE_ARCH} \
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
     -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR}/bzip2 \
     ..
@@ -83,7 +90,7 @@ function build_headless_deps () {
   mkdir build
   cd build
   cmake \
-    -G "Visual Studio 17 2022" -A ${CMAKE_ARCH} \
+    -G "${CMAKE_GENERATOR}" -A ${CMAKE_ARCH} \
     -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR}/xz \
     ..
   cmake --build . --config Release -- /property:Configuration=Release
@@ -122,7 +129,7 @@ function build_headless_deps () {
   mkdir build
   cd build
   cmake \
-    -G "Visual Studio 17 2022" -A ${CMAKE_ARCH} \
+    -G "${CMAKE_GENERATOR}" -A ${CMAKE_ARCH} \
     -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR}/zlib \
     ..
   cmake --build . --config Release -- /property:Configuration=Release
@@ -228,7 +235,7 @@ function build_python () {
   cmake \
     "${cmake_verbose_flags[@]}" \
     ${cmake_python_features} \
-    -G "Visual Studio 17 2022" -A ${CMAKE_ARCH} \
+    -G "${CMAKE_GENERATOR}" -A ${CMAKE_ARCH} \
     -DPYTHON_VERSION=${PYTHON_FULL_VER} \
     -DPORTABLE_PYTHON_BUILD=ON \
     -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
