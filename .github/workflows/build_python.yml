@@ -95,7 +95,7 @@ jobs:
         uses: fawazahmed0/action-debug-vscode@b86399d1033aab18cf8f962fc7f634f39c9945ec # v3
 
       - name: Upload dependency artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: deps-linux-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           include-hidden-files: true
@@ -147,14 +147,14 @@ jobs:
         uses: fawazahmed0/action-debug-vscode@b86399d1033aab18cf8f962fc7f634f39c9945ec # v3
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: python-linux-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
         if: ${{ always()  && inputs.debug }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: build-python-linux-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./*python*.tar.gz
@@ -266,7 +266,7 @@ jobs:
         if: ${{ always() && inputs.debug_interactive }}
 
       - name: Upload dependency artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: deps-windows-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           include-hidden-files: true
@@ -324,13 +324,13 @@ jobs:
         if: ${{ always() && inputs.debug_interactive }}
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: python-windows-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: ${{ always() && inputs.debug }}
         with:
           name: build-python-windows-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
@@ -400,7 +400,7 @@ jobs:
         if: ${{ always() && inputs.debug_interactive }}
 
       - name: Upload dependency artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: deps-darwin-universal2-${{ matrix.distribution }}-${{ inputs.python_version }}
           include-hidden-files: true
@@ -446,13 +446,13 @@ jobs:
         if: ${{ always() && inputs.debug_interactive }}
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: python-darwin-universal2-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: ${{ always() && inputs.debug }}
         with:
           name: build-python-darwin-universal2-${{ matrix.distribution }}-${{ inputs.python_version }}
@@ -551,7 +551,7 @@ jobs:
         uses: fawazahmed0/action-debug-vscode@b86399d1033aab18cf8f962fc7f634f39c9945ec # v3
 
       - name: Upload headless dependency artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: headless-deps-freebsd${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           include-hidden-files: true
@@ -636,7 +636,7 @@ jobs:
         uses: fawazahmed0/action-debug-vscode@b86399d1033aab18cf8f962fc7f634f39c9945ec # v3
 
       - name: Upload UI dependency artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ui-deps-freebsd${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           include-hidden-files: true
@@ -719,14 +719,14 @@ jobs:
         uses: fawazahmed0/action-debug-vscode@b86399d1033aab18cf8f962fc7f634f39c9945ec # v3
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: python-freebsd${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
         if: ${{ always() && inputs.debug }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: build-python-freebsd${{ matrix.release }}-${{ matrix.arch }}-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./*python*.tar.gz
@@ -842,7 +842,7 @@ jobs:
         uses: fawazahmed0/action-debug-vscode@b86399d1033aab18cf8f962fc7f634f39c9945ec # v3
 
       - name: Upload dependency artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: deps-solaris${{ matrix.release }}-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
           include-hidden-files: true
@@ -911,14 +911,14 @@ jobs:
         uses: fawazahmed0/action-debug-vscode@b86399d1033aab18cf8f962fc7f634f39c9945ec # v3
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: python-solaris${{ matrix.release }}-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
         if: ${{ always() && inputs.debug }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: build-python-solaris${{ matrix.release }}-x86_64-${{ matrix.distribution }}-${{ inputs.python_version }}
           path: ./*python*.tar.gz
@@ -992,7 +992,7 @@ jobs:
         uses: fawazahmed0/action-debug-vscode@b86399d1033aab18cf8f962fc7f634f39c9945ec # v3
 
       - name: Upload dependency artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: deps-cosmo-unknown-${{ inputs.python_version }}
           include-hidden-files: true
@@ -1035,14 +1035,14 @@ jobs:
         uses: fawazahmed0/action-debug-vscode@b86399d1033aab18cf8f962fc7f634f39c9945ec # v3
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: python-cosmo-unknown-${{ inputs.python_version }}
           path: ./python*.zip
 
       - name: Upload artifacts
         if: ${{ always()  && inputs.debug }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: build-python-cosmo-unknown-${{ inputs.python_version }}
           path: ./*python*.tar.gz
