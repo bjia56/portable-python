@@ -216,7 +216,7 @@ function build_headless_deps () {
   download_verify_extract libpng-1.6.41.tar.gz
   cd libpng*
   maybe_patch
-  ./configure --with-zlib-prefix=${DEPSDIR}  --enable-static --disable-shared --disable-tools --prefix=${DEPSDIR}
+  ./configure --with-zlib-prefix=${DEPSDIR}  --enable-static --disable-shared --disable-tools --disable-tests --prefix=${DEPSDIR}
   gmake -j4
   gmake install
   install_license
