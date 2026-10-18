@@ -23,7 +23,7 @@ export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig:${DEPSDIR}/share/pkgconfig"
 
 echo "::endgroup::"
 
-function build_deps () {
+function build_headless_deps () {
   ###########
   # ncurses #
   ###########
@@ -33,7 +33,7 @@ function build_deps () {
   download_verify_extract ncurses-6.4.tar.gz
   cd ncurses*
   maybe_patch
-  CC=clang CXX=clang++ CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" CXXFLAGS="${CXXFLAGS} -arch x86_64 -arch arm64" ./configure --with-normal --without-progs --enable-overwrite --disable-stripping --enable-widec --with-termlib --disable-database --with-fallbacks=xterm,xterm-256color,screen-256color,linux,vt100 --prefix=${DEPSDIR}
+  CC=clang CXX=clang++ CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" CXXFLAGS="${CXXFLAGS} -arch x86_64 -arch arm64" ./configure --with-normal --without-progs --without-cxx-binding --enable-overwrite --disable-stripping --enable-widec --with-termlib --disable-database --with-fallbacks=xterm,xterm-256color,screen-256color,linux,vt100 --prefix=${DEPSDIR}
   make -j4
   make install.libs
   install_license
@@ -54,43 +54,6 @@ function build_deps () {
   install_license
 
   echo "::endgroup::"
-
-  if [[ "${DISTRIBUTION}" != "headless" ]]; then
-    #######
-    # tcl #
-    #######
-    echo "::group::tcl"
-    cd ${BUILDDIR}
-
-    download_verify_extract tcl8.6.13-src.tar.gz
-    cd tcl*
-    maybe_patch
-    cd unix
-    CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --disable-shared --enable-aqua --prefix=${DEPSDIR}
-    make -j${NPROC}
-    make install
-    cd ..
-    install_license ./license.terms
-
-    echo "::endgroup::"
-    ######
-    # tk #
-    ######
-    echo "::group::tk"
-    cd ${BUILDDIR}
-
-    download_verify_extract tk8.6.13-src.tar.gz
-    cd tk*
-    maybe_patch
-    cd unix
-    CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --disable-shared --enable-aqua --prefix=${DEPSDIR}
-    make -j${NPROC}
-    make install
-    cd ..
-    install_license ./license.terms
-
-    echo "::endgroup::"
-  fi
 
   ###########
   # OpenSSL #
@@ -269,6 +232,11 @@ function build_deps () {
   file ${DEPSDIR}/lib/libffi.a
 
   echo "::endgroup::"
+}
+
+function build_headless_deps_pt2 () {
+  # uuid's headers conflict with tcl build, so we build it after tcl and tk
+
   ########
   # uuid #
   ########
@@ -287,10 +255,64 @@ function build_deps () {
   echo "::endgroup::"
 }
 
+function build_ui_deps () {
+  if [[ "${DISTRIBUTION}" == "headless" ]]; then
+    return
+  fi
+
+  #######
+  # tcl #
+  #######
+  echo "::group::tcl"
+  cd ${BUILDDIR}
+
+  download_verify_extract tcl8.6.13-src.tar.gz
+  cd tcl*
+  maybe_patch
+  cd unix
+  CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --disable-shared --enable-aqua --prefix=${DEPSDIR}
+  make -j${NPROC}
+  make install
+  cd ..
+  install_license ./license.terms
+
+  echo "::endgroup::"
+  ######
+  # tk #
+  ######
+  echo "::group::tk"
+  cd ${BUILDDIR}
+
+  download_verify_extract tk8.6.13-src.tar.gz
+  cd tk*
+  maybe_patch
+  cd unix
+  CC=clang CFLAGS="${CFLAGS} -arch x86_64 -arch arm64" ./configure --disable-shared --enable-aqua --prefix=${DEPSDIR}
+  make -j${NPROC}
+  make install
+  cd ..
+  install_license ./license.terms
+
+  echo "::endgroup::"
+}
+
 if [[ "${PYTHON_ONLY}" == "false" ]]; then
-  build_deps
+  if [[ "${HEADLESS_DEPS_ONLY}" == "true" ]]; then
+    build_headless_deps
+  fi
+  if [[ "${UI_DEPS_ONLY}" == "true" ]]; then
+    build_ui_deps
+  fi
+  if [[ "${HEADLESS_DEPS_ONLY}" == "true" ]]; then
+    build_headless_deps_pt2
+  fi
+  if [[ "${HEADLESS_DEPS_ONLY}" == "false" && "${UI_DEPS_ONLY}" == "false" ]]; then
+    build_headless_deps
+    build_ui_deps
+    build_headless_deps_pt2
+  fi
 fi
-if [[ "${DEPS_ONLY}" == "true" ]]; then
+if [[ "${HEADLESS_DEPS_ONLY}" == "true" || "${UI_DEPS_ONLY}" == "true" ]]; then
   exit 0
 fi
 

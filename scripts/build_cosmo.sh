@@ -26,7 +26,7 @@ export PKG_CONFIG_PATH="${DEPSDIR}/lib/pkgconfig:${DEPSDIR}/share/pkgconfig"
 
 echo "::endgroup::"
 
-function build_deps () {
+function build_headless_deps () {
   mkdir -p ${DEPSDIR}/lib/.aarch64
 
   cd $(dirname $(dirname $(which cosmocc)))
@@ -108,7 +108,7 @@ function build_deps () {
   download_verify_extract ncurses-6.4.tar.gz
   cd ncurses*
   maybe_patch
-  CFLAGS="${CFLAGS} -std=c89" ./configure --with-normal --without-progs --enable-overwrite --disable-stripping --enable-widec --with-termlib --disable-database --with-fallbacks=xterm,xterm-256color,screen-256color,linux,vt100 --prefix=${DEPSDIR}
+  CFLAGS="${CFLAGS} -std=c89" ./configure --with-normal --without-progs --without-cxx-binding --enable-overwrite --disable-stripping --enable-widec --with-termlib --disable-database --with-fallbacks=xterm,xterm-256color,screen-256color,linux,vt100 --prefix=${DEPSDIR}
   make -j4
   make install
   cp lib/.aarch64/lib*.a ${DEPSDIR}/lib/.aarch64
@@ -188,12 +188,78 @@ function build_deps () {
   install_license
 
   echo "::endgroup::"
+  ##########
+  # libffi #
+  ##########
+  echo "::group::libffi"
+  cd ${BUILDDIR}
+
+  download_verify_extract libffi-3.5.2.tar.gz
+  cd libffi*
+  maybe_patch
+  install_license
+
+  COSMOCC_BIN=$(dirname $(which cosmocc))
+  LIBFFI_CONFIG_ARGS="--disable-shared --enable-static --without-pic --disable-exec-static-tramp CFLAGS=-Os"
+
+  mkdir build-x86_64
+  cd build-x86_64
+  CC=${COSMOCC_BIN}/x86_64-unknown-cosmo-cc \
+    CXX=${COSMOCC_BIN}/x86_64-unknown-cosmo-c++ \
+    AR=${COSMOCC_BIN}/x86_64-linux-cosmo-ar \
+    RANLIB=${COSMOCC_BIN}/x86_64-linux-cosmo-ranlib \
+    ../configure --prefix=${DEPSDIR}/libffi-x86_64 --build=x86_64-linux-gnu --host=x86_64-linux-gnu ${LIBFFI_CONFIG_ARGS}
+  make -j4
+  make install
+  cd ..
+
+  mkdir build-aarch64
+  cd build-aarch64
+  CC=${COSMOCC_BIN}/aarch64-unknown-cosmo-cc \
+    CXX=${COSMOCC_BIN}/aarch64-unknown-cosmo-c++ \
+    AR=${COSMOCC_BIN}/aarch64-linux-cosmo-ar \
+    RANLIB=${COSMOCC_BIN}/aarch64-linux-cosmo-ranlib \
+    ../configure --prefix=${DEPSDIR}/libffi-aarch64 --build=x86_64-linux-gnu --host=aarch64-linux-gnu ${LIBFFI_CONFIG_ARGS}
+  make -j4
+  make install
+  cd ..
+
+  # combine these into dispatch headers, selectively chosen by arch macro
+  cp ${DEPSDIR}/libffi-x86_64/include/ffi.h ${DEPSDIR}/include/ffi-x86_64.h
+  cp ${DEPSDIR}/libffi-x86_64/include/ffitarget.h ${DEPSDIR}/include/ffitarget-x86_64.h
+  cp ${DEPSDIR}/libffi-aarch64/include/ffi.h ${DEPSDIR}/include/ffi-aarch64.h
+  cp ${DEPSDIR}/libffi-aarch64/include/ffitarget.h ${DEPSDIR}/include/ffitarget-aarch64.h
+
+  cat > ${DEPSDIR}/include/ffi.h << 'FFI_H_EOF'
+#if defined(__aarch64__)
+#include "ffi-aarch64.h"
+#else
+#include "ffi-x86_64.h"
+#endif
+FFI_H_EOF
+
+  cat > ${DEPSDIR}/include/ffitarget.h << 'FFITARGET_H_EOF'
+#if defined(__aarch64__)
+#include "ffitarget-aarch64.h"
+#else
+#include "ffitarget-x86_64.h"
+#endif
+FFITARGET_H_EOF
+
+  cp ${DEPSDIR}/libffi-x86_64/lib/libffi.a ${DEPSDIR}/lib/libffi.a
+  cp ${DEPSDIR}/libffi-aarch64/lib/libffi.a ${DEPSDIR}/lib/.aarch64/libffi.a
+  rm -rf ${DEPSDIR}/libffi-x86_64 ${DEPSDIR}/libffi-aarch64
+
+  echo "::endgroup::"
 }
 
 if [[ "${PYTHON_ONLY}" == "false" ]]; then
-  build_deps
+  # cosmo has no UI dependencies; --ui-deps-only is a no-op
+  if [[ "${HEADLESS_DEPS_ONLY}" == "true" || "${UI_DEPS_ONLY}" == "false" ]]; then
+    build_headless_deps
+  fi
 fi
-if [[ "${DEPS_ONLY}" == "true" ]]; then
+if [[ "${HEADLESS_DEPS_ONLY}" == "true" || "${UI_DEPS_ONLY}" == "true" ]]; then
   exit 0
 fi
 
@@ -244,7 +310,10 @@ function build_python () {
     -DBUILD_TESTING=${INSTALL_TEST} \
     -DINSTALL_TEST=${INSTALL_TEST} \
     -DINSTALL_MANUAL=OFF \
-    -DENABLE_CTYPES=OFF \
+    -DENABLE_CTYPES=ON \
+    -DUSE_SYSTEM_LibFFI=ON \
+    -DLibFFI_INCLUDE_DIR:PATH=${DEPSDIR}/include \
+    -DLibFFI_LIBRARY:FILEPATH=${DEPSDIR}/lib/libffi.a \
     -DOPENSSL_INCLUDE_DIR:PATH=${DEPSDIR}/include \
     -DOPENSSL_LIBRARIES="${DEPSDIR}/lib/libssl.a;${DEPSDIR}/lib/libcrypto.a" \
     -DEXPAT_INCLUDE_DIRS:PATH=${DEPSDIR}/include \
@@ -329,6 +398,16 @@ function build_python () {
   cd ${BUILDDIR}
 
   ${WORKDIR}/pyclean -v ${python_install_dir}
+
+  cd ${python_install_dir}
+
+  # bundle lib/ and licenses/ into a copy of python.com's own zip store
+  # so it runs standalone with no sibling files
+  # archives excluded - they can't be used to build native extensions anyways
+  cp ./bin/python.com ./bin/python.standalone.com
+  zip -qr9 ./bin/python.standalone.com lib licenses -x "lib/.aarch64/*" "lib/libpython*.a"
+  cd ${BUILDDIR}
+
   mv ${python_install_dir} python-${python_distro_ver}-${PLATFORM}-${ARCH}
   tar -czf ${WORKDIR}/python-${python_distro_ver}-${PLATFORM}-${ARCH}.tar.gz python-${python_distro_ver}-${PLATFORM}-${ARCH}
   zip ${WORKDIR}/python-${python_distro_ver}-${PLATFORM}-${ARCH}.zip $(tar tf ${WORKDIR}/python-${python_distro_ver}-${PLATFORM}-${ARCH}.tar.gz)

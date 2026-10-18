@@ -12,7 +12,14 @@ else
   BINDEPS_ARCH=arm64
 fi
 
-function build_deps () {
+# Pick the CMake generator matching the Visual Studio exposed by msvc-dev-cmd
+case "${VisualStudioVersion}" in
+  18.*) CMAKE_GENERATOR="Visual Studio 18 2026" ;;
+  *)    CMAKE_GENERATOR="Visual Studio 17 2022" ;;
+esac
+echo "Using CMake generator: ${CMAKE_GENERATOR}"
+
+function build_headless_deps () {
   ###########
   # OpenSSL #
   ###########
@@ -60,7 +67,7 @@ function build_deps () {
   mkdir build
   cd build
   cmake \
-    -G "Visual Studio 17 2022" -A ${CMAKE_ARCH} \
+    -G "${CMAKE_GENERATOR}" -A ${CMAKE_ARCH} \
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
     -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR}/bzip2 \
     ..
@@ -83,7 +90,7 @@ function build_deps () {
   mkdir build
   cd build
   cmake \
-    -G "Visual Studio 17 2022" -A ${CMAKE_ARCH} \
+    -G "${CMAKE_GENERATOR}" -A ${CMAKE_ARCH} \
     -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR}/xz \
     ..
   cmake --build . --config Release -- /property:Configuration=Release
@@ -122,7 +129,7 @@ function build_deps () {
   mkdir build
   cd build
   cmake \
-    -G "Visual Studio 17 2022" -A ${CMAKE_ARCH} \
+    -G "${CMAKE_GENERATOR}" -A ${CMAKE_ARCH} \
     -DCMAKE_INSTALL_PREFIX:PATH=${DEPSDIR}/zlib \
     ..
   cmake --build . --config Release -- /property:Configuration=Release
@@ -147,34 +154,47 @@ function build_deps () {
   install_license LICENSE libffi-3.4.4
 
   echo "::endgroup::"
+}
 
-  if [[ "${DISTRIBUTION}" != "headless" ]]; then
-    #########
-    # tcltk #
-    #########
-    echo "::group::tcltk"
-    cd ${BUILDDIR}
-
-    curl -L https://github.com/python/cpython-bin-deps/archive/refs/tags/tcltk-8.6.14.0.tar.gz --output cpython-bin-deps-tcltk-8.6.14.0.tar.gz
-    tar -xf cpython-bin-deps-tcltk-8.6.14.0.tar.gz
-    cd cpython-bin-deps-tcltk-8.6.14.0
-    mkdir ${DEPSDIR}/tcltk
-    cp -r ${BINDEPS_ARCH}/include ${DEPSDIR}/tcltk/include
-    mkdir ${DEPSDIR}/tcltk/lib
-    cp -r ${BINDEPS_ARCH}/lib/* ${DEPSDIR}/tcltk/lib/
-    mkdir ${DEPSDIR}/tcltk/bin
-    cp ${BINDEPS_ARCH}/bin/*.dll ${DEPSDIR}/tcltk/bin
-    install_license ${BINDEPS_ARCH}/tcllicense.terms tcl-8.6.14.0
-    install_license ${BINDEPS_ARCH}/tklicense.terms tk-8.6.14.0
-
-    echo "::endgroup::"
+function build_ui_deps () {
+  if [[ "${DISTRIBUTION}" == "headless" ]]; then
+    return
   fi
+
+  #########
+  # tcltk #
+  #########
+  echo "::group::tcltk"
+  cd ${BUILDDIR}
+
+  curl -L https://github.com/python/cpython-bin-deps/archive/refs/tags/tcltk-8.6.14.0.tar.gz --output cpython-bin-deps-tcltk-8.6.14.0.tar.gz
+  tar -xf cpython-bin-deps-tcltk-8.6.14.0.tar.gz
+  cd cpython-bin-deps-tcltk-8.6.14.0
+  mkdir ${DEPSDIR}/tcltk
+  cp -r ${BINDEPS_ARCH}/include ${DEPSDIR}/tcltk/include
+  mkdir ${DEPSDIR}/tcltk/lib
+  cp -r ${BINDEPS_ARCH}/lib/* ${DEPSDIR}/tcltk/lib/
+  mkdir ${DEPSDIR}/tcltk/bin
+  cp ${BINDEPS_ARCH}/bin/*.dll ${DEPSDIR}/tcltk/bin
+  install_license ${BINDEPS_ARCH}/tcllicense.terms tcl-8.6.14.0
+  install_license ${BINDEPS_ARCH}/tklicense.terms tk-8.6.14.0
+
+  echo "::endgroup::"
 }
 
 if [[ "${PYTHON_ONLY}" == "false" ]]; then
-  build_deps
+  if [[ "${HEADLESS_DEPS_ONLY}" == "true" ]]; then
+    build_headless_deps
+  fi
+  if [[ "${UI_DEPS_ONLY}" == "true" ]]; then
+    build_ui_deps
+  fi
+  if [[ "${HEADLESS_DEPS_ONLY}" == "false" && "${UI_DEPS_ONLY}" == "false" ]]; then
+    build_headless_deps
+    build_ui_deps
+  fi
 fi
-if [[ "${DEPS_ONLY}" == "true" ]]; then
+if [[ "${HEADLESS_DEPS_ONLY}" == "true" || "${UI_DEPS_ONLY}" == "true" ]]; then
   exit 0
 fi
 
@@ -215,7 +235,7 @@ function build_python () {
   cmake \
     "${cmake_verbose_flags[@]}" \
     ${cmake_python_features} \
-    -G "Visual Studio 17 2022" -A ${CMAKE_ARCH} \
+    -G "${CMAKE_GENERATOR}" -A ${CMAKE_ARCH} \
     -DPYTHON_VERSION=${PYTHON_FULL_VER} \
     -DPORTABLE_PYTHON_BUILD=ON \
     -DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \

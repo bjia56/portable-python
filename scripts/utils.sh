@@ -40,12 +40,14 @@ GETOPT_BINARY="${SCRIPT_DIR}/../.getopt/getopt"
 function parse_arguments() {
     ARCH=""
     PYTHON_FULL_VER=""
-    DISTRIBUTION="full"  # Default to full distribution
-    DEPS_ONLY="false"    # Default to building everything
-    PYTHON_ONLY="false"  # Default to building everything
+    DISTRIBUTION="full"       # Default to full distribution
+    DEPS_ONLY="false"         # Default to building everything
+    PYTHON_ONLY="false"       # Default to building everything
+    HEADLESS_DEPS_ONLY="false"  # Only build headless (non-UI) dependencies
+    UI_DEPS_ONLY="false"        # Only build UI dependencies (tcl/tk/X11)
 
     # Use getopt for argument parsing
-    PARSED_ARGS=$("$GETOPT_BINARY" -o a:v:d:h --long arch:,version:,distribution:,deps-only,python-only,help -n "$0" -- "$@")
+    PARSED_ARGS=$("$GETOPT_BINARY" -o a:v:d:h --long arch:,version:,distribution:,deps-only,python-only,headless-deps-only,ui-deps-only,help -n "$0" -- "$@")
     if [ $? != 0 ]; then
         echo "Failed to parse arguments" >&2
         exit 1
@@ -75,14 +77,24 @@ function parse_arguments() {
                 PYTHON_ONLY="true"
                 shift
                 ;;
+            --headless-deps-only)
+                HEADLESS_DEPS_ONLY="true"
+                shift
+                ;;
+            --ui-deps-only)
+                UI_DEPS_ONLY="true"
+                shift
+                ;;
             -h|--help)
-                echo "Usage: $0 -a|--arch ARCH -v|--version VERSION [-d|--distribution DISTRIBUTION] [--deps-only] [--python-only]"
+                echo "Usage: $0 -a|--arch ARCH -v|--version VERSION [-d|--distribution DISTRIBUTION] [--deps-only] [--headless-deps-only] [--ui-deps-only] [--python-only]"
                 echo ""
                 echo "Options:"
                 echo "  -a, --arch ARCH              Target architecture (e.g., x86_64, aarch64, universal2, unknown)"
                 echo "  -v, --version VERSION        Python version (e.g., 3.11.10)"
                 echo "  -d, --distribution DIST      Distribution type: full or headless (default: full)"
-                echo "      --deps-only              Only build dependencies, not Python itself"
+                echo "      --deps-only              Only build all dependencies (headless + UI), not Python itself"
+                echo "      --headless-deps-only     Only build headless (non-UI) dependencies"
+                echo "      --ui-deps-only           Only build UI dependencies (tcl/tk/X11)"
                 echo "      --python-only            Only build Python, skip building dependencies"
                 echo "  -h, --help                   Show this help message"
                 exit 0
@@ -97,6 +109,12 @@ function parse_arguments() {
                 ;;
         esac
     done
+
+    # --deps-only implies both headless and UI deps
+    if [[ "${DEPS_ONLY}" == "true" ]]; then
+        HEADLESS_DEPS_ONLY="true"
+        UI_DEPS_ONLY="true"
+    fi
 
     # Validate required arguments
     if [ -z "$ARCH" ]; then
