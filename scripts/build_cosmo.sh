@@ -410,7 +410,7 @@ function build_python () {
 
   mv ${python_install_dir} python-${python_distro_ver}-${PLATFORM}-${ARCH}
   tar -czf ${WORKDIR}/python-${python_distro_ver}-${PLATFORM}-${ARCH}.tar.gz python-${python_distro_ver}-${PLATFORM}-${ARCH}
-  zip ${WORKDIR}/python-${python_distro_ver}-${PLATFORM}-${ARCH}.zip $(tar tf ${WORKDIR}/python-${python_distro_ver}-${PLATFORM}-${ARCH}.tar.gz)
+  tar tf ${WORKDIR}/python-${python_distro_ver}-${PLATFORM}-${ARCH}.tar.gz | zip ${WORKDIR}/python-${python_distro_ver}-${PLATFORM}-${ARCH}.zip -@
 
   echo "::endgroup::"
 }

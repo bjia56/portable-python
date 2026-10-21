@@ -101,7 +101,7 @@ function repackage_graal () {
   if [[ "${PLATFORM}" == "windows" ]]; then
     7z.exe a ${WORKDIR}/${UPLOAD_FILENAME}.zip ${UPLOAD_FILENAME}
   else
-    zip ${WORKDIR}/${UPLOAD_FILENAME}.zip $(tar tf ${WORKDIR}/${UPLOAD_FILENAME}.tar.gz)
+    tar tf ${WORKDIR}/${UPLOAD_FILENAME}.tar.gz | zip ${WORKDIR}/${UPLOAD_FILENAME}.zip -@
   fi
 
   # Clean up the extracted directory
