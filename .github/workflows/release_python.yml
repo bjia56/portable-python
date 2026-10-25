@@ -83,6 +83,7 @@ jobs:
     needs: publish
     permissions:
       contents: write
+      id-token: write
     uses: ./.github/workflows/update_nodejs_installers.yml
     with:
       version: ${{ inputs.python_version }}
