@@ -299,7 +299,7 @@ function build_headless_deps () {
   echo "::group::Brotli"
   cd ${BUILDDIR}
 
-  download_verify_extract brotli-1.1.0.tar.gz
+  download_verify_extract brotli-1.2.1.tar.gz
   cd brotli*
   maybe_patch
   mkdir build
