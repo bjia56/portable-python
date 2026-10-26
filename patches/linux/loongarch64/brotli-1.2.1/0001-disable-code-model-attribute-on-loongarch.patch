@@ -1,0 +1,11 @@
+--- a/c/common/platform.h	2026-10-21 13:10:51.000000000 +0000
++++ b/c/common/platform.h	2026-10-26 12:30:48.607178553 +0000
+@@ -665,7 +665,7 @@
+ #undef BROTLI_TEST
+ #endif
+ 
+-#if BROTLI_GNUC_HAS_ATTRIBUTE(model, 3, 0, 3)
++#if BROTLI_GNUC_HAS_ATTRIBUTE(model, 3, 0, 3) && !defined(__loongarch__)
+ #define BROTLI_MODEL(M) __attribute__((model(M)))
+ #else
+ #define BROTLI_MODEL(M) /* M */
