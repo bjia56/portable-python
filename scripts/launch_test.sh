@@ -186,7 +186,7 @@ function run_test () {
   cd ${WORKDIR}/${FULL_DISTRO}
   ./bin/${PYTHON_EXE} --version
   ./bin/${PYTHON_EXE} -m sysconfig
-  ./bin/${PYTHON_EXE} ${WORKDIR}/scripts/test.py
+  ./bin/${PYTHON_EXE} ${WORKDIR}/scripts/validate.py --os ${OS} --arch ${ARCH} --distribution ${DISTRIBUTION}
   ./bin/${PYTHON_EXE} -m pip
 
   if [[ "${RUN_TESTS}" == "true" ]]; then
@@ -207,7 +207,7 @@ function run_test () {
 
     ./python.standalone.com --version
     ./python.standalone.com -m sysconfig
-    ./python.standalone.com ${WORKDIR}/scripts/test.py
+    ./python.standalone.com ${WORKDIR}/scripts/validate.py --os ${OS} --arch ${ARCH} --distribution ${DISTRIBUTION}
     ./python.standalone.com -m pip
 
     if [[ "${RUN_TESTS}" == "true" ]]; then
@@ -218,6 +218,9 @@ function run_test () {
     echo "::endgroup::"
   fi
 }
+
+# fail the job if any validation step fails
+set -e
 
 run_test
 if [[ "${PYTHON_MINOR}" == "13" ]]; then
